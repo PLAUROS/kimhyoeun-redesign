@@ -325,6 +325,7 @@ svg.i{width:1.35em;height:1.35em;flex:none}
 #map.pickable>svg{touch-action:none}
 .k-taxi svg{width:24px;height:31px;display:block;filter:drop-shadow(0 2px 2px rgba(0,0,0,.25))}
 .k-taxi.big svg{width:31px;height:40px}
+.k-taxi.big{will-change:transform}
 .bob{animation:bob 2.6s ease-in-out infinite}
 @keyframes bob{50%{transform:translate(6px,-3px)}}
 .k-radar{width:160px;height:160px;position:relative}
@@ -1216,7 +1217,7 @@ const KakaoMap = {
     if(v.dest){ const d=PLACES[v.dest]; this.add(d,`<div class="k-pin d"><b>${v.bar?`도착 · 약 ${fareOf(v.dest).min}분`:d.n}</b><span></span></div>`,1,5); }
     if(v.bar) this.add(v.at,'<div class="k-tag">출발</div>',1.9,5);
     if(v.origin) this.add(v.at,'<div class="k-dot"></div>',.5,4);
-    if(v.car) this.car=this.add(v.carAt||v.at,`<div class="k-taxi big">${CAB(myCar().c)}</div>`,.5,6);
+    if(v.car){ this.carAnchor=v.carAt||v.at; this.car=this.add(this.carAnchor,`<div class="k-taxi big">${CAB(myCar().c)}</div>`,.5,6); }
     this.fit();
   },
   fit(){
@@ -1247,7 +1248,14 @@ const KakaoMap = {
   refit(){ this.lock(); this.fit(); },
   // 지도 크기만 바뀔 때: 보던 중심과 확대 단계를 그대로 둬요
   keep(){ const c=this.map.getCenter(); this.map.relayout(); this.map.setCenter(c); MapCtl.sizeCls(); this.lock(); },
-  moveCar(p){ if(this.car) this.car.setPosition(this.LL(p)); }
+  moveCar(p){
+    if(!this.car) return;
+    const a=this.carAnchor, el=this.map.getNode().querySelector('.k-taxi.big');
+    if(!a||!el){ this.car.setPosition(this.LL(p)); return; }
+    const pr=this.map.getProjection(), o=pr.containerPointFromCoords(this.LL(a)), b=pr.containerPointFromCoords(this.LL({lat:a.lat+.02,lon:a.lon+.02}));
+    const kx=(b.x-o.x)/.02, ky=(b.y-o.y)/.02;
+    el.style.transform=`translate3d(${((p.lon-a.lon)*kx).toFixed(2)}px,${((p.lat-a.lat)*ky).toFixed(2)}px,0)`;
+  }
 };
 
 const SHORT_MAP_PX = 130; // 지도가 이보다 낮으면 목적지 이름표를 숨기고 핀 자리만 남겨요
