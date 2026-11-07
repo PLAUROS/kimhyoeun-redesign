@@ -944,11 +944,17 @@ async function fetchRoute(a,to){ // to는 PLACES의 key예요. 함수도 이 장
   }catch(e){ return null; }
   finally{ clearTimeout(t); }
 }
-let liveReq=0;
+let liveReq=0, liveDirty=false;
+function flushLive(){ // 안내창이나 시트 끌기를 방해하지 않게 기다렸다가, 끝나면 한 번 반영해요
+  if(!liveDirty||!$('modal').hidden||sheetDrag) return;
+  liveDirty=false;
+  if(S.step!=='route'||!S.live) return;
+  MapCtl.lastKey=null; render(); announce('예상 요금을 새로 맞췄어요.');
+}
 function refreshLive(){ // 지금 탑승 위치에서 목적지까지의 실제 경로를 받아요. 늦게 온 옛 응답은 버려요
   if(!CONFIG.ROUTE_API||(S.step!=='origin'&&S.step!=='route')||!S.dest||km(S.pick,ROUTES_ORIGIN)<PICK_KEEP_KM||routeData(S.dest)) return;
   const req=++liveReq, at=S.pick, dest=S.dest;
-  fetchRoute(at,dest).then(r=>{ if(r&&req===liveReq&&(S.step==='origin'||S.step==='route')&&S.pick===at&&S.dest===dest){ S.live={dest,at,...r}; if(S.step!=='route') showPick(); else if($('modal').hidden&&!sheetDrag){ MapCtl.lastKey=null; render(); announce('예상 요금을 새로 맞췄어요.'); } } });
+  fetchRoute(at,dest).then(r=>{ if(r&&req===liveReq&&(S.step==='origin'||S.step==='route')&&S.pick===at&&S.dest===dest){ S.live={dest,at,...r}; if(S.step!=='route') showPick(); else { MapCtl.lastKey=null; liveDirty=true; flushLive(); } } });
 }
 const toPts = p => p.map(([lat,lon])=>({lat,lon}));
 function routePath(k){
@@ -1944,7 +1950,8 @@ document.addEventListener('pointermove',e=>{
   sh.style.maxHeight=Math.max(d.peek,Math.min(d.full,d.start-dy))+'px';
 });
 function endSheetDrag(e){
-  const d=sheetDrag; if(!d||e.pointerId!==d.id) return; sheetDrag=null;
+  const d=sheetDrag; if(!d||e.pointerId!==d.id) return; sheetDrag=null; setTimeout(flushLive,450); // 시트가 자리를 잡은 뒤에 반영해요
+ 
   if(!d.moved) return;
   sheetJustDragged=true; setTimeout(()=>{sheetJustDragged=false},0);
   const h=$('sheet').getBoundingClientRect().height, moved=d.start-h;
@@ -1965,7 +1972,7 @@ function setStep(st){
   haltStep(); stopSpeech(); tickStep(); clearTimeout(resAnnounce);
   if(st==='ride'){ clearTimeout(noti._t); $('noti').hidden=true; }
   if(toastIsMistake) hideMessages(); // 고친 뒤에도 "다시 골라 봐요"가 남지 않게 해요
-  S.step=st; S.hintOpen=false; S.listening=false; S.sheetDown=false; sheetDrag=null;
+  S.step=st; S.hintOpen=false; S.listening=false; S.sheetDown=false; sheetDrag=null; liveDirty=false;
   markGuide();
   render();
   { const sh=$('sheet'); sh.setAttribute('role','group'); sh.setAttribute('aria-label',STEP_SAY[st]()); sh.classList.remove('enter'); void sh.offsetWidth; sh.classList.add('enter'); clearTimeout(setStep.enterT); setStep.enterT=setTimeout(()=>sh.classList.remove('enter'),700); }
@@ -2060,7 +2067,7 @@ function say(t,force){ if((!PREF.voice&&!force)||!t) return; try{speechSynthesis
 /* 안내창: 열려 있는 동안 뒤 화면은 터치도 키보드도 닿지 않아요 */
 let modalFrom=null, lastExitAt=-1e9;
 function openModal(html,label){ lastStepAt=performance.now(); modalFrom=document.activeElement; $('modal').innerHTML=html; $('modal').setAttribute('aria-label',label); $('modal').setAttribute('aria-describedby','modal-desc'); $('modal').hidden=false; $('app').inert=true; $('modal').querySelector('[data-a=modal-no]').focus(); }
-function closeModal(){ $('modal').hidden=true; $('app').inert=false; lastStepAt=performance.now(); const f=modalFrom; modalFrom=null; if(f&&f.isConnected) quietFocus(f); }
+function closeModal(){ $('modal').hidden=true; $('app').inert=false; lastStepAt=performance.now(); const f=modalFrom; modalFrom=null; if(f&&f.isConnected) quietFocus(f); setTimeout(flushLive,0); }
 const confirmHTML=(title,body,noText,yesAction,yesText,risky)=>`<div class="modal-in"><h3>${title}</h3><p id="modal-desc">${body}</p><div class="row2">${risky?`<button class="btn ghost risky" data-a="${yesAction}">${yesText}</button><button class="btn dark" data-a="modal-no">${noText}</button>`:`<button class="btn ghost" data-a="modal-no">${noText}</button><button class="btn dark" data-a="${yesAction}">${yesText}</button>`}</div></div>`;
 
 /* =====================================================================
@@ -2135,7 +2142,7 @@ let resAnnounce=0;
 document.addEventListener('input',e=>{ if(e.target.id!=='q') return;
   const changed=e.target.value!==S.q; S.q=e.target.value;
   if(S.listening){ S.listening=false; clearTimers(); const l=document.querySelector('.listen'); if(l) l.remove(); const m=document.querySelector('.mic'); if(m) m.classList.remove('live'); } // 직접 쓰면 듣기를 멈춰요
-  if(changed){ clearTimeout(resAnnounce); resAnnounce=setTimeout(()=>{ const n=document.querySelectorAll('.res-i').length; announce(n?`${n}곳을 찾았어요.`:'검색 결과가 없어요.'); },500); }
+  if(changed){ clearTimeout(resAnnounce); resAnnounce=setTimeout(()=>{ const n=document.querySelectorAll('.res-i').length; announce(document.querySelector('#res .empty')?'검색 결과가 없어요. 가까운 곳을 대신 보여 드려요.':n?`${n}곳을 찾았어요.`:'검색 결과가 없어요.'); },500); }
   if(changed) $('res').innerHTML=resultsHTML(); // 값이 같으면 목록을 바꾸지 않아요(누르는 중인 버튼이 사라지지 않게)
 });
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!$('modal').hidden) A['modal-no'](); });
