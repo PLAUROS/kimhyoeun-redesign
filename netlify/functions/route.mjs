@@ -23,9 +23,11 @@ function km(a, b) {
 }
 
 function parseFrom(v) {
-  const m = /^(\d{1,2}\.\d{1,3}),(\d{1,3}\.\d{1,3})$/.exec(v || '');
+  // 소수 3자리로 고정해요. 같은 자리가 여러 표기로 캐시되지 않게 하려는 거예요
+  const m = /^(\d{2}\.\d{3}),(\d{3}\.\d{3})$/.exec(v || '');
   if (!m) return null;
   const p = { lat: +m[1], lon: +m[2] };
+  if (p.lat > 90 || p.lon > 180) return null; // 경도 487처럼 한 바퀴 돌면 가까워 보이는 값도 막아요
   return km(p, HOME) <= MAX_FROM_KM ? p : null;
 }
 
@@ -97,6 +99,9 @@ export default async (req) => {
   if (!sameSite) { try { sameSite = new URL(from).origin === url.origin; } catch { sameSite = false; } }
   if (!sameSite) return reply(403, { error: 'origin' });
 
+  // from과 to만 한 번씩 받아요. 다른 값을 붙여 캐시를 비켜 가지 못하게 하려는 거예요
+  const keys = [...url.searchParams.keys()].sort().join();
+  if (keys !== 'from,to') return reply(400, { error: 'point' });
   const a = parseFrom(url.searchParams.get('from'));
   const b = parseTo(url.searchParams.get('to'));
   if (!a || !b) return reply(400, { error: 'point' });
@@ -114,5 +119,5 @@ export default async (req) => {
   if (!res.ok) return reply(502, { error: 'upstream', status: res.status }); // 카카오 응답 본문은 그대로 넘기지 않아요
   const route = extract(await res.json().catch(() => null));
   if (!route) return reply(502, { error: 'route' });
-  return reply(200, route, { 'cache-control': 'public, max-age=86400', 'netlify-cdn-cache-control': 'public, s-maxage=604800' });
+  return reply(200, route, { 'cache-control': 'public, max-age=86400', 'netlify-cdn-cache-control': 'public, s-maxage=604800', 'netlify-vary': 'query=from|to' });
 };
