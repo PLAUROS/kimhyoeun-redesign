@@ -832,6 +832,12 @@ button{letter-spacing:inherit;line-height:1.3}
 @container (max-width:340px){.coach-tools{grid-template-columns:1fr 1fr}.coach-tools button.help-btn{grid-column:1 / -1}}
 @media (prefers-reduced-motion:reduce){.tgt{animation:none}}
 
+
+/* 차종은 참고 시안처럼 이름과 요금을 두 열로 보여줘요. */
+.car{grid-template-columns:minmax(0,1fr) auto;column-gap:.7em;padding:.4em .75em}
+.car .cimg{display:none}
+.car .cname{grid-column:1}
+.car .cfare{grid-column:2}
 </style>
 </head>
 <body>
