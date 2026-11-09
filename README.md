@@ -2,5 +2,4 @@
 
 어르신이 택시 부르기를 연습하는 페이지의 임시 디자인 시안이에요. 실제로 호출되거나 결제되지 않아요.
 
-시작 화면의 건물·도로·공원 자료는 © OpenStreetMap 기여자의 자료이며, Open Database License(ODbL)로 제공돼요.
-https://www.openstreetmap.org/copyright
+3D 시작 화면이 있는 이전 버전은 with-3d-intro 브랜치에 있어요.
