@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>배프 · 택시 부르기 연습</title>
 <meta name="robots" content="noindex">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap">
 <!--
 ==========================================================================
  배프 · 택시 부르기 연습 (단독 페이지)
@@ -749,6 +749,89 @@ button{letter-spacing:inherit;line-height:1.3}
 .coach-tools button.help-btn:focus-visible{outline:3px solid #1F66E5;outline-offset:3px}
 .coach-tools button.help-btn:disabled{background:#FFF0B5;color:#513700;opacity:1;box-shadow:inset 0 1px 0 rgba(255,255,255,.8)}
 @container (max-width:360px){.coach-tools{flex-wrap:wrap}}
+
+/* ---------- 배프 원본 디자인: 배프.zip의 tokens.css / 택시 시안 ---------- */
+:root{
+  --sky:#CFE6F8;--sky-2:#EAF5FD;--blue:#2C77BA;--blue-ink:#1B4F80;
+  --butter:#FFE27A;--butter-2:#FFF5CC;--gold:#E3AE00;--taxi:#FFD21F;
+  --ink:#1E2833;--ink-2:#526070;--ink-3:#8C99A6;--line:#DCE6EF;
+  --paper:#FFF;--bg:#F6FAFD;--stage:#EAF5FD;--map:#EEF4EA;--night:#1E2833;
+  --mint:#23966D;--mint-2:#DFF4EA;--coral:#C8492F;--coral-2:#FCE6E0;
+  --ok-ink:#17694C;--tint:#EAF5FD;--blue-grad:linear-gradient(180deg,#3A87C9,#2C77BA);
+  --f-body:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-display:"Jua","Noto Sans KR",sans-serif;
+}
+.stage{background-image:none;background-color:var(--stage)}
+.phone{background:var(--bg)}
+.sb{background:var(--taxi);color:var(--ink)}
+.sb i{border-color:var(--ink)}.sb i::after{background:var(--ink)}
+.prac-banner{background:var(--taxi);color:var(--ink);font-weight:800;line-height:1.35;padding:.35em .65em .35em .85em}
+.prac-banner>span:not(.logo){font-weight:800}
+.prac-banner>span:not(.logo)::before{display:none}
+.prac-banner button{background:var(--ink);color:white;border-radius:12px;min-height:48px;font-weight:800}
+.coach{background:var(--paper);box-shadow:none;border-bottom:1px solid var(--line)}
+.c-row{font-weight:800}
+.tag,.tag.test{background:var(--butter);color:var(--ink);border:0;border-radius:99px;font-weight:800}
+.c-prog{color:var(--blue-ink)}
+.c-bars i{background:var(--line)}.c-bars i.on{background:var(--blue)}.c-bars i.done{background:var(--mint);opacity:1}
+.hint,.note.blue{background:var(--sky-2);color:var(--blue-ink);border-radius:14px}
+.hint{align-items:center}
+.hint button{background:var(--paper);border-radius:12px;margin:0;min-width:48px;min-height:48px}
+.coach-tools{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr);gap:6px}
+.coach-tools button{min-height:48px;border:1px solid var(--line);border-radius:12px;background:var(--line);color:var(--ink);font-size:max(14px,.78em);font-weight:800;padding:.35em .45em;box-shadow:none;white-space:normal}
+.coach-tools button.on{background:var(--butter);color:var(--ink);border-color:#E3B83F;box-shadow:none}
+.coach-tools button.help-btn{margin:0;min-height:56px;border:1.5px solid #C79A1C;border-radius:14px;background:var(--butter);color:var(--ink);font-size:max(16px,.9em);font-weight:800;padding:.35em .45em;box-shadow:none;gap:.35em}
+.coach-tools button.help-btn>svg{width:1.65em;height:1.65em;fill:var(--taxi);color:#795400;background:var(--butter-2);box-shadow:none}
+.coach-tools button.help-btn:hover:not(:disabled){background:#FFDA55}
+.coach-tools button.help-btn:disabled{background:var(--butter-2);color:var(--ink);box-shadow:none}
+.coach-tools button.help-btn:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+.sheet{border-radius:20px 20px 0 0;box-shadow:0 -3px 14px rgb(30 40 51 / .12);corner-shape:round}
+.sheet h3{font-weight:800}
+.grab::before{background:#8C99A6}
+.tx-search,.tx-sh input{background:var(--bg);color:var(--ink);border-radius:14px;box-shadow:inset 0 0 0 1px var(--ink-3);font-weight:700}
+.tx-search{min-height:3.25em}
+.tx-search span{color:var(--ink)}
+.mic-ic,.mic{background:var(--butter);color:var(--ink);border-radius:14px}
+.mic.live{background:var(--coral);color:white}
+.quick button,.row3 button{border:1px solid var(--line);box-shadow:none;font-weight:700;min-height:48px}
+.route-bar{border-radius:14px;background:var(--paper);font-weight:800;box-shadow:0 2px 10px rgb(30 40 51 / .1)}
+.ft,.receipt{background:var(--bg);border-radius:14px;box-shadow:none}
+.car{border:2px solid var(--line);border-radius:16px;box-shadow:none;min-height:3.3em}
+.car.on{background:var(--sky-2);border-color:var(--blue)}
+.car .cimg{background:var(--bg)}.car.on .cimg{background:transparent}
+.car .cname b,.car .cfare{font-weight:800}
+.tx-call,.btn.y{background:var(--butter);color:var(--ink);border-radius:14px;font-weight:800;box-shadow:none}
+.tx-call{min-height:3em;font-size:1.15em;letter-spacing:0}
+.tx-call:hover,.btn.y:hover{background:#FFD957}
+.btn.dark{background:var(--ink);color:white}
+.btn{font-weight:800;border-radius:14px}
+.btn.ghost{background:var(--paper);border:1.5px solid var(--line);box-shadow:none}
+.foot,.pfoot{background:var(--paper);box-shadow:none;border-top:1px solid var(--line)}
+.tgt,.tx-call.tgt,.pc.tgt{box-shadow:0 0 0 2px var(--paper),0 0 0 5px var(--gold)}
+@keyframes tgt{50%{box-shadow:0 0 0 2px var(--paper),0 0 0 7px rgba(227,174,0,.35)}}
+.res-i.tgt{box-shadow:inset 0 0 0 3px var(--gold);background:var(--butter-2)}
+.note{background:var(--butter-2)}
+.drv,.pc,.pay-opt{border-radius:16px;corner-shape:round;box-shadow:none}
+.drv{border:1px solid var(--line)}
+.drv .av{background:var(--sky);color:var(--blue-ink)}
+.eta{font-family:var(--f-display);font-weight:400}
+.eta em{color:var(--blue-ink)}
+.radar{background:var(--butter);color:var(--ink);box-shadow:none}
+.radar::before,.radar::after{border-color:var(--taxi)}
+.ridebar{background:var(--line)}.ridebar i{background:var(--blue);box-shadow:none}
+.pbody{background:var(--bg)}
+.result-hd{align-items:center;text-align:center;gap:.6em}
+.result-hd h2{font-family:var(--f-display);font-weight:400;letter-spacing:0;font-size:1.6em}
+.okmark{width:4.5em;height:4.5em;background:var(--mint-2);color:var(--ok-ink);box-shadow:none}
+.okmark svg{width:2.4em;height:2.4em}
+.okmark.retry{background:var(--butter-2);color:#795400;box-shadow:none}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:20px;corner-shape:round;box-shadow:none}
+.rec-ic{background:var(--sky-2)!important;color:var(--blue-ink);box-shadow:none}
+.ck.y{background:var(--mint-2);color:var(--ok-ink)}
+.pay-opt.on{background:var(--sky-2);box-shadow:inset 0 0 0 2px var(--blue)}
+@container (max-width:340px){.coach-tools{grid-template-columns:1fr 1fr}.coach-tools button.help-btn{grid-column:1 / -1}}
+@media (prefers-reduced-motion:reduce){.tgt{animation:none}}
+
 </style>
 </head>
 <body>
