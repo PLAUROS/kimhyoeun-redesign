@@ -918,6 +918,15 @@ body{letter-spacing:-.011em}
 .coach-tools button.help-btn:hover:not(:disabled){background:#FFE9A6}
 .coach-tools button.help-btn:disabled{background:#FFF7DE;color:#544000;border:0}
 
+/* 힌트 내용과 눌러야 할 곳: 노랑으로 표시하고 깜빡이지 않아요. 기다리는 단계의 안내(.wait)는 하늘색 그대로예요 */
+.hint:not(.wait){background:#FFF0BF;color:#4A3700}
+.hint:not(.wait)>svg{color:#A87600;fill:#FFCE3A}
+.hint:not(.wait) button{color:#7A5900}
+.tgt,.tx-call.tgt,.pc.tgt,.tx-search.tgt,.mic.tgt{animation:none;box-shadow:0 0 0 2px var(--paper),0 0 0 5px #FFC400,0 0 0 6px rgba(138,97,0,.55)}
+.res-i.tgt{animation:none;background:#FFF6D6;box-shadow:inset 0 0 0 3px #FFC400}
+.tgt::after{content:"여기를 눌러요";position:absolute;left:.9em;top:0;transform:translateY(-62%);z-index:3;padding:.16em .7em;border-radius:999px;background:#FFC400;color:#3D2E00;font-size:max(14px,.72em);font-weight:700;line-height:1.4;letter-spacing:-.015em;white-space:nowrap;pointer-events:none;box-shadow:0 1px 4px rgba(90,60,0,.28)}
+.mic.tgt::after{left:auto;right:0;top:100%;transform:translateY(8px)}
+
 /* 지도 위 */
 .route-bar,.cancel-chip,.fab{background:rgba(255,255,255,.84);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);box-shadow:var(--float)}
 .route-bar{border-radius:18px;font-weight:600;letter-spacing:-.02em}
