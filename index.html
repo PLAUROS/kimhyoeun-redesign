@@ -782,7 +782,7 @@ button{letter-spacing:inherit;line-height:1.3}
   .intro-sub{display:none}
 }
 @container (max-height:600px){
-  .car .cimg,.pc svg{display:none}
+  .car .cimg,.pc svg{display:none}fa2e2f82ff225feaa7788ad2e47c0751
   [data-step=route] .map-wrap,.big [data-step=route] .map-wrap{--map-min:72px}
   [data-step=arrive] .map-wrap,.big [data-step=arrive] .map-wrap{--map-min:40px}
   .big .ft small{display:none}
@@ -832,7 +832,7 @@ button{letter-spacing:inherit;line-height:1.3}
 const CONFIG = {
   // 카카오 JavaScript 키. 비워두면 그림 지도(SVG)
   // 브라우저에 노출되는 키라 파일에 둘 수 있고, 등록한 도메인에서만 동작해요. REST 키는 절대 여기에 넣지 마세요.
-  KAKAO_JS_KEY: 'b2bcbb8237ee32a324ef80b0249f1bf7',
+  KAKAO_JS_KEY: 'fa2e2f82ff225feaa7788ad2e47c0751',
   KAKAO_TIMEOUT_MS: 5000,  // 이 시간 안에 카카오맵이 안 뜨면 그림 지도로 바꿔요
   // 탑승 핀을 옮겼을 때 실제 도로 경로를 받는 주소(netlify/functions/route.mjs). 함수가 없는 곳에서는 비워 둬서 곡선으로 그려요
   ROUTE_API: /\.netlify\.app$/.test(location.hostname) ? '/api/route' : '', // 직접 만든 도메인을 쓰면 이 조건과 아래 ON_NETLIFY를 함께 바꿔요
