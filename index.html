@@ -143,7 +143,6 @@ svg.i{width:1.35em;height:1.35em;flex:none}
 /* 손잡이: 끌어서 시트를 내리고 올려요. 눌러도 접히고 펴져요 */
 .grab{display:grid;place-items:center;flex:none;width:calc(100% + 2em);height:44px;margin:-.6em -1em -.75em;padding:0;border:0;background:none;touch-action:none;cursor:grab}
 .grab::before{content:"";width:3em;height:6px;border-radius:9px;background:#6B7A89}
-.sheet.down .grab::before{content:"▲ 더 보기";width:auto;height:auto;background:none;font-size:.85em;font-weight:800;color:var(--ink-2)}
 .grab:hover::before{background:var(--ink-2)}
 .sheet.dragging{transition:none;overflow:hidden}
 .sheet.dragging .grab{cursor:grabbing}
@@ -1132,6 +1131,14 @@ button.car:active:not(:disabled),button.res-i:active:not(:disabled){transform:sc
 .origin-actions button:disabled{color:var(--ink-2)}
 .res-i.gps-row b{color:var(--blue-ink)}
 
+
+/* 시트 올림·내림: 높이는 스크립트의 스프링으로 움직이고, 손잡이와 "더 보기" 글자는 서로 번져요 */
+.sheet{transition:none}
+.sheet.moving{overflow:hidden;will-change:height}
+.grab::before,.grab::after{grid-area:1/1;transition:opacity .22s ease}
+.grab::after{content:"▲ 더 보기";font-size:.85em;font-weight:800;color:var(--ink-2);opacity:0;pointer-events:none}
+.sheet.down .grab::before{opacity:0}
+.sheet.down .grab::after{opacity:1}
 </style>
 </head>
 <body>
@@ -1595,6 +1602,11 @@ const KakaoMap = {
   refit(){ this.lock(); this.fit(); },
   // 지도 크기만 바뀔 때: 보던 중심과 확대 단계를 그대로 둬요
   keep(){ const c=this.map.getCenter(); this.map.relayout(); this.map.setCenter(c); MapCtl.sizeCls(); this.lock(); },
+  resizeKeep(){ // 시트 때문에 지도 상자 높이만 바뀔 때예요. 탑승 핀은 중심을 유지하고, 그 밖에는 화면에 보이던 자리를 그대로 둬요
+    const m=this.map, pick=this.view&&this.view.pick;
+    const c=pick?m.getCenter():m.getProjection().coordsFromContainerPoint(new kakao.maps.Point(this.el.clientWidth/2,this.el.clientHeight/2));
+    m.relayout(); m.setCenter(c);
+  },
   moveCar(p){
     if(!this.car) return;
     const a=this.carAnchor, el=this.map.getNode().querySelector('.k-taxi.big');
@@ -1619,7 +1631,24 @@ const MapCtl = {
     this.ready=true;
     let t; if(window.ResizeObserver) new ResizeObserver(()=>{clearTimeout(t);t=setTimeout(()=>this.resized(),60)}).observe(el); // 크기가 바뀔 때만 움직여요
   },
+  // 시트가 움직이는 동안 지도 상자를 가장 커질 크기로 한 번만 맞춰요. 드러날 곳을 미리 그려 두어서, 시트가 멈춘 뒤에 지도가 튀지 않아요
+  sheetStart(extra){
+    if(this.sheetOn||!this.ready||this.impl!==KakaoMap) return;
+    const el=this.el; this.sheetOn=true; this.sheetGap=el.parentElement.clientHeight-el.clientHeight;
+    el.style.height=(el.clientHeight+extra)+'px'; el.style.bottom='auto';
+    KakaoMap.resizeKeep(); this.sheetFollow();
+  },
+  sheetFollow(){ // 탑승 위치를 고를 때는 핀 끝이 항상 지도 가운데라서, 지도도 핀과 같이 움직여요
+    if(!this.sheetOn||!KakaoMap.view||!KakaoMap.view.pick) return;
+    const el=this.el; el.style.transform=`translateY(${((el.parentElement.clientHeight-this.sheetGap-el.clientHeight)/2).toFixed(1)}px)`;
+  },
+  sheetEnd(){
+    if(!this.sheetOn) return;
+    const el=this.el; this.sheetOn=false; el.style.height=''; el.style.bottom=''; el.style.transform='';
+    KakaoMap.resizeKeep(); this.sizeCls(); KakaoMap.lock(); this.hold();
+  },
   resized(){ // 시트를 움직이거나 사용자가 지도를 옮겨 볼 수 있는 화면이면 보던 곳을 유지하고, 그 밖에는 다시 맞춰요
+    if(this.sheetOn) return; // 시트가 멈추면 sheetEnd가 맞춰요
     this.sizeCls();
     const k=this.impl.view&&this.impl.view.key, held=performance.now()<this.holdUntil||S.sheetDown||k==='pick'||k==='home';
     if(held&&this.impl.keep) this.impl.keep(); else this.impl.refit();
@@ -2065,7 +2094,7 @@ function render(){
 }
 
 /* 바텀시트: 손잡이를 끌거나 눌러서 내리고 올려요. 주 버튼은 시트 밖에 있어서 접어도 그대로 보여요 */
-let sheetDrag=null, sheetJustDragged=false, sheetOpenT=0;
+let sheetDrag=null, sheetJustDragged=false, sheetAnim=0;
 function sheetPeek(){ // 접었을 때: 손잡이와 첫 줄까지만 보여요. 목적지 고르기는 검색칸까지 남겨요
   const sh=$('sheet'), keep=sh.querySelector('.tx-search-wrap'), first=keep||sh.querySelector('.grab+*');
   if(!first) return 44;
@@ -2076,45 +2105,72 @@ function markSheetBody(down,peek){ // 가려진 내용에는 키보드 초점이
   const sh=$('sheet'), top=sh.getBoundingClientRect().top;
   [...sh.children].forEach(el=>{ if(el.classList.contains('grab')) return; el.inert=!!down&&(el.getBoundingClientRect().bottom-top>peek+1); });
 }
+function sheetStop(){ // 움직임을 끝내고 지도를 실제 크기로 돌려요
+  const sh=$('sheet'); cancelAnimationFrame(sheetAnim);
+  if(!sh.classList.contains('moving')) return;
+  sh.classList.remove('moving'); sh.style.height=''; MapCtl.sheetEnd();
+}
 function applySheet(){
-  const sh=$('sheet'); clearTimeout(sheetOpenT);
+  const sh=$('sheet'); cancelAnimationFrame(sheetAnim);
   sh.classList.toggle('down',!!S.sheetDown); sh.classList.remove('dragging');
   const peek=S.sheetDown?sheetPeek():0;
   sh.style.maxHeight = S.sheetDown ? peek+'px' : '';
   markSheetBody(S.sheetDown,peek);
+  sheetStop();
 }
-function setSheet(down){
-  const sh=$('sheet'), a=$('area'), from=sh.getBoundingClientRect().height;
-  S.sheetDown=down; a.scrollTop=0; clearTimeout(sheetOpenT); MapCtl.hold();
+function sheetNatural(sh){ // 다 폈을 때의 높이예요
+  const h=sh.style.height, m=sh.style.maxHeight; sh.style.height='auto'; sh.style.maxHeight='none';
+  const n=sh.getBoundingClientRect().height; sh.style.height=h; sh.style.maxHeight=m; return n;
+}
+function sheetMoveStart(){
+  const sh=$('sheet'); if(sh.classList.contains('moving')) return;
+  const h=sh.getBoundingClientRect().height;
+  sh.style.height=h+'px'; sh.style.maxHeight='none'; sh.classList.add('moving');
+  MapCtl.sheetStart(Math.max(0,h-sheetPeek())+40);
+}
+function sheetSet(h){ $('sheet').style.height=h.toFixed(2)+'px'; MapCtl.sheetFollow(); }
+function sheetGo(to,v,done){ // 스프링으로 움직여요. 끌던 속도를 이어받고, 중간에 다시 잡아도 끊기지 않아요
+  cancelAnimationFrame(sheetAnim);
+  if(!Motion.ok()){ done(); return; }
+  const w=2*Math.PI/.44, z=.86; let h=parseFloat($('sheet').style.height)||to, last=performance.now();
+  const tick=now=>{
+    let left=Math.min(.05,Math.max(0,(now-last)/1000)); last=now;
+    while(left>0){ const dt=Math.min(left,1/240); v+=(-w*w*(h-to)-2*z*w*v)*dt; h+=v*dt; left-=dt; }
+    if(Math.abs(h-to)<.5&&Math.abs(v)<12){ done(); return; }
+    sheetSet(h); sheetAnim=requestAnimationFrame(tick);
+  };
+  sheetAnim=requestAnimationFrame(tick);
+}
+function setSheet(down,v=0){
+  const sh=$('sheet');
+  S.sheetDown=down; $('area').scrollTop=0; MapCtl.hold();
   const g=sh.querySelector('.grab'); if(g){ g.setAttribute('aria-expanded',String(!down)); g.setAttribute('aria-label',grabLabel(down)); }
-  sh.classList.remove('dragging');
+  sheetMoveStart(); sh.classList.remove('dragging'); sh.classList.toggle('down',down);
   const peek=sheetPeek(); markSheetBody(down,peek);
-  if(down){ sh.classList.add('down'); sh.style.maxHeight=from+'px'; void sh.offsetHeight; sh.style.maxHeight=peek+'px'; return; }
-  sh.style.maxHeight=from+'px'; void sh.offsetHeight; sh.style.maxHeight=sh.scrollHeight+'px';
-  sheetOpenT=setTimeout(()=>{ if(!S.sheetDown){ sh.style.maxHeight=''; sh.classList.remove('down'); } },400); // 다 펴지면 내용 길이에 맡겨요
+  sheetGo(down?peek:sheetNatural(sh),v,applySheet);
 }
 document.addEventListener('pointerdown',e=>{
   const g=e.target.closest&&e.target.closest('.grab'); if(!g||sheetDrag||(e.button&&e.pointerType==='mouse')) return;
-  const sh=$('sheet');
-  sheetDrag={id:e.pointerId,y:e.clientY,start:sh.getBoundingClientRect().height,peek:sheetPeek(),full:sh.scrollHeight,moved:false};
+  const sh=$('sheet'); cancelAnimationFrame(sheetAnim); // 움직이는 중에 잡으면 그 자리에서 이어서 끌어요
+  const h=sh.getBoundingClientRect().height;
+  sheetDrag={id:e.pointerId,y:e.clientY,start:h,peek:sheetPeek(),full:sheetNatural(sh),moved:false,h,t:e.timeStamp,v:0};
   try{ g.setPointerCapture(e.pointerId); }catch(err){}
 });
 document.addEventListener('pointermove',e=>{
   const d=sheetDrag; if(!d||e.pointerId!==d.id) return;
-  const dy=e.clientY-d.y; if(!d.moved&&Math.abs(dy)<6) return;
-  const sh=$('sheet');
-  MapCtl.hold();
-  if(!d.moved){ d.moved=true; clearTimeout(sheetOpenT); $('area').scrollTop=0; sh.classList.add('dragging'); }
-  sh.style.maxHeight=Math.max(d.peek,Math.min(d.full,d.start-dy))+'px';
+  if(!d.moved){ if(Math.abs(e.clientY-d.y)<6) return; d.moved=true; d.y=e.clientY; $('area').scrollTop=0; MapCtl.hold(); sheetMoveStart(); $('sheet').classList.add('dragging'); }
+  let h=d.start-(e.clientY-d.y);
+  if(h>d.full) h=d.full+Math.min(34,(h-d.full)*.3); else if(h<d.peek) h=d.peek-Math.min(34,(d.peek-h)*.3); // 끝에서는 살짝 버티듯 움직여요
+  sheetSet(h);
+  if(e.timeStamp>d.t){ d.v=d.v*.6+(h-d.h)/(e.timeStamp-d.t)*400; d.h=h; d.t=e.timeStamp; }
 });
 function endSheetDrag(e){
-  const d=sheetDrag; if(!d||e.pointerId!==d.id) return; sheetDrag=null; setTimeout(flushLive,450); // 시트가 자리를 잡은 뒤에 반영해요
- 
-  if(!d.moved) return;
+  const d=sheetDrag; if(!d||e.pointerId!==d.id) return; sheetDrag=null; setTimeout(flushLive,900); // 시트가 자리를 잡은 뒤에 반영해요
+  if(!d.moved){ if($('sheet').classList.contains('moving')) setSheet(!!S.sheetDown); return; }
   sheetJustDragged=true; setTimeout(()=>{sheetJustDragged=false},0);
-  const h=$('sheet').getBoundingClientRect().height, moved=d.start-h;
-  // 조금만 움직여도 그 방향으로 접히거나 펴져요
-  setSheet(Math.abs(moved)<24 ? !!S.sheetDown : moved>0);
+  const moved=d.start-d.h, v=e.timeStamp-d.t>90?0:Math.max(-3000,Math.min(3000,d.v));
+  // 빠르게 튕기면 그 방향으로, 천천히 움직였으면 조금만 움직여도 그 방향으로 접히거나 펴져요
+  setSheet(Math.abs(v)>350 ? v<0 : Math.abs(moved)<24 ? !!S.sheetDown : moved>0, v);
 }
 document.addEventListener('pointerup',endSheetDrag);
 document.addEventListener('pointercancel',endSheetDrag);
