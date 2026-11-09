@@ -1,12 +1,11 @@
 // 탑승 핀을 옮겼을 때 실제 도로 경로를 받아 주는 Cloudflare Worker예요.
 // REST 키는 코드에 넣지 않고 Worker의 Secret(KAKAO_REST_KEY)에 넣어요. 응답에도 키는 담기지 않아요.
-// GET /route?from=위도,경도&to=장소key (좌표는 소수 3자리)
+// GET /route?from=위도,경도&to=장소key 또는 위도,경도 (좌표는 소수 3자리)
 
 const API = 'https://apis-navi.kakaomobility.com/v1/directions';
 const ALLOWED_ORIGINS = new Set(['https://baepu-team.github.io', 'http://127.0.0.1:5500']); // 이 페이지들에서만 부를 수 있어요
-const HOME = { lat: 37.256, lon: 127.0665 }; // 페이지의 ROUTES_ORIGIN과 같아요
-const MAX_FROM_KM = 30; // 현재 위치나 검색한 장소에서 출발할 수 있게 넓혔어요. 도착지가 영통 일대라 이보다 먼 출발지는 어림값으로 보여 줘요
-// 페이지의 PLACES와 같은 도착지만 받아요. 이 서버로 다른 경로를 받아 가지 못하게 하려는 거예요
+const MAX_POINTS = 1500; // 아주 긴 경로도 무료 요금제의 CPU 한도 안에서 처리하게 점을 줄여요
+// 페이지의 기본 도착지예요. 시범 기간에는 검색한 장소의 좌표도 받아요
 const PLACES = {
   ajou: [37.2797, 127.0473], ytst: [37.251528, 127.071347], mpst: [37.245799, 127.057364], cmst: [37.259485, 127.078945],
   mtst: [37.253019, 127.040389], gjst: [37.2886, 127.0514], lake: [37.281433, 127.069243], cafe: [37.2528, 127.069],
@@ -36,17 +35,16 @@ function km(a, b) {
   return 2 * 6371 * Math.asin(Math.sqrt(h));
 }
 
-function parseFrom(v) {
+function parsePoint(v) {
   // 소수 3자리로 고정해요. 같은 자리가 여러 표기로 저장되지 않게 하려는 거예요
   const m = /^(\d{2}\.\d{3}),(\d{3}\.\d{3})$/.exec(v || '');
   if (!m) return null;
   const p = { lat: +m[1], lon: +m[2] };
-  if (p.lat > 90 || p.lon > 180) return null;
-  return km(p, HOME) <= MAX_FROM_KM ? p : null;
+  return p.lat >= 33 && p.lat <= 39 && p.lon >= 124 && p.lon <= 132 ? p : null; // 국내 좌표만 받아요
 }
 
 function parseTo(v) {
-  if (!Object.prototype.hasOwnProperty.call(PLACES, v)) return null;
+  if (!Object.prototype.hasOwnProperty.call(PLACES, v)) return parsePoint(v);
   const [lat, lon] = PLACES[v];
   return { lat, lon };
 }
@@ -97,7 +95,9 @@ function extract(body) {
   }
   const s = route.summary || {}, fare = s.fare || {};
   if (points.length < 2 || !(s.distance > 0) || !(s.duration > 0) || !(fare.taxi > 0)) return null;
-  return { path: simplify(points), m: s.distance, s: s.duration, taxi: fare.taxi };
+  const step = Math.ceil(points.length / MAX_POINTS);
+  const thin = step > 1 ? points.filter((_, i) => i % step === 0 || i === points.length - 1) : points;
+  return { path: simplify(thin), m: s.distance, s: s.duration, taxi: fare.taxi };
 }
 
 function reply(status, body, origin, extra = {}) {
@@ -119,8 +119,8 @@ export default {
     const keys = [...url.searchParams.keys()].sort().join();
     if (keys !== 'from,to') return reply(400, { error: 'point' }, allowed);
     const from = url.searchParams.get('from'), to = url.searchParams.get('to');
-    const a = parseFrom(from), b = parseTo(to);
-    if (!a || !b) return reply(400, { error: 'point' }, allowed);
+    const a = parsePoint(from), b = parseTo(to);
+    if (!a || !b || km(a, b) < 0.05) return reply(400, { error: 'point' }, allowed);
 
     if (limited(req.headers.get('cf-connecting-ip') || 'unknown', Date.now())) return reply(429, { error: 'rate' }, allowed, { 'retry-after': '60' });
 
