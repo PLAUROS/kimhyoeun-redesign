@@ -10,7 +10,7 @@
 ==========================================================================
  배프 · 택시 부르기 연습 (단독 페이지)
 --------------------------------------------------------------------------
- ■ 팀원이 바꿀 곳: 아래 <script> 맨 위의 CONFIG (Netlify 외의 주소를 쓰면 ON_NETLIFY도)
+ ■ 팀원이 바꿀 곳: 아래 <script> 맨 위의 CONFIG
      KAKAO_JS_KEY 를 넣으면 카카오맵, 비워두면 그림 지도(SVG)로 동작해요.
      카카오맵을 쓰려면 카카오 개발자 콘솔에서
        ① 앱의 카카오맵 API 활성화
@@ -71,9 +71,6 @@ svg.i{width:1.35em;height:1.35em;flex:none}
   .stage{height:100%;display:block;padding:0;background:var(--bg)}
   .phone{width:100%;height:100%;border:0;border-radius:0;box-shadow:none}
   .sb{display:none}
-  /* Netlify 무료 요금제의 안내 배지가 화면 아래를 덮어요. 배지는 그대로 두고 버튼이 가려지지 않게 그만큼 비워요 */
-  .on-netlify .phone{height:calc(100% - 64px)}
-  .on-netlify .foot,.on-netlify .pfoot{padding-bottom:.7em}
 }
 
 /* ---------- 연습 배너 + 코치 ---------- */
@@ -779,8 +776,8 @@ const CONFIG = {
   // 브라우저에 노출되는 키라 파일에 둘 수 있고, 등록한 도메인에서만 동작해요. REST 키는 절대 여기에 넣지 마세요.
   KAKAO_JS_KEY: 'fa2e2f82ff225feaa7788ad2e47c0751',
   KAKAO_TIMEOUT_MS: 5000,  // 이 시간 안에 카카오맵이 안 뜨면 그림 지도로 바꿔요
-  // 탑승 핀을 옮겼을 때 실제 도로 경로를 받는 주소(netlify/functions/route.mjs). 함수가 없는 곳에서는 비워 둬서 곡선으로 그려요
-  ROUTE_API: /\.netlify\.app$/.test(location.hostname) ? '/api/route' : '', // 직접 만든 도메인을 쓰면 이 조건과 아래 ON_NETLIFY를 함께 바꿔요
+  // 탑승 핀을 옮겼을 때 실제 도로 경로를 받는 주소(cloudflare/route-worker.js). 허용하지 않은 주소에서는 비워 둬서 곡선으로 그려요
+  ROUTE_API: /^(baepu-team\.github\.io|127\.0\.0\.1)$/.test(location.hostname) ? 'https://baepu-route.goodkkjung.workers.dev/route' : '', // 주소를 바꾸면 Worker의 ALLOWED_ORIGINS도 함께 바꿔요
   PARENT_ORIGIN: ''        // 결과를 받을 본 서비스 주소(예: https://baepu.kr). 비우면 이 페이지와 같은 주소에만 보내요
 };
 
@@ -821,8 +818,6 @@ const ROUTES = {
 /* =====================================================================
    3. 받는 값 (URL 쿼리)
    ===================================================================== */
-const ON_NETLIFY = /\.netlify\.app$/.test(location.hostname);
-document.documentElement.classList.toggle('on-netlify',ON_NETLIFY);
 const Q = new URLSearchParams(location.search);
 const esc = s => String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); // HTML에 넣는 바깥 값은 모두 이걸 거쳐요
 const cleanText = (v,max) => (v||'').replace(/[\u0000-\u001f\u007f]/g,'').trim().slice(0,max);
