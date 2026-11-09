@@ -1260,15 +1260,16 @@ let TAXIS = makeTaxis(1);       // 주변 택시
 const PICK_KEEP_KM = 0.15; // 탑승 위치가 경로 출발지에서 이 안이면 받아 둔 도로 경로와 요금을 그대로 써요
 const MAX_PICK_KM = 1;     // 탑승 핀은 기준 위치(현재 위치나 검색한 장소)에서 이만큼까지 옮길 수 있어요
 const routeData = k => {
-  if(km(S.pick,ROUTES_ORIGIN)<PICK_KEEP_KM) return ROUTES[k]&&ROUTES[k].path ? ROUTES[k] : null;
+  if(km(S.pick,ROUTES_ORIGIN)<PICK_KEEP_KM&&ROUTES[k]&&ROUTES[k].path) return ROUTES[k];
   return S.live&&S.live.dest===k&&S.live.at===S.pick ? S.live : null; // 그 탑승 위치로 받아 온 경로
 };
 // 서버 함수로 경로 받기. 실패하면 null이고, 그때는 곡선과 조정 요금으로 그대로 진행해요
 async function fetchRoute(a,to){ // to는 PLACES의 key예요. 함수도 이 장소들만 받아요
-  if(!CONFIG.ROUTE_API||!Object.prototype.hasOwnProperty.call(ROUTES,to)) return null;
+  if(!CONFIG.ROUTE_API||!Object.prototype.hasOwnProperty.call(PLACES,to)) return null;
+  const place=PLACES[to], target=place.dynamic?`${place.lat.toFixed(3)},${place.lon.toFixed(3)}`:to; // 검색한 장소는 좌표로 보내요
   const ctl=new AbortController(), t=setTimeout(()=>ctl.abort(),5000);
   try{
-    const res=await fetch(`${CONFIG.ROUTE_API}?from=${a.lat.toFixed(3)},${a.lon.toFixed(3)}&to=${to}`,{signal:ctl.signal});
+    const res=await fetch(`${CONFIG.ROUTE_API}?from=${a.lat.toFixed(3)},${a.lon.toFixed(3)}&to=${target}`,{signal:ctl.signal});
     if(!res.ok) return null;
     const r=await res.json();
     const ok=r&&Array.isArray(r.path)&&r.path.length>1&&r.path.every(p=>Array.isArray(p)&&Number.isFinite(p[0])&&Number.isFinite(p[1]))&&r.m>0&&r.s>0&&r.taxi>0;
@@ -1284,7 +1285,7 @@ function flushLive(){ // 안내창이나 시트 끌기를 방해하지 않게 �
   MapCtl.lastKey=null; render(); announce('예상 요금을 새로 맞췄어요.');
 }
 function refreshLive(){ // 지금 탑승 위치에서 목적지까지의 실제 경로를 받아요. 늦게 온 옛 응답은 버려요
-  if(!CONFIG.ROUTE_API||(S.step!=='origin'&&S.step!=='route')||!S.dest||km(S.pick,ROUTES_ORIGIN)<PICK_KEEP_KM||routeData(S.dest)) return;
+  if(!CONFIG.ROUTE_API||(S.step!=='origin'&&S.step!=='route')||!S.dest||routeData(S.dest)) return;
   const req=++liveReq, at=S.pick, dest=S.dest;
   fetchRoute(at,dest).then(r=>{ if(r&&req===liveReq&&(S.step==='origin'||S.step==='route')&&S.pick===at&&S.dest===dest){ S.live={dest,at,...r}; if(S.step!=='route') showPick(); else { MapCtl.lastKey=null; liveDirty=true; flushLive(); } } });
 }
@@ -1784,7 +1785,7 @@ function sheetHTML(){
     <div class="res-h">최근 도착지</div>
     <div class="quick">${RECENT.map(k=>`<button data-a="pick" data-v="${k}">${I(PLACES[k].kind==='st'?'station':'clock')}${PLACES[k].n}</button>`).join('')}</div>`;
   case 'route': return `${GRAB()}<h3>${esc(P.n)}</h3>${P.dynamic?`<p class="small muted">${esc(P.a)}</p>`:''}<div class="trip tabnum">약 ${fr.km}km · 약 ${fr.min}분</div>
-    ${P.dynamic?'<p class="small muted">거리·시간·요금은 연습용 어림값이에요.</p>':''}<div class="cars">${CARS.map(c=>`<button class="car${S.car===c.k?' on':''}" data-a="car" data-v="${c.k}" aria-pressed="${S.car===c.k}">
+    ${P.dynamic&&!routeData(d)?'<p class="small muted">거리·시간·요금은 연습용 어림값이에요.</p>':''}<div class="cars">${CARS.map(c=>`<button class="car${S.car===c.k?' on':''}" data-a="car" data-v="${c.k}" aria-pressed="${S.car===c.k}">
       <span class="cimg">${c.k==='대형'?VAN3D(VEHICLES[c.k].c):CAR3D(VEHICLES[c.k].c)}</span><span class="cname"><b>${c.t}</b><small>${c.eta}분 뒤 도착 · ${c.d}</small></span>
       <span class="cfare tabnum"><small>예상</small>${won(carFare(fr.f,c.k))}</span></button>`).join('')}</div>
     <button class="payrow" data-a="pay-open" aria-label="결제 수단 바꾸기. 지금은 ${S.pay==='card'?'연습카드 자동결제':'기사님에게 직접 결제'}">${I('card')}${S.pay==='card'?'연습카드 ···· 0000':'기사님에게 직접 결제'}<span>${S.pay==='card'?'내릴 때 자동결제':'내릴 때 직접 내요'} ›</span></button>`;
