@@ -1272,19 +1272,40 @@ const routeData = k => {
 };
 // 서버 함수로 경로 받기. 실패하면 null이고, 그때는 곡선과 조정 요금으로 그대로 진행해요
 const coordText = p => `${p.lat.toFixed(3)},${p.lon.toFixed(3)}`;
-async function fetchRoute(a,to){ // to는 PLACES의 key이거나 {lat,lon} 좌표예요
-  if(!CONFIG.ROUTE_API) return null;
-  if(typeof to==='string'&&!Object.prototype.hasOwnProperty.call(PLACES,to)) return null;
-  const target=typeof to==='string'?(PLACES[to].dynamic?coordText(PLACES[to]):to):coordText(to); // 검색한 장소는 좌표로 보내요
+// 좌표를 소수 3자리로 줄이면 역 안 선로처럼 도로가 먼 곳에 떨어질 때가 있어요. 그때는 가까운 칸으로 옮겨 다시 받고, 성공한 칸은 기억해요
+const roadNudge = new Map();
+const nudged = p => roadNudge.get(coordText(p))||coordText(p);
+function nearGrid(p){ // p 둘레의 칸을 가까운 순으로 돌려줘요
+  const la=Math.round(p.lat*1000), lo=Math.round(p.lon*1000), out=[];
+  for(let i=-1;i<=1;i++) for(let j=-1;j<=1;j++) if(i||j) out.push({lat:(la+i)/1000,lon:(lo+j)/1000});
+  return out.sort((x,y)=>km(x,p)-km(y,p));
+}
+async function askRoute(from,to){ // 경로, 도로가 없다는 뜻의 'noroad', 그 밖의 실패는 null이에요
   const ctl=new AbortController(), t=setTimeout(()=>ctl.abort(),5000);
   try{
-    const res=await fetch(`${CONFIG.ROUTE_API}?from=${coordText(a)}&to=${target}`,{signal:ctl.signal});
-    if(!res.ok) return null;
+    const res=await fetch(`${CONFIG.ROUTE_API}?from=${from}&to=${to}`,{signal:ctl.signal});
+    if(!res.ok){ if(res.status!==502) return null; const e=await res.json().catch(()=>null); return e&&e.error==='route'?'noroad':null; }
     const r=await res.json();
     const ok=r&&Array.isArray(r.path)&&r.path.length>1&&r.path.every(p=>Array.isArray(p)&&Number.isFinite(p[0])&&Number.isFinite(p[1]))&&r.m>0&&r.s>0&&r.taxi>0;
     return ok?{path:r.path,m:r.m,s:r.s,taxi:r.taxi}:null;
   }catch(e){ return null; }
   finally{ clearTimeout(t); }
+}
+async function fetchRoute(a,to){ // to는 PLACES의 key이거나 {lat,lon} 좌표예요
+  if(!CONFIG.ROUTE_API) return null;
+  if(typeof to==='string'&&!Object.prototype.hasOwnProperty.call(PLACES,to)) return null;
+  const dest=typeof to!=='string'?to:(PLACES[to].dynamic?PLACES[to]:null); // 검색한 장소는 좌표로 보내요
+  const from=nudged(a), target=dest?nudged(dest):to;
+  let r=await askRoute(from,target);
+  if(r!=='noroad') return r;
+  const fs=nearGrid(a).slice(0,2).map(coordText), ts=dest?nearGrid(dest).slice(0,2).map(coordText):[];
+  const tries=[[fs[0],target],...(ts[0]?[[from,ts[0]]]:[]),[fs[1],target],...(ts[1]?[[from,ts[1]]]:[])];
+  for(const [f,g] of tries){
+    r=await askRoute(f,g);
+    if(r===null) return null;
+    if(r!=='noroad'){ if(f!==from) roadNudge.set(coordText(a),f); if(g!==target) roadNudge.set(coordText(dest),g); return r; }
+  }
+  return null;
 }
 let liveReq=0, liveDirty=false;
 function flushLive(){ // 안내창이나 시트 끌기를 방해하지 않게 기다렸다가, 끝나면 한 번 반영해요
