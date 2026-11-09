@@ -1024,6 +1024,93 @@ body{letter-spacing:-.011em}
   .sheet,.modal-in{corner-shape:squircle;border-radius:36px 36px 0 0}
 }
 
+
+/* ---------- 움직임: 빠르게 반응하고, 끊기지 않게 이어지고, 조용히 멈춰요 ----------
+   값은 살짝만 넘쳤다 돌아오는 스프링이에요. 움직임 줄이기 설정이면 위쪽 규칙이 모두 꺼요 */
+:root{--pop:cubic-bezier(.34,1.3,.64,1)}
+@supports (animation-timing-function:linear(0,1)){:root{--spring:linear(0,0.0348,0.118,0.2256,0.3411,0.4541,0.5582,0.6502,0.7289,0.7945,0.8477,0.8901,0.923,0.9481,0.9668,0.9803,0.9899,0.9963,1.0005,1.0031,1.0044,1.005,1.005,1.0047,1.0042,1.0036,1);--pop:linear(0,0.0554,0.1859,0.349,0.5154,0.6667,0.7932,0.8918,0.9631,1.0104,1.0383,1.0514,1.0542,1.0503,1.0428,1.0338,1.0249,1.0169,1.0102,1.0051,1.0015,0.9991,0.9978,0.9972,0.9971,0.9973,1)}}
+button{transition:transform .34s var(--spring),background-color .22s ease,color .22s ease,box-shadow .22s ease,opacity .2s ease}
+button:not(.grab):active:not(:disabled){transform:scale(.965);transition-duration:.07s}
+button.car:active:not(:disabled),button.res-i:active:not(:disabled){transform:scale(.99)}
+.car{z-index:1}
+.cars{position:relative}
+.car-ghost{position:absolute;left:0;right:0;z-index:2;display:block;border-radius:18px;background:var(--tint);box-shadow:inset 0 0 0 2px var(--blue);pointer-events:none}
+.car.on.sel-moving{background:transparent;box-shadow:none}
+.car.on .cname b::after{display:inline-block;animation:check-pop .4s var(--pop) backwards}
+.panel.same .car.on .cname b::after{animation:none}
+@keyframes check-pop{from{transform:scale(.4);opacity:0}}
+
+/* 힌트: 버튼과 내용이 한 덩어리예요 */
+.coach-tools .island{grid-column:1;grid-row:1;justify-self:start;min-width:0;border-radius:22px}
+.coach-tools.hint-on .island{grid-column:1 / -1;justify-self:stretch;background:#FFF0BF;border-radius:24px}
+.island .help-btn{position:relative}
+.coach-tools .island.open button.help-btn:disabled{background:transparent;color:#544000}
+.coach-tools.hint-on>button{grid-row:2}
+.coach-tools.hint-on>button[data-a=voice]{grid-column:2}
+.coach-tools.hint-on>button[data-a=big]{grid-column:3}
+.island.morphing{overflow:hidden;background:#FFF0BF}
+.island-body .hint{background:none;border-radius:0;padding:0 .6em .8em 1em;align-items:center;font-size:.95em;line-height:1.5}
+.island-body .hint>svg{display:none}
+.island.morphing .island-body{animation:island-in .42s ease-out .1s backwards}
+@keyframes island-in{from{opacity:0;transform:translateY(-6px)}}
+@container (max-width:340px){
+  .coach-tools .island{grid-column:1 / -1}
+}
+
+/* 눌러야 할 곳 */
+.tgt::after{animation:tgt-float 2.8s ease-in-out .5s infinite}
+.mic.tgt::after{animation-name:tgt-float-under}
+@keyframes tgt-float{50%{transform:translateY(calc(-62% - 4px))}}
+@keyframes tgt-float-under{50%{transform:translateY(12px)}}
+#app.tgt-fresh .tgt{animation:tgt-ring .56s var(--spring) backwards}
+#app.tgt-fresh .tgt::after{animation:tgt-label .46s var(--pop) backwards,tgt-float 2.8s ease-in-out .6s infinite}
+#app.tgt-fresh .mic.tgt::after{animation:tgt-label-under .46s var(--pop) backwards,tgt-float-under 2.8s ease-in-out .6s infinite}
+@keyframes tgt-ring{from{box-shadow:0 0 0 0 var(--paper),0 0 0 0 #FFC400,0 0 0 0 rgba(138,97,0,0)}}
+@keyframes tgt-label{from{opacity:0;transform:translateY(-20%) scale(.7)}}
+@keyframes tgt-label-under{from{opacity:0;transform:translateY(0) scale(.7)}}
+
+/* 화면 전환 */
+.area.morph{overflow:hidden}
+.sheet.morph::after{content:"";position:absolute;left:0;right:0;top:100%;height:70vh;background:var(--paper)}
+.sheet.enter>*:not(.grab){animation:lift .5s var(--spring) backwards}
+.sheet.enter>*:nth-child(3){animation-delay:.04s}
+.sheet.enter>*:nth-child(4){animation-delay:.08s}
+.sheet.enter>*:nth-child(n+5){animation-delay:.12s}
+@keyframes lift{from{opacity:0;transform:translateY(12px)}}
+.panel:not(.same) .pbody>*{animation:lift .56s var(--spring) backwards}
+.panel:not(.same) .pbody>*:nth-child(2){animation-delay:.05s}
+.panel:not(.same) .pbody>*:nth-child(3){animation-delay:.1s}
+.panel:not(.same) .pbody>*:nth-child(n+4){animation-delay:.15s}
+.panel:not(.same) .res>*{animation:lift .46s var(--spring) backwards}
+.panel:not(.same) .res>*:nth-child(2){animation-delay:.04s}
+.panel:not(.same) .res>*:nth-child(3){animation-delay:.07s}
+.panel:not(.same) .res>*:nth-child(4){animation-delay:.1s}
+.panel:not(.same) .res>*:nth-child(n+5){animation-delay:.13s}
+.okmark{animation:pop .62s var(--pop)}
+.panel.same .okmark{animation:none}
+.okmark.draw svg *{stroke-dasharray:1;stroke-dashoffset:1;animation:check-draw .44s ease-out .24s forwards}
+.panel.same .okmark.draw svg *{animation:none;stroke-dashoffset:0}
+@keyframes check-draw{to{stroke-dashoffset:0}}
+.modal-ghost{position:absolute;inset:0;z-index:30;display:flex;align-items:flex-end;background:rgba(0,0,0,.32);pointer-events:none}
+.modal-ghost .modal-in{animation:none}
+#toast:not([hidden]){animation:drop .46s var(--spring)}
+#noti:not([hidden]){animation:drop .52s var(--spring)}
+@keyframes drop{from{opacity:0;transform:translateY(-14px) scale(.96)}}
+
+/* 지도 위 */
+#map .k-pin{animation:pin-drop .56s var(--pop) backwards}
+@keyframes pin-drop{from{opacity:0;transform:translateY(-16px) scale(.86)}}
+#map .k-dot{position:relative}
+#map .k-dot::after{content:"";position:absolute;inset:-3px;border-radius:50%;background:rgba(10,114,209,.35);animation:dot-halo 2.8s ease-out infinite}
+#map.pickable .k-dot::after{animation:none;opacity:0}
+@keyframes dot-halo{from{transform:scale(1);opacity:.7}70%,to{transform:scale(3.1);opacity:0}}
+.map-ui>.center-pin{transition:transform .34s var(--spring)}
+.fab,.route-bar,.cancel-chip{animation:float-in .46s var(--spring) backwards}
+.area[data-step=home] .route-bar{animation:none}
+@keyframes float-in{from{opacity:0;transform:translateY(-6px) scale(.97)}}
+.fab:active{transform:scale(.92)}
+.c-bars i{transition:background-color .3s ease}
+
 </style>
 </head>
 <body>
@@ -1621,15 +1708,18 @@ const mmss = () => { const t=Math.max(0,Math.floor((flowNow()-S.t0)/1000)); retu
 const helpBtn = () => `<button class="help-btn" data-a="hint" ${S.hintOpen?'disabled':''}>${I('light')+(S.named?(S.hintOpen?'도움 보는 중':'도움 요청'):(S.hintOpen?'힌트 보는 중':'힌트 보기'))}</button>`;
 function coachHTML(){
   const st=S.step, sk=SKILL_OF[st], idx=SKILLS.findIndex(x=>x[0]===sk), test=S.mode==='test';
-  const showHint = WAIT[st] || guided();
+  const island = test && !WAIT[st]; // 힌트 버튼과 내용을 한 덩어리로 합쳐요
+  const showHint = (WAIT[st] || guided()) && !island;
+  const hintBody = `<div class="hint${WAIT[st]?' wait':''}">${I('light')}<span>${HINT[st]()}</span><button data-a="say" aria-label="읽어주기">${I('speaker')}</button></div>`;
+  const islandHTML = `<div class="island${S.hintOpen?' open':''}">${helpBtn()}${S.hintOpen?`<div class="island-body">${hintBody}</div>`:''}</div>`;
   const tag = test ? (S.named?'<span class="tag test">테스트<span class="tag-more"> · 혼자 해봐요</span></span>':'<span class="tag">연습</span>') : `<span class="tag">연습 모드<span class="tag-more"> · 힌트 ${PREF.guide?'켬':'끔'}</span></span>`;
-  const tools = (test ? (WAIT[st]?'':helpBtn()) : `<button class="${PREF.guide?'on':''}" aria-pressed="${!!PREF.guide}" data-a="guide">힌트 ${PREF.guide?'켜짐':'꺼짐'}</button>`)
+  const tools = (test ? (WAIT[st]?'':islandHTML) : `<button class="${PREF.guide?'on':''}" aria-pressed="${!!PREF.guide}" data-a="guide">힌트 ${PREF.guide?'켜짐':'꺼짐'}</button>`)
     + `<button class="${PREF.voice?'on':''}" aria-pressed="${!!PREF.voice}" data-a="voice">소리 ${PREF.voice?'켜짐':'꺼짐'}</button>`
     + `<button class="${PREF.big?'on':''}" aria-pressed="${!!PREF.big}" data-a="big">글자 크게</button>`;
   return `<div class="c-row">${tag}<span class="m-full">${missionText()}</span><span class="m-short">${missionShort()}</span></div>
     <div class="c-prog"><span class="c-bars" role="img" aria-label="${idx+1}단계 / ${SKILLS.length}단계">${SKILLS.map((x,i)=>`<i class="${i<idx?'done':i===idx?'on':''}"></i>`).join('')}</span><span class="c-step">${idx+1}/${SKILLS.length} · ${SKILLS[idx][1]}</span>${test&&S.named?`<b class="c-time tabnum" role="timer" aria-label="걸린 시간"><span id="timer">${mmss()}</span></b>`:''}</div>
-    ${showHint?`<div class="hint${WAIT[st]?' wait':''}">${I('light')}<span>${HINT[st]()}</span><button data-a="say" aria-label="읽어주기">${I('speaker')}</button></div>`:''}
-    <div class="coach-tools">${tools}</div>`;
+    ${showHint?hintBody:''}
+    <div class="coach-tools${island&&S.hintOpen?' hint-on':''}">${tools}</div>`;
 }
 
 const grabLabel = down => down?'아래 내용 펴기':'아래 내용 접기';
@@ -1749,11 +1839,95 @@ function mapUiHTML(){
   return h;
 }
 
+/* 화면 전환의 움직임. 화면은 통째로 다시 그려지므로, 그리기 전 위치를 기억했다가 새 위치까지 이어 줘요.
+   움직임 줄이기 설정이거나 지원하지 않는 기기에서는 아무것도 하지 않고, 여기서 난 오류가 흐름을 막지 않아요 */
+const Motion = {
+  soft:'linear(0,0.0348,0.118,0.2256,0.3411,0.4541,0.5582,0.6502,0.7289,0.7945,0.8477,0.8901,0.923,0.9481,0.9668,0.9803,0.9899,0.9963,1.0005,1.0031,1.0044,1.005,1.005,1.0047,1.0042,1.0036,1)',
+  pop:'linear(0,0.0554,0.1859,0.349,0.5154,0.6667,0.7932,0.8918,0.9631,1.0104,1.0383,1.0514,1.0542,1.0503,1.0428,1.0338,1.0249,1.0169,1.0102,1.0051,1.0015,0.9991,0.9978,0.9972,0.9971,0.9973,1)',
+  ok(){ try{ return !!Element.prototype.animate && !matchMedia('(prefers-reduced-motion:reduce)').matches; }catch(e){ return false; } },
+  ease(k){ try{ return CSS.supports('animation-timing-function','linear(0,1)') ? this[k||'soft'] : 'cubic-bezier(.32,.72,0,1)'; }catch(e){ return 'ease-out'; } },
+  play(el,frames,o){ if(!el||!this.ok()) return null; try{ return el.animate(frames,Object.assign({duration:480,easing:this.ease()},o)); }catch(e){ return null; } },
+  done(a,fn){ if(a){ a.onfinish=fn; a.oncancel=fn; } else fn(); },
+  before(){
+    try{
+      if(!this.ok()) return null;
+      const box=s=>{ const el=document.querySelector(s); return el?el.getBoundingClientRect():null; };
+      const isl=document.querySelector('#coach .island'), sel=document.querySelector('#sheet .car.on'), bars=[...document.querySelectorAll('#coach .c-bars i')];
+      return {key:render.key, island:isl?isl.getBoundingClientRect():null, open:!!(isl&&isl.classList.contains('open')), sheetTop:$('sheet').firstElementChild?$('sheet').getBoundingClientRect().top:null,
+        search:box('#sheet .tx-search'), field:box('#q'), car:sel?sel.getBoundingClientRect():null, carV:sel?sel.dataset.v:null, bar:bars.findIndex(b=>b.classList.contains('on')), tgt:this.tgtKey, tools:[...document.querySelectorAll('#coach .coach-tools>button')].map(b=>({a:b.dataset.a,r:b.getBoundingClientRect()}))};
+    }catch(e){ return null; }
+  },
+  after(p){ try{ if(p) this.run(p); }catch(e){} },
+  run(p){
+    const key=render.key, changed=p.key!==key, panelOpen=!$('panel').hidden, app=$('app');
+    // 힌트: 버튼이 내용까지 품은 한 덩어리로 커지고 작아져요
+    const isl=$('coach').querySelector('.island');
+    if(isl&&p.island){
+      const open=isl.classList.contains('open');
+      if(open!==p.open){
+        const r=isl.getBoundingClientRect(), c=isl.classList; c.add('morphing');
+        const a=this.play(isl,[{width:p.island.width+'px',height:p.island.height+'px'},{width:r.width+'px',height:r.height+'px'}],{duration:open?520:380});
+        this.done(a,()=>c.remove('morphing'));
+        (p.tools||[]).forEach(t=>{ const b=$('coach').querySelector(`.coach-tools>button[data-a="${t.a}"]`); if(!b) return; const n=b.getBoundingClientRect(), dx=t.r.left-n.left, dy=t.r.top-n.top; if(dx||dy) this.play(b,[{transform:`translate(${dx}px,${dy}px)`},{transform:'none'}],{duration:open?520:380}); });
+      }
+    }
+    // 눌러야 할 곳을 처음 가리킬 때만 등장 움직임을 줘요. 같은 화면을 다시 그릴 때는 되풀이하지 않아요
+    const tk=key+'|'+(guided()?1:0);
+    if(tk!==this.tgtKey){ this.tgtKey=tk; if(guided()){ app.classList.add('tgt-fresh'); clearTimeout(this.tgtT); this.tgtT=setTimeout(()=>app.classList.remove('tgt-fresh'),800); } else app.classList.remove('tgt-fresh'); }
+    // 고른 택시: 표시가 새 줄로 미끄러져요
+    const sel=document.querySelector('#sheet .car.on');
+    if(!changed&&p.car&&sel&&sel.dataset.v!==p.carV){
+      const box=sel.parentNode, g=document.createElement('i'), r=sel.getBoundingClientRect();
+      g.className='car-ghost'; g.setAttribute('aria-hidden','true'); g.style.top=sel.offsetTop+'px'; g.style.height=sel.offsetHeight+'px';
+      box.appendChild(g); sel.classList.add('sel-moving');
+      const a=this.play(g,[{transform:`translateY(${p.car.top-r.top}px)`},{transform:'none'}],{duration:420});
+      this.done(a,()=>{ g.remove(); sel.classList.remove('sel-moving'); });
+    }
+    if(!changed) return;
+    // 진행 표시: 지금 단계의 칸이 왼쪽부터 차올라요
+    const bars=[...document.querySelectorAll('#coach .c-bars i')], idx=bars.findIndex(b=>b.classList.contains('on'));
+    if(idx>=0&&idx!==p.bar){ this.play(bars[idx],[{transform:'scaleX(0)',transformOrigin:'left'},{transform:'scaleX(1)',transformOrigin:'left'}],{duration:520}); this.play(document.querySelector('#coach .c-step'),[{opacity:0,transform:'translateY(4px)'},{opacity:1,transform:'none'}],{duration:320,easing:'ease-out'}); }
+    // 검색칸은 사라졌다 나타나는 대신 제자리에서 옮겨 가요
+    if(key==='search'&&p.search){ const f=$('q'), bar=$('panel').querySelector('.tx-sh'); if(f&&bar){ const r=f.getBoundingClientRect(); this.play(bar,[{transform:`translate(${p.search.left-r.left}px,${p.search.top-r.top}px)`},{transform:'none'}],{duration:520}); this.play($('panel'),[{backgroundColor:'rgba(255,255,255,0)'},{backgroundColor:'rgba(255,255,255,1)'}],{duration:260,easing:'ease-out'}); } }
+    if(p.key==='search'&&key==='home'&&p.field){ const w=$('sheet').querySelector('.tx-search-wrap'); if(w){ const r=w.getBoundingClientRect(); this.play(w,[{transform:`translate(${p.field.left-r.left}px,${p.field.top-r.top}px)`},{transform:'none'}],{duration:480}); } }
+    // 시트: 높이가 끊기지 않고 이전 자리에서 새 자리로 이어져요. 지도 크기에는 영향을 주지 않아요
+    const sh=$('sheet'), area=$('area');
+    if(!panelOpen&&p.sheetTop!=null&&sh.firstElementChild&&!S.sheetDown&&!sheetDrag){
+      const dy=p.sheetTop-sh.getBoundingClientRect().top;
+      if(Math.abs(dy)>2&&Math.abs(dy)<700){
+        if(this.sheetA) this.sheetA.cancel();
+        area.classList.add('morph'); sh.classList.add('morph');
+        const a=this.play(sh,[{transform:`translateY(${dy}px)`},{transform:'none'}],{duration:560});
+        this.sheetA=a; this.done(a,()=>{ area.classList.remove('morph'); sh.classList.remove('morph'); });
+      }
+    }
+    if(!panelOpen) this.play($('foot').firstElementChild,[{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'none'}],{duration:360});
+    // 결과: 체크 표시를 그려요
+    if(key==='result'){ const m=document.querySelector('.okmark:not(.retry)'); if(m){ m.querySelectorAll('svg path,svg polyline').forEach(x=>x.setAttribute('pathLength','1')); m.classList.add('draw'); } }
+  },
+  stop(el){ if(el&&el._leave){ const a=el._leave; el._leave=null; a.onfinish=null; a.cancel(); } },
+  leave(el){
+    const a=this.play(el,[{opacity:1,transform:'none'},{opacity:0,transform:'translateY(-8px) scale(.98)'}],{duration:220,easing:'ease-in',fill:'forwards'});
+    if(!a){ el.hidden=true; return; }
+    el._leave=a; a.onfinish=()=>{ el.hidden=true; a.cancel(); el._leave=null; };
+  },
+  ghost(modal){ // 안내창은 바로 닫되, 닫히는 모습은 복사본으로 보여 줘요
+    if(!this.ok()||modal.hidden) return;
+    try{
+      const g=modal.cloneNode(true); g.removeAttribute('id'); g.className='modal-ghost'; g.setAttribute('aria-hidden','true'); g.inert=true; g.querySelectorAll('[id]').forEach(x=>x.removeAttribute('id'));
+      modal.parentNode.appendChild(g);
+      this.play(g,[{opacity:1},{opacity:0}],{duration:280,easing:'ease-out',fill:'forwards'});
+      const a=this.play(g.firstElementChild,[{transform:'none'},{transform:'translateY(100%)'}],{duration:300,easing:'cubic-bezier(.4,0,1,1)',fill:'forwards'});
+      this.done(a,()=>g.remove());
+    }catch(e){}
+  }
+};
 function render(){
   document.documentElement.classList.toggle('big',PREF.big);
   const ride=S.screen==='ride', scroller=()=>$('panel').querySelector('.pbody,.res');
   const ae=document.activeElement, qFocus=ae&&ae.id==='q', qPos=qFocus?ae.selectionStart:0; // 다시 그려도 입력 칸의 커서를 지켜요
   // 같은 화면을 다시 그릴 때는 스크롤 위치와 누른 버튼의 초점도 지켜요
+  const motion=Motion.before();
   const panelKey=ride?S.step:S.screen, samePanel=panelKey===render.key; render.key=panelKey;
   const oldScroller=scroller(), panelTop=samePanel&&oldScroller?oldScroller.scrollTop:0;
   const focusA=samePanel&&ae&&$('app').contains(ae)&&ae.dataset?ae.dataset.a:null, focusV=focusA?ae.dataset.v:null;
@@ -1773,6 +1947,7 @@ function render(){
   if(qFocus){ const q=$('q'); if(q){ quietFocus(q); q.setSelectionRange(qPos,qPos); } }
   if(panel&&panelTop){ const sc=scroller(); if(sc) sc.scrollTop=panelTop; }
   if(focusA){ const b=[...$('app').querySelectorAll('[data-a]')].find(x=>x.dataset.a===focusA&&x.dataset.v===focusV); if(b) quietFocus(b); }
+  Motion.after(motion);
   requestAnimationFrame(()=>MapCtl.show(viewOf()));
 }
 
@@ -1928,17 +2103,17 @@ function exitNow(){
    11. 알림·소리
    ===================================================================== */
 function placeMsg(el){ const c=$('coach'), b=(c.hidden?document.querySelector('.prac-banner'):c).getBoundingClientRect(), p=$('phone'); el.style.top=Math.max(6,b.bottom-p.getBoundingClientRect().top-p.clientTop+6)+'px'; }
-function hideMessages(){ clearTimeout(toast._t); clearTimeout(noti._t); $('toast').hidden=true; $('noti').hidden=true; }
+function hideMessages(){ clearTimeout(toast._t); clearTimeout(noti._t); Motion.stop($('toast')); Motion.stop($('noti')); $('toast').hidden=true; $('noti').hidden=true; }
 let toastIsMistake=false;
-function toast(m,kind){ hideMessages(); toastIsMistake=false; announce(m); const t=$('toast'); t.className=kind||''; t.textContent=m; placeMsg(t); t.hidden=false; toast._t=setTimeout(()=>t.hidden=true, Math.max(5000,m.length*170)); }
-function noti(title,body){ hideMessages(); const n=$('noti'); if(S.step!=='approach'&&S.step!=='plate') announce(`${title}. ${body}`); n.innerHTML=`<span class="ni">${I('taxi')}</span><div><b>${title}</b><p>${body}</p></div>`; placeMsg(n); n.hidden=false; noti._t=setTimeout(()=>n.hidden=true,5000); }
+function toast(m,kind){ hideMessages(); toastIsMistake=false; announce(m); const t=$('toast'); t.className=kind||''; t.textContent=m; placeMsg(t); t.hidden=false; toast._t=setTimeout(()=>Motion.leave(t), Math.max(5000,m.length*170)); }
+function noti(title,body){ hideMessages(); const n=$('noti'); if(S.step!=='approach'&&S.step!=='plate') announce(`${title}. ${body}`); n.innerHTML=`<span class="ni">${I('taxi')}</span><div><b>${title}</b><p>${body}</p></div>`; placeMsg(n); n.hidden=false; noti._t=setTimeout(()=>Motion.leave(n),5000); }
 function stopSpeech(){ try{ speechSynthesis.cancel(); }catch(e){} }
 function say(t,force){ if((!PREF.voice&&!force)||!t) return; try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='ko-KR';u.rate=.9;speechSynthesis.speak(u)}catch(e){} }
 
 /* 안내창: 열려 있는 동안 뒤 화면은 터치도 키보드도 닿지 않아요 */
 let modalFrom=null, lastExitAt=-1e9;
 function openModal(html,label){ lastStepAt=performance.now(); modalFrom=document.activeElement; $('modal').innerHTML=html; $('modal').setAttribute('aria-label',label); $('modal').setAttribute('aria-describedby','modal-desc'); $('modal').hidden=false; $('app').inert=true; $('modal').querySelector('[data-a=modal-no]').focus(); }
-function closeModal(){ $('modal').hidden=true; $('app').inert=false; lastStepAt=performance.now(); const f=modalFrom; modalFrom=null; if(f&&f.isConnected) quietFocus(f); setTimeout(flushLive,0); }
+function closeModal(){ Motion.ghost($('modal')); $('modal').hidden=true; $('app').inert=false; lastStepAt=performance.now(); const f=modalFrom; modalFrom=null; if(f&&f.isConnected) quietFocus(f); setTimeout(flushLive,0); }
 const confirmHTML=(title,body,noText,yesAction,yesText,risky)=>`<div class="modal-in"><h3>${title}</h3><p id="modal-desc">${body}</p><div class="row2">${risky?`<button class="btn ghost risky" data-a="${yesAction}">${yesText}</button><button class="btn dark" data-a="modal-no">${noText}</button>`:`<button class="btn ghost" data-a="modal-no">${noText}</button><button class="btn dark" data-a="${yesAction}">${yesText}</button>`}</div></div>`;
 
 /* =====================================================================
