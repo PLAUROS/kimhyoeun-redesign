@@ -840,6 +840,29 @@ button{letter-spacing:inherit;line-height:1.3}
 .car .cfare{grid-column:2}
 
 .pfoot .btn.dark{background:var(--butter);color:var(--ink)}
+
+/* 하늘색 강조와 글자에 맞춘 안내 도구 */
+:root{--butter:#D7ECFA;--butter-2:#EEF7FD;--taxi:#CFE6F8;--gold:#5A9CCB}
+.prac-banner,.sb{background:var(--sky);color:var(--ink)}
+.tag,.tag.test{background:var(--sky-2);color:var(--blue-ink)}
+.coach-tools{display:flex;flex-wrap:wrap;justify-content:flex-start;align-items:center;gap:6px}
+.coach-tools button{flex:0 0 auto;width:auto;min-height:44px;padding:.35em .65em;font-size:.8em;line-height:1.35;border-radius:12px;white-space:nowrap;background:var(--bg);border:1px solid #C8DCEB;color:var(--ink-2)}
+.coach-tools button.on{background:var(--sky);border-color:#82B3D5;color:var(--blue-ink)}
+.coach-tools button.help-btn{flex:0 0 auto;grid-column:auto;margin:0;width:auto;min-height:44px;padding:.35em .65em;gap:.35em;font-size:.85em;line-height:1.35;white-space:nowrap;background:var(--sky);color:var(--blue-ink);border:1px solid #82B3D5;border-radius:12px;box-shadow:none}
+.coach-tools button.help-btn>svg{width:1.15em;height:1.15em;padding:0;box-sizing:border-box;background:none;border-radius:0;fill:none;color:currentColor;box-shadow:none;stroke-width:2}
+.coach-tools button.help-btn:disabled{background:var(--sky-2);color:var(--blue-ink);border-color:#B6D5EA;box-shadow:none}
+.coach-tools button.help-btn:hover:not(:disabled){background:#BEDDF3}
+.coach-tools button>svg{width:1.15em;height:1.15em}
+.tx-call,.btn.y,.pfoot .btn.dark{background:var(--sky);color:var(--blue-ink)}
+.tx-call:hover,.btn.y:hover,.pfoot .btn.dark:hover{background:#BEDDF3}
+.mic-ic,.mic{background:var(--sky);color:var(--blue-ink)}
+.mic.live{background:var(--coral);color:white}
+.note,.okmark.retry{background:var(--sky-2)}
+.okmark.retry{color:var(--blue-ink)}
+.tgt,.tx-call.tgt,.pc.tgt{box-shadow:0 0 0 2px var(--paper),0 0 0 4px var(--blue)}
+@keyframes tgt{50%{box-shadow:0 0 0 2px var(--paper),0 0 0 6px rgba(44,119,186,.3)}}
+.res-i.tgt{background:var(--sky-2);box-shadow:inset 0 0 0 3px var(--blue)}
+
 </style>
 </head>
 <body>
