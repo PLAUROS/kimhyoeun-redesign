@@ -863,6 +863,20 @@ button{letter-spacing:inherit;line-height:1.3}
 @keyframes tgt{50%{box-shadow:0 0 0 2px var(--paper),0 0 0 6px rgba(44,119,186,.3)}}
 .res-i.tgt{background:var(--sky-2);box-shadow:inset 0 0 0 3px var(--blue)}
 
+
+/* 하늘색 바탕에 노란 힌트, 설정 도구는 오른쪽 정렬 */
+.coach-tools{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:6px}
+.coach-tools button{justify-self:end}
+.coach-tools button.help-btn{justify-self:start;background:#FFE27A;color:#513700;border-color:#C79A1C}
+.coach-tools button.help-btn>svg{color:#795400;fill:#FFD43B}
+.coach-tools button.help-btn:hover:not(:disabled){background:#FFDA55}
+.coach-tools button.help-btn:disabled{background:#FFF5CC;color:#513700;border-color:#DCC27A}
+@container (max-width:340px){
+  .coach-tools button.help-btn{grid-column:1 / -1}
+  .coach-tools button[data-a=voice]{grid-column:2}
+  .coach-tools button[data-a=big]{grid-column:3}
+}
+
 </style>
 </head>
 <body>
