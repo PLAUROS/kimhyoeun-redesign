@@ -1250,7 +1250,7 @@ function curve(a,b,bend=0.18,n=32){const A=prj(a),B=prj(b),mx=(A.x+B.x)/2,my=(A.
 const HP = prj(HOME);
 const makeTaxis = (s,at=HOME) => { const c=prj(at); return [[-55,-40],[48,-28],[32,46],[-42,38],[74,8],[-8,-68]].map(([dx,dy])=>unprj(c.x+dx*s,c.y+dy*s)); };
 const makeApproach = s => { const P=prj(S.pick); return curve(unprj(P.x-80*s,P.y-62*s), S.pick, 0.22, 28); };
-// 기사님은 가까운 망포역 쪽에서 오는 것으로 보여줘요(받아 둔 경로를 거꾸로). 일방통행까지 맞춘 길은 아니에요
+// 경로 서버를 못 쓸 때의 대체 경로예요(받아 둔 망포역 경로를 거꾸로, 없으면 곡선). 평소에는 fetchApproach가 받은 실제 도로로 바꿔요
 const roadApproach = () => { const r=routeData('mpst'); return r ? [...toPts(r.path).reverse(),S.pick] : makeApproach(.5); };
 const approachPath = () => MapCtl.impl===KakaoMap ? roadApproach() : makeApproach(1); // 배차된 택시가 오는 길
 // 그림 지도 기준 값이에요. 실제 지도에서는 MapCtl.init이 주변 택시를 약 400m로 바꿔요
@@ -1264,12 +1264,14 @@ const routeData = k => {
   return S.live&&S.live.dest===k&&S.live.at===S.pick ? S.live : null; // 그 탑승 위치로 받아 온 경로
 };
 // 서버 함수로 경로 받기. 실패하면 null이고, 그때는 곡선과 조정 요금으로 그대로 진행해요
-async function fetchRoute(a,to){ // to는 PLACES의 key예요. 함수도 이 장소들만 받아요
-  if(!CONFIG.ROUTE_API||!Object.prototype.hasOwnProperty.call(PLACES,to)) return null;
-  const place=PLACES[to], target=place.dynamic?`${place.lat.toFixed(3)},${place.lon.toFixed(3)}`:to; // 검색한 장소는 좌표로 보내요
+const coordText = p => `${p.lat.toFixed(3)},${p.lon.toFixed(3)}`;
+async function fetchRoute(a,to){ // to는 PLACES의 key이거나 {lat,lon} 좌표예요
+  if(!CONFIG.ROUTE_API) return null;
+  if(typeof to==='string'&&!Object.prototype.hasOwnProperty.call(PLACES,to)) return null;
+  const target=typeof to==='string'?(PLACES[to].dynamic?coordText(PLACES[to]):to):coordText(to); // 검색한 장소는 좌표로 보내요
   const ctl=new AbortController(), t=setTimeout(()=>ctl.abort(),5000);
   try{
-    const res=await fetch(`${CONFIG.ROUTE_API}?from=${a.lat.toFixed(3)},${a.lon.toFixed(3)}&to=${target}`,{signal:ctl.signal});
+    const res=await fetch(`${CONFIG.ROUTE_API}?from=${coordText(a)}&to=${target}`,{signal:ctl.signal});
     if(!res.ok) return null;
     const r=await res.json();
     const ok=r&&Array.isArray(r.path)&&r.path.length>1&&r.path.every(p=>Array.isArray(p)&&Number.isFinite(p[0])&&Number.isFinite(p[1]))&&r.m>0&&r.s>0&&r.taxi>0;
@@ -1290,6 +1292,12 @@ function refreshLive(){ // 지금 탑승 위치에서 목적지까지의 실제 
   fetchRoute(at,dest).then(r=>{ if(r&&req===liveReq&&(S.step==='origin'||S.step==='route')&&S.pick===at&&S.dest===dest){ S.live={dest,at,...r}; if(S.step!=='route') showPick(); else { MapCtl.lastKey=null; liveDirty=true; flushLive(); } } });
 }
 const toPts = p => p.map(([lat,lon])=>({lat,lon}));
+// 배차되는 택시는 지도에 보이던 주변 택시 중 하나예요. 너무 가까우면 움직임이 안 보여서 250m 넘게 떨어진 택시부터 골라요
+const dispatchFrom = at => TAXIS.filter(p=>km(p,at)>=0.25).sort((a,b)=>km(a,at)-km(b,at)).slice(0,2);
+async function fetchApproach(at){ // 택시가 실제 도로를 따라 오는 길이에요. 그 자리에서 경로를 못 받으면 다음 택시로 받아요
+  for(const from of dispatchFrom(at)){ const r=await fetchRoute(from,at); if(r) return toPts(r.path); }
+  return null;
+}
 function routePath(k){
   const r = routeData(k);
   // 그림 지도의 도로는 실제 도로가 아니라서, 도로 경로는 실제 지도에서만 그려요. 양 끝은 출발지·도착지 좌표로 이어요
@@ -1634,7 +1642,7 @@ function viewOf(){
     case 'route':    return {key:'route'+d, at, dest:d, fit:[PLACES[d]]};
     case 'origin':   return {key:'pick', at:base(), pick:1, origin:1, taxis:1, fit:[at]};
     case 'calling':  return {key:'calling', at, origin:1, radar:1, taxis:1, fit:[at,...TAXIS]};
-    case 'approach': return {key:'approach', at, origin:1, car:1, carAt:S.approach[0], approachLine:S.approach, fit:S.approach};
+    case 'approach': return {key:'approach', at, origin:1, car:1, carAt:S.approach[0], approachLine:S.approach, fit:[at,...S.approach]};
     case 'plate':    return {key:'plate', at, origin:1, car:1, carAt:at, fit:[at]};
     case 'ride':     return {key:'ride'+d, at, dest:d, route:r, car:1, carAt:r[0], fit:[at,PLACES[d],...r]};
     case 'arrive':   return {key:'arrive'+d, at, dest:d, car:1, carAt:PLACES[d], fit:[PLACES[d]]};
@@ -2252,8 +2260,8 @@ const A = {
     if(MapCtl.impl===KakaoMap&&KakaoMap.view&&KakaoMap.view.pick){ const c=KakaoMap.map.getCenter(); if(!tryPick({lat:c.getLat(),lon:c.getLng()})) return; }
     if(km(S.pick,PLACES[S.dest])<0.1){ toast('탑승 위치가 도착지와 너무 가까워요. 조금 떨어진 곳을 골라 봐요'); toastIsMistake=true; return; }
     S.plates=plateOpts(S.car); S.plateBad=-1; S.approach=approachPath(); setStep('calling');
-    // 핀을 멀리 옮겼으면 기사님이 오는 길도 그 위치 기준으로 받아요. 호출 중(4초) 안에 오면 써요
-    if(!routeData('mpst')&&MapCtl.impl===KakaoMap&&km(S.pick,PLACES.mpst)<5){ const at=S.pick; fetchRoute(at,'mpst').then(r=>{ if(r&&S.step==='calling'&&S.pick===at) S.approach=[...toPts(r.path).reverse(),at]; }); } },
+    // 기사님이 오는 길은 호출 중(4초)에 실제 도로로 받아서, 그 안에 오면 바꿔요
+    if(MapCtl.impl===KakaoMap){ const at=S.pick; fetchApproach(at).then(p=>{ if(p&&S.step==='calling'&&S.pick===at) S.approach=p; }); } },
   cancel:()=>{setStep('route');toast('호출을 취소했어요. 다시 불러볼까요?')},
   'cancel-ask':()=>{ pauseFlow('modal'); stopSpeech();
     openModal(confirmHTML('기사님이 오고 있어요. 취소할까요?','취소하고 다시 부르면 더 먼 택시가 올 수 있어요. 실제 앱에서는 택시 종류에 따라 취소 수수료가 나오기도 하니 안내를 꼭 읽어요. 연습이라 돈은 나가지 않아요.','아니요','cancel-yes','호출 취소하기',true),'호출 취소 확인'); },
