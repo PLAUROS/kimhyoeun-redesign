@@ -1114,6 +1114,24 @@ button.car:active:not(:disabled),button.res-i:active:not(:disabled){transform:sc
 
 [data-step=route] .map-wrap{--map-min:clamp(180px,30cqh,300px)}
 .big [data-step=route] .map-wrap{--map-min:120px}
+
+/* 안내 위쪽: 연습 표시와 진행 칸을 한 줄로, 제목은 그 아래 넓게 */
+.c-prog{gap:.6em;line-height:1.35}
+.c-prog .tag{font-size:max(13px,.95em);flex:none}
+.c-bars{flex:0 0 5.4em;max-width:5.4em}
+.c-step{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c-row{font-size:1.04em;line-height:1.35}
+@container (max-height:760px){.c-prog{order:-1;line-height:1.35}}
+/* 안내 글은 낱말 사이를 조금 띄우고, 문장마다 줄을 나눠요 */
+.hint span,.note,.sheet p.small,.modal-in p{letter-spacing:-.004em;word-spacing:.07em;line-height:1.55;text-wrap:pretty}
+.island-body .hint{font-size:.97em}
+/* 탑승 위치 바꾸기 */
+.origin-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.origin-actions button{display:inline-flex;align-items:center;justify-content:center;gap:.35em;min-height:48px;padding:.3em .5em;border:0;border-radius:14px;background:var(--fill);color:var(--ink);font-weight:600;font-size:.95em;letter-spacing:-.018em;white-space:nowrap}
+.origin-actions button svg{width:1.15em;height:1.15em;color:var(--blue)}
+.origin-actions button:disabled{color:var(--ink-2)}
+.res-i.gps-row b{color:var(--blue-ink)}
+
 </style>
 </head>
 <body>
@@ -1230,7 +1248,7 @@ function km(a,b){const R=6371,t=Math.PI/180,dLa=(b.lat-a.lat)*t,dLo=(b.lon-a.lon
 function curve(a,b,bend=0.18,n=32){const A=prj(a),B=prj(b),mx=(A.x+B.x)/2,my=(A.y+B.y)/2,dx=B.x-A.x,dy=B.y-A.y,C={x:mx-dy*bend,y:my+dx*bend};const out=[];
   for(let i=0;i<=n;i++){const t=i/n,u=1-t;out.push(unprj(u*u*A.x+2*u*t*C.x+t*t*B.x,u*u*A.y+2*u*t*C.y+t*t*B.y))}return out}
 const HP = prj(HOME);
-const makeTaxis = s => [[-55,-40],[48,-28],[32,46],[-42,38],[74,8],[-8,-68]].map(([dx,dy])=>unprj(HP.x+dx*s,HP.y+dy*s));
+const makeTaxis = (s,at=HOME) => { const c=prj(at); return [[-55,-40],[48,-28],[32,46],[-42,38],[74,8],[-8,-68]].map(([dx,dy])=>unprj(c.x+dx*s,c.y+dy*s)); };
 const makeApproach = s => { const P=prj(S.pick); return curve(unprj(P.x-80*s,P.y-62*s), S.pick, 0.22, 28); };
 // 기사님은 가까운 망포역 쪽에서 오는 것으로 보여줘요(받아 둔 경로를 거꾸로). 일방통행까지 맞춘 길은 아니에요
 const roadApproach = () => { const r=routeData('mpst'); return r ? [...toPts(r.path).reverse(),S.pick] : makeApproach(.5); };
@@ -1240,7 +1258,7 @@ let TAXIS = makeTaxis(1);       // 주변 택시
 
 // 받아 둔 경로는 그 출발지 근처에서만 맞아요. 더 멀리 타면 함수로 받은 경로(S.live)를 쓰고, 없으면 곡선과 조정 요금이에요
 const PICK_KEEP_KM = 0.15; // 탑승 위치가 경로 출발지에서 이 안이면 받아 둔 도로 경로와 요금을 그대로 써요
-const MAX_PICK_KM = 1;     // 탑승 핀은 현재 위치에서 이만큼까지 옮길 수 있어요
+const MAX_PICK_KM = 1;     // 탑승 핀은 기준 위치(현재 위치나 검색한 장소)에서 이만큼까지 옮길 수 있어요
 const routeData = k => {
   if(km(S.pick,ROUTES_ORIGIN)<PICK_KEEP_KM) return ROUTES[k]&&ROUTES[k].path ? ROUTES[k] : null;
   return S.live&&S.live.dest===k&&S.live.at===S.pick ? S.live : null; // 그 탑승 위치로 받아 온 경로
@@ -1339,7 +1357,7 @@ const HINT = {
   home:    ()=>'아래 "어디로 갈까요?" 칸을 눌러요.',
   search:  ()=>S.missionOn ? `"${PLACES[MISSION_KEY].n}"${eul(PLACES[MISSION_KEY].n)} 글자로 쓰거나, 파란 마이크를 누르고 말해요. 찾으면 이름을 눌러요.` : '가고 싶은 곳을 글자로 쓰거나, 파란 마이크를 누르고 말해요. 찾으면 이름을 눌러요.',
   route:   ()=>S.missionOn&&S.car!=='일반' ? '먼저 "일반택시"를 눌러요.' : S.missionOn ? `"일반택시"와 요금을 보고 맨 아래 "${S.car}택시 선택하기" 버튼을 눌러요.` : `택시 종류와 요금을 보고 맨 아래 "${S.car}택시 선택하기" 버튼을 눌러요.`,
-  origin:  ()=>`핀 끝이 택시를 탈 곳이에요. 지도를 움직이거나 누르면 옮겨져요. 맞으면 맨 아래 "${S.car}택시 호출하기" 버튼을 눌러요.`,
+  origin:  ()=>`핀 끝이 택시를 탈 곳이에요. 지도를 움직이거나 위치 버튼으로 바꿀 수 있어요. 맞으면 맨 아래 "${S.car}택시 호출하기" 버튼을 눌러요.`,
   calling: ()=>'가까운 택시를 찾고 있어요. 잠깐만 기다려요.',
   approach:()=>S.mode==='test'?'기사님이 오고 있어요. 잠깐만 기다려요.':'기사님이 오고 있어요. 차 번호와 차 색깔을 기억해 둬요.',
   plate:   ()=>'내 택시 번호판과 똑같은 차를 골라요. 숫자 하나까지 같아야 해요.',
@@ -1353,7 +1371,7 @@ const HINT = {
 const PREF = {guide:PARAMS.guide, voice:PARAMS.voice, big:PARAMS.big};
 let S = fresh(PARAMS.mode, PARAMS.mission!=null, PARAMS.named);
 function fresh(mode, missionOn, named){
-  return {screen:'ride', step:'home', mode, missionOn, named, pick:HOME, pickName:'', approach:[], dest:null, car:'일반', q:'', listening:false, shared:false, booked:false, sheetDown:false,
+  return {screen:'ride', step:'home', mode, missionOn, named, pick:HOME, pickName:'', base:null, originSearch:false, locating:false, approach:[], dest:null, car:'일반', q:'', listening:false, shared:false, booked:false, sheetDown:false,
     hintOpen:false, t0:0, stepAt:null, mist:0, hints:0, sk:Object.fromEntries(SKILLS.map(([k])=>[k,{m:0,h:0,g:0,ms:0}])),
     plates:[], live:null, pay:'card', res:null};
 }
@@ -1613,7 +1631,7 @@ function viewOf(){
     case 'home':
     case 'search':   return {key:'home', at, origin:1, taxis:1, fit:[at,...TAXIS]};
     case 'route':    return {key:'route'+d, at, dest:d, fit:[PLACES[d]]};
-    case 'origin':   return {key:'pick', at:HOME, pick:1, origin:1, taxis:1, fit:[at]};
+    case 'origin':   return {key:'pick', at:base(), pick:1, origin:1, taxis:1, fit:[at]};
     case 'calling':  return {key:'calling', at, origin:1, radar:1, taxis:1, fit:[at,...TAXIS]};
     case 'approach': return {key:'approach', at, origin:1, car:1, carAt:S.approach[0], approachLine:S.approach, fit:S.approach};
     case 'plate':    return {key:'plate', at, origin:1, car:1, carAt:at, fit:[at]};
@@ -1624,19 +1642,21 @@ function viewOf(){
 
 /* 탑승 위치: 카카오맵과 그림 지도가 같은 함수로 바꿔요. 위치는 결과에 넣지 않고 옮겼는지만 기록해요 */
 let pickReq=0;
-const pickLabel = () => km(S.pick,HOME)<0.01 ? `현재 위치 · ${esc(HOME.a)}` : (esc(S.pickName)||'지도에서 고른 곳');
+const base = () => S.base||HOME; // 탑승 핀의 기준. 기본은 연습용 집이고, 실제 현재 위치나 검색한 장소로 바꿀 수 있어요
+const baseName = () => { const b=base(); return b.kind==='place'?b.n:'현재 위치'; };
+const pickLabel = () => { const b=base(); if(km(S.pick,b)>=0.01) return esc(S.pickName)||'지도에서 고른 곳'; if(b.kind==='place') return esc(b.n); const a=b.a||S.pickName; return `현재 위치${a?` · ${esc(a)}`:''}`; };
 function pickRows(){
-  const fr=fareOf(S.dest), m=Math.round(km(S.pick,HOME)*1000);
-  return `<div class="ft-r"><i class="dot s"></i><span><small>탑승 위치${m>=10?` · 현재 위치에서 약 ${m}m`:''}</small><b>${pickLabel()}</b></span></div>
+  const fr=fareOf(S.dest), m=Math.round(km(S.pick,base())*1000);
+  return `<div class="ft-r"><i class="dot s"></i><span><small>탑승 위치${m>=10?` · ${esc(baseName())}에서 약 ${m}m`:''}</small><b>${pickLabel()}</b></span></div>
     <div class="ft-r extra"><i class="dot n"></i><span><small>예상 요금 · 약 ${fr.km}km</small><b class="tabnum">${won(carFare(fr.f,S.car))}</b></span></div>`;
 }
-const barFrom=()=>km(S.pick,HOME)<0.01?'현재 위치':'고른 위치';
+const barFrom=()=>km(S.pick,base())<0.01?baseName():'고른 위치';
 const setMapLabel=()=>$('map').setAttribute('aria-label',S.dest?`택시 호출 지도. 도착 ${PLACES[S.dest].n}. 출발 ${barFrom()}.`:'택시 호출 지도. 도착지를 아직 고르지 않았어요.');
 const showPick=()=>{ const e=$('pick-ft'), f=$('bar-from'); if(e) e.innerHTML=pickRows(); if(f) f.textContent=barFrom(); setMapLabel(); };
 function setPick(p){
   if(S.step!=='origin'||km(p,S.pick)<0.003) return; // 지도를 다시 맞출 때 생기는 아주 작은 차이는 옮긴 것으로 보지 않아요
   S.pick={lat:p.lat,lon:p.lon}; S.pickName='';
-  S.sk.origin.moved = km(p,HOME)>=0.01 ? 1 : 0; // 현재 위치로 되돌리면 옮기지 않은 것으로 봐요
+  S.sk.origin.moved = S.base||km(p,HOME)>=0.01 ? 1 : 0; // 처음 위치로 되돌리면 옮기지 않은 것으로 봐요
   const req=++pickReq; showPick(); refreshLive();
   try{
     if(MapCtl.impl!==KakaoMap||!kakao.maps.services) return;
@@ -1648,8 +1668,38 @@ function setPick(p){
   }catch(e){}
 }
 function tryPick(p){
-  if(km(p,HOME)>MAX_PICK_KM){ toast(`탑승 위치는 현재 위치에서 ${MAX_PICK_KM}km 안에서 골라요`); MapCtl.impl.refit(); return false; }
+  if(km(p,base())>MAX_PICK_KM){ toast(`탑승 위치는 ${baseName()}에서 ${MAX_PICK_KM}km 안에서 골라요`); MapCtl.impl.refit(); return false; }
   setPick(p); return true;
+}
+// 기준 위치 바꾸기: 실제 현재 위치나 검색한 장소로 옮겨요. 위치 값은 결과에 넣지 않고 옮겼는지만 기록해요
+function setBase(b){
+  S.base=b; S.pick={lat:b.lat,lon:b.lon}; S.pickName=''; S.live=null; S.sk.origin.moved=1; S.originSearch=false; S.q=''; PlaceSearch.reset();
+  TAXIS=makeTaxis(MapCtl.impl===KakaoMap?.4:1,b); MapCtl.lastKey=null;
+  const req=++pickReq; render(); refreshLive();
+  if(b.kind!=='gps') return;
+  try{
+    new kakao.maps.services.Geocoder().coord2Address(b.lon,b.lat,(r,st)=>{
+      if(req!==pickReq||st!==kakao.maps.services.Status.OK||!r[0]) return;
+      const a=r[0].road_address||r[0].address;
+      if(a&&a.address_name){ S.pickName=a.address_name; showPick(); }
+    });
+  }catch(e){}
+}
+const canChooseBase=()=>MapCtl.impl===KakaoMap;
+function useGps(){
+  if(S.locating) return;
+  if(!navigator.geolocation){ toast('이 기기에서는 현재 위치를 확인할 수 없어요'); return; }
+  const run=S, open=()=>S===run&&(S.step==='home'||S.step==='origin');
+  S.locating=true; render(); announce('현재 위치를 찾고 있어요.');
+  navigator.geolocation.getCurrentPosition(g=>{
+    if(!open()) return; S.locating=false;
+    const lat=g.coords.latitude, lon=g.coords.longitude;
+    if(!(lat>=33&&lat<=39&&lon>=124&&lon<=132)){ render(); toast('국내에서만 현재 위치를 쓸 수 있어요'); return; }
+    setBase({lat,lon,kind:'gps'}); toast('현재 위치로 맞췄어요','good');
+  },e=>{
+    if(!open()) return; S.locating=false; render();
+    toast(e&&e.code===1?'위치 사용을 허용하면 실제 위치로 맞출 수 있어요':'현재 위치를 찾지 못했어요. 장소를 검색해 봐요');
+  },{enableHighAccuracy:true,timeout:10000,maximumAge:30000});
 }
 // 그림 지도에서 탑승 위치 고르기: 끌면 지도가 따라오고, 누르면 그 자리로 옮겨요
 let svgDrag=null;
@@ -1713,14 +1763,14 @@ function coachHTML(){
   const st=S.step, sk=SKILL_OF[st], idx=SKILLS.findIndex(x=>x[0]===sk), test=S.mode==='test';
   const island = test && !WAIT[st]; // 힌트 버튼과 내용을 한 덩어리로 합쳐요
   const showHint = (WAIT[st] || guided()) && !island;
-  const hintBody = `<div class="hint${WAIT[st]?' wait':''}">${I('light')}<span>${HINT[st]()}</span><button data-a="say" aria-label="읽어주기">${I('speaker')}</button></div>`;
+  const hintBody = `<div class="hint${WAIT[st]?' wait':''}">${I('light')}<span>${HINT[st]().replace(/([요다]\.)\s+/g,'$1<br>')}</span><button data-a="say" aria-label="읽어주기">${I('speaker')}</button></div>`;
   const islandHTML = `<div class="island${S.hintOpen?' open':''}">${helpBtn()}${S.hintOpen?`<div class="island-body">${hintBody}</div>`:''}</div>`;
   const tag = test ? (S.named?'<span class="tag test">테스트<span class="tag-more"> · 혼자 해봐요</span></span>':'<span class="tag">연습</span>') : `<span class="tag">연습 모드<span class="tag-more"> · 힌트 ${PREF.guide?'켬':'끔'}</span></span>`;
   const tools = (test ? (WAIT[st]?'':islandHTML) : `<button class="${PREF.guide?'on':''}" aria-pressed="${!!PREF.guide}" data-a="guide">힌트 ${PREF.guide?'켜짐':'꺼짐'}</button>`)
     + `<button class="${PREF.voice?'on':''}" aria-pressed="${!!PREF.voice}" data-a="voice">소리 ${PREF.voice?'켜짐':'꺼짐'}</button>`
     + `<button class="${PREF.big?'on':''}" aria-pressed="${!!PREF.big}" data-a="big">글자 크게</button>`;
-  return `<div class="c-row">${tag}<span class="m-full">${missionText()}</span><span class="m-short">${missionShort()}</span></div>
-    <div class="c-prog"><span class="c-bars" role="img" aria-label="${idx+1}단계 / ${SKILLS.length}단계">${SKILLS.map((x,i)=>`<i class="${i<idx?'done':i===idx?'on':''}"></i>`).join('')}</span><span class="c-step">${idx+1}/${SKILLS.length} · ${SKILLS[idx][1]}</span>${test&&S.named?`<b class="c-time tabnum" role="timer" aria-label="걸린 시간"><span id="timer">${mmss()}</span></b>`:''}</div>
+  return `<div class="c-prog">${tag}<span class="c-bars" role="img" aria-label="${idx+1}단계 / ${SKILLS.length}단계">${SKILLS.map((x,i)=>`<i class="${i<idx?'done':i===idx?'on':''}"></i>`).join('')}</span><span class="c-step">${idx+1}/${SKILLS.length} · ${SKILLS[idx][1]}</span>${test&&S.named?`<b class="c-time tabnum" role="timer" aria-label="걸린 시간"><span id="timer">${mmss()}</span></b>`:''}</div>
+    <div class="c-row"><span class="m-full">${missionText()}</span><span class="m-short">${missionShort()}</span></div>
     ${showHint?hintBody:''}
     <div class="coach-tools${island&&S.hintOpen?' hint-on':''}">${tools}</div>`;
 }
@@ -1740,6 +1790,7 @@ function sheetHTML(){
     <button class="payrow" data-a="pay-open" aria-label="결제 수단 바꾸기. 지금은 ${S.pay==='card'?'연습카드 자동결제':'기사님에게 직접 결제'}">${I('card')}${S.pay==='card'?'연습카드 ···· 0000':'기사님에게 직접 결제'}<span>${S.pay==='card'?'내릴 때 자동결제':'내릴 때 직접 내요'} ›</span></button>`;
   case 'origin': return `${GRAB()}<div class="pick-h"><h3>어디서 탈까요?</h3><span>도착 <b>${esc(P.n)}</b></span></div>
     <div class="ft" id="pick-ft">${pickRows()}</div>
+    ${canChooseBase()?`<div class="origin-actions"><button data-a="use-gps"${S.locating?' disabled':''}>${I('loc')}${S.locating?'찾는 중…':'현재 위치로'}</button><button data-a="origin-search">${I('search')}다른 곳 검색</button></div>`:''}
     <p class="small muted extra">지도를 움직이거나 누르면 핀이 옮겨져요. 찾기 쉬운 곳으로 골라 봐요.</p><div class="pin-move" role="group" aria-label="핀 옮기기">${[['n','위로','↑'],['s','아래로','↓'],['w','왼쪽으로','←'],['e','오른쪽으로','→']].map(([v,t,g])=>`<button data-a="pin-move" data-v="${v}" aria-label="핀을 ${t} 옮기기">${g}</button>`).join('')}</div>`;
   case 'calling': return `<div class="radar">${I('taxi')}</div>
     <h3 style="text-align:center">가까운 택시를 찾고 있어요</h3>
@@ -1781,17 +1832,18 @@ function footHTML(){
 
 function searchHTML(){
   return `<div class="tx-sh"><button class="ic-btn" data-a="search-back" aria-label="뒤로">${I('back')}</button>
-    <input id="q" placeholder="어디로 갈까요?" value="${esc(S.q)}" autocomplete="off" aria-label="도착지 검색">
-    <button class="mic${S.listening?' live':''}${tg(!S.q&&!S.listening)}" data-a="mic" aria-label="말로 찾기">${I('mic')}</button></div>
+    <input id="q" placeholder="${S.originSearch?'어디서 탈까요?':'어디로 갈까요?'}" value="${esc(S.q)}" autocomplete="off" aria-label="${S.originSearch?'탑승 장소 검색':'도착지 검색'}">
+    ${S.originSearch?'':`<button class="mic${S.listening?' live':''}${tg(!S.q&&!S.listening)}" data-a="mic" aria-label="말로 찾기">${I('mic')}</button>`}</div>
     ${S.listening?`<div class="listen"><div class="wave"><i></i><i></i><i></i><i></i><i></i></div><b>듣고 있어요… 가고 싶은 곳을 말해 봐요</b><small>연습 화면이라 말하지 않아도 예시 장소가 채워져요</small></div>`:''}
     <div class="res" id="res">${resultsHTML()}</div>`;
 }
 // 카카오 장소 검색. 이전 검색의 늦은 응답이 최신 목록을 덮지 않게 해요.
+const searching=()=>S.step==='search'||S.originSearch;
 const PlaceSearch = {
   query:'', items:[], status:'idle', id:0, timer:0, timeout:0, composing:false, cache:new Map(), known:new Map(),
   reset(){ clearTimeout(this.timer); clearTimeout(this.timeout); this.id++; this.query=''; this.items=[]; this.status='idle'; },
   update(){
-    if(S.step!=='search'||!$('res')) return;
+    if(!searching()||!$('res')) return;
     $('res').innerHTML=resultsHTML();
   },
   schedule(){
@@ -1807,7 +1859,7 @@ const PlaceSearch = {
     const id=this.id, query=this.query;
     this.timer=setTimeout(()=>{
       const finish=(items,status)=>{
-        if(id!==this.id||S.step!=='search'||S.q.trim()!==query) return;
+        if(id!==this.id||!searching()||S.q.trim()!==query) return;
         clearTimeout(this.timeout);
         if(status!=='error'){
           this.cache.set(cacheKey,{items,status});
@@ -1836,11 +1888,13 @@ function resultsHTML(){
   const norm=s=>s.replace(/\s/g,'').toLowerCase(), q=norm(S.q.trim());
   const local=NEARBY.filter(([,p])=>!q||norm(p.n+p.a+(p.kw||'')).includes(q));
   const row=(p,action,key)=>`<button class="res-i" data-a="${action}" data-v="${key}">${I('pin')}<span><b>${esc(p.n)}</b><small>${esc(p.a)}</small></span><em class="tabnum">${km(S.pick,p).toFixed(1)}km</em></button>`;
-  if(!q) return '<div class="res-h">가까운 곳</div>'+local.map(([k,p])=>row(p,'pick',k)).join('');
+  const pickAct=S.originSearch?'origin-local':'pick', placeAct=S.originSearch?'origin-place':'pick-place';
+  const gps=S.originSearch&&!q?`<button class="res-i gps-row" data-a="use-gps">${I('loc')}<span><b>현재 위치로 설정</b><small>이 기기의 위치를 사용해요</small></span></button>`:'';
+  if(!q) return gps+'<div class="res-h">가까운 곳</div>'+local.map(([k,p])=>row(p,pickAct,k)).join('');
   const current=PlaceSearch.query===S.q.trim(), status=current?PlaceSearch.status:'loading';
   const remote=current?PlaceSearch.items:[];
   const seen=new Set(remote.map(p=>norm(p.n)));
-  const list=remote.map(p=>row(p,'pick-place',p.id)).join('')+local.filter(([,p])=>!seen.has(norm(p.n))).map(([k,p])=>row(p,'pick',k)).join('');
+  const list=remote.map(p=>row(p,placeAct,p.id)).join('')+local.filter(([,p])=>!seen.has(norm(p.n))).map(([k,p])=>row(p,pickAct,k)).join('');
   const msg=status==='loading'?'장소를 찾고 있어요…':status==='error'?'장소 검색에 연결하지 못했어요. 잠시 후 글자를 다시 입력해 주세요.':!list?'찾은 장소가 없어요. 지역 이름과 장소 이름을 함께 써 보세요.':'';
   return '<div class="res-h">검색 결과 · 가까운 곳은 직선거리로 표시해요</div>'+ (msg?`<div class="${list?'res-h':'empty'}" role="status">${msg}</div>`:'')+list;
 }
@@ -1880,7 +1934,7 @@ function resultHTML(){
 function mapUiHTML(){
   if(S.screen!=='ride') return '';
   let h='';
-  const bar=(act,label)=>`<div class="route-bar"><button data-a="${act}" aria-label="${label}">${I('back')}</button><span class="from"><small>출발</small> <em id="bar-from">${barFrom()}</em></span><i aria-hidden="true">›</i><span class="to"><small>도착</small> ${esc(PLACES[S.dest].n)}</span></div>`;
+  const bar=(act,label)=>`<div class="route-bar"><button data-a="${act}" aria-label="${label}">${I('back')}</button><span class="from"><small>출발</small> <em id="bar-from">${esc(barFrom())}</em></span><i aria-hidden="true">›</i><span class="to"><small>도착</small> ${esc(PLACES[S.dest].n)}</span></div>`;
   if(S.step==='route') h+=`<div class="route-bar"><button data-a="route-back" aria-label="도착지 다시 고르기">${I('back')}</button><span>${esc(PLACES[S.dest].n)}</span></div><button class="fab loc" data-a="dest-locate" aria-label="목적지로 지도 맞추기">${I('loc')}</button>`;
   if(S.step==='approach') h+=`<button class="cancel-chip" data-a="cancel-ask">호출 취소</button>`;
   if(S.step==='origin') h+=`<div class="center-pin k-pin o"><b>여기서 타요</b><span></span></div>${bar('pick-back','택시 종류 다시 고르기')}`;
@@ -1978,7 +2032,7 @@ function render(){
   const ae=document.activeElement, qFocus=ae&&ae.id==='q', qPos=qFocus?ae.selectionStart:0; // 다시 그려도 입력 칸의 커서를 지켜요
   // 같은 화면을 다시 그릴 때는 스크롤 위치와 누른 버튼의 초점도 지켜요
   const motion=Motion.before();
-  const panelKey=ride?S.step:S.screen, samePanel=panelKey===render.key; render.key=panelKey;
+  const panelKey=ride?(S.originSearch?'origin-search':S.step):S.screen, samePanel=panelKey===render.key; render.key=panelKey;
   const oldScroller=scroller(), panelTop=samePanel&&oldScroller?oldScroller.scrollTop:0;
   const focusA=samePanel&&ae&&$('app').contains(ae)&&ae.dataset?ae.dataset.a:null, focusV=focusA?ae.dataset.v:null;
   $('coach').hidden=!ride; if(ride) $('coach').innerHTML=coachHTML();
@@ -1990,7 +2044,7 @@ function render(){
   const foot = ride ? footHTML() : '';
   $('foot').hidden=!foot; $('foot').innerHTML=foot;
   $('mapui').innerHTML = mapUiHTML();
-  const panel = S.screen==='result' ? resultHTML() : (ride&&S.step==='search') ? searchHTML() : '';
+  const panel = S.screen==='result' ? resultHTML() : (ride&&(S.step==='search'||S.originSearch)) ? searchHTML() : '';
   $('panel').classList.toggle('same',samePanel); $('panel').hidden=!panel; if(panel) $('panel').innerHTML=panel;
   document.querySelector('.map-wrap').inert=!!panel; $('sheet').inert=!!panel; // 패널 뒤의 버튼에는 키보드도 닿지 않아요
   $('area').classList.toggle('lock',!!panel); if(panel) $('area').scrollTop=0;
@@ -2068,7 +2122,7 @@ function setStep(st){
   if(st==='ride'){ clearTimeout(noti._t); $('noti').hidden=true; }
   if(toastIsMistake) hideMessages(); // 고친 뒤에도 "다시 골라 봐요"가 남지 않게 해요
   if(st!=='search') PlaceSearch.reset();
-  S.step=st; S.hintOpen=false; S.listening=false; S.sheetDown=false; sheetDrag=null; liveDirty=false;
+  S.step=st; S.originSearch=false; S.locating=false; S.hintOpen=false; S.listening=false; S.sheetDown=false; sheetDrag=null; liveDirty=false;
   markGuide();
   render();
   { const sh=$('sheet'); sh.setAttribute('role','group'); sh.setAttribute('aria-label',STEP_SAY[st]()); sh.classList.remove('enter'); void sh.offsetWidth; sh.classList.add('enter'); clearTimeout(setStep.enterT); setStep.enterT=setTimeout(()=>sh.classList.remove('enter'),700); }
@@ -2092,7 +2146,7 @@ function mistake(msg,key){ // 같은 곳을 손이 떨려 연달아 누른 건 �
   if(!dup){ S.mist++; S.sk[SKILL_OF[S.step]].m++; if(PREF.voice) say(msg); }
   toast(msg,'mist'); toastIsMistake=true;
 }
-function begin(){ S.t0=flowNow(); S.screen='ride'; MapCtl.lastKey=null; setStep('home'); }
+function begin(){ TAXIS=makeTaxis(MapCtl.impl===KakaoMap?.4:1); S.t0=flowNow(); S.screen='ride'; MapCtl.lastKey=null; setStep('home'); }
 
 // 막힌 단계: 그만둔 곳, 끝까지 했으면 실수×3 + 힌트×2(테스트) + 90초 초과 1 이 가장 큰 곳
 function stuckStep(done){
@@ -2164,7 +2218,7 @@ function say(t,force){ if((!PREF.voice&&!force)||!t) return; try{speechSynthesis
 
 /* 안내창: 열려 있는 동안 뒤 화면은 터치도 키보드도 닿지 않아요 */
 let modalFrom=null, lastExitAt=-1e9;
-function openModal(html,label){ lastStepAt=performance.now(); modalFrom=document.activeElement; $('modal').innerHTML=html; $('modal').setAttribute('aria-label',label); $('modal').setAttribute('aria-describedby','modal-desc'); $('modal').hidden=false; $('app').inert=true; $('modal').querySelector('[data-a=modal-no]').focus(); }
+function openModal(html,label){ lastStepAt=performance.now(); modalFrom=document.activeElement; $('modal').innerHTML=html; $('modal').setAttribute('aria-label',label); $('modal').setAttribute('aria-describedby','modal-desc'); $('modal').hidden=false; $('app').inert=true; quietFocus($('modal').querySelector('[data-a=modal-no]')); } // 화면 아래에서 올라오는 창에 포커스를 줄 때 화면이 스크롤되지 않게 해요
 function closeModal(){ Motion.ghost($('modal')); $('modal').hidden=true; $('app').inert=false; lastStepAt=performance.now(); const f=modalFrom; modalFrom=null; if(f&&f.isConnected) quietFocus(f); setTimeout(flushLive,0); }
 const confirmHTML=(title,body,noText,yesAction,yesText,risky)=>`<div class="modal-in"><h3>${title}</h3><p id="modal-desc">${body}</p><div class="row2">${risky?`<button class="btn ghost risky" data-a="${yesAction}">${yesText}</button><button class="btn dark" data-a="modal-no">${noText}</button>`:`<button class="btn ghost" data-a="modal-no">${noText}</button><button class="btn dark" data-a="${yesAction}">${yesText}</button>`}</div></div>`;
 
@@ -2173,10 +2227,14 @@ const confirmHTML=(title,body,noText,yesAction,yesText,risky)=>`<div class="moda
    ===================================================================== */
 const A = {
   'dest-locate':()=>MapCtl.impl.refit(),
-  locate:()=>{ if(S.step==='origin') setPick(HOME); else if(S.pick!==HOME){ S.pick=HOME; S.pickName=''; S.live=null; S.sk.origin.moved=0; MapCtl.lastKey=null; render(); } MapCtl.impl.refit(); toast('현재 위치로 지도를 맞췄어요'); },
+  locate:()=>{ if(canChooseBase()){ useGps(); return; } if(S.step==='origin') setPick(HOME); else if(S.pick!==HOME){ S.pick=HOME; S.pickName=''; S.live=null; S.sk.origin.moved=0; MapCtl.lastKey=null; render(); } MapCtl.impl.refit(); toast('현재 위치로 지도를 맞췄어요'); },
   'open-search':()=>setStep('search'),
   'open-mic':()=>{ setStep('search'); A.mic(); },
-  'search-back':()=>setStep('home'),
+  'search-back':()=>{ if(S.originSearch){ S.originSearch=false; S.q=''; PlaceSearch.reset(); render(); return; } setStep('home'); },
+  'use-gps':()=>useGps(),
+  'origin-search':()=>{ if(!canChooseBase()) return; S.originSearch=true; S.q=''; PlaceSearch.reset(); render(); announce('탈 곳을 검색해요.'); later(()=>{const q=$('q');if(q)quietFocus(q)},60); },
+  'origin-place':id=>{ if(PlaceSearch.query!==S.q.trim()) return; const p=PlaceSearch.items.find(x=>x.id===id); if(!p) return; setBase({lat:p.lat,lon:p.lon,n:p.n,kind:'place'}); toast(`${p.n}${eul(p.n)} 탑승 위치로 골랐어요`,'good'); },
+  'origin-local':k=>{ if(!Object.prototype.hasOwnProperty.call(PLACES,k)) return; const p=PLACES[k]; setBase({lat:p.lat,lon:p.lon,n:p.n,kind:'place'}); toast(`${p.n}${eul(p.n)} 탑승 위치로 골랐어요`,'good'); },
   mic:()=>{ if(S.listening) return;
     S.listening=true; render(); announce('듣고 있어요.');
     later(()=>{ S.sk.search.mic=1; // 말로 찾기도 실제 앱에 있는 방법이에요. 힌트로 세지 않고, 끝까지 들었을 때만 기록해요
@@ -2188,13 +2246,13 @@ const A = {
   'car-ok':()=>{ if(S.missionOn&&S.car!=='일반'){ mistake('오늘은 "일반택시"로 불러 봐요. 일반택시를 먼저 눌러요','car-ok'); return; } setStep('origin'); refreshLive(); },
   'pick-back':()=>setStep('route'),
   'pin-move':v=>{ const d={n:[.00027,0],s:[-.00027,0],w:[0,-.00034],e:[0,.00034]}[v]; if(!d) return; // 한 번에 약 30m
-    if(tryPick({lat:S.pick.lat+d[0],lon:S.pick.lon+d[1]})){ MapCtl.impl.refit(); announce(`탑승 위치를 옮겼어요. 현재 위치에서 약 ${Math.round(km(S.pick,HOME)*1000)}미터예요.`); } },
+    if(tryPick({lat:S.pick.lat+d[0],lon:S.pick.lon+d[1]})){ MapCtl.impl.refit(); announce(`탑승 위치를 옮겼어요. ${baseName()}에서 약 ${Math.round(km(S.pick,base())*1000)}미터예요.`); } },
   call:()=>{ // 지도가 멈추기 전에 눌러도 끌어 놓은 자리에서 타게, 호출 직전에 지도 가운데를 다시 읽어요
     if(MapCtl.impl===KakaoMap&&KakaoMap.view&&KakaoMap.view.pick){ const c=KakaoMap.map.getCenter(); if(!tryPick({lat:c.getLat(),lon:c.getLng()})) return; }
     if(km(S.pick,PLACES[S.dest])<0.1){ toast('탑승 위치가 도착지와 너무 가까워요. 조금 떨어진 곳을 골라 봐요'); toastIsMistake=true; return; }
     S.plates=plateOpts(S.car); S.plateBad=-1; S.approach=approachPath(); setStep('calling');
     // 핀을 멀리 옮겼으면 기사님이 오는 길도 그 위치 기준으로 받아요. 호출 중(4초) 안에 오면 써요
-    if(!routeData('mpst')&&MapCtl.impl===KakaoMap){ const at=S.pick; fetchRoute(at,'mpst').then(r=>{ if(r&&S.step==='calling'&&S.pick===at) S.approach=[...toPts(r.path).reverse(),at]; }); } },
+    if(!routeData('mpst')&&MapCtl.impl===KakaoMap&&km(S.pick,PLACES.mpst)<5){ const at=S.pick; fetchRoute(at,'mpst').then(r=>{ if(r&&S.step==='calling'&&S.pick===at) S.approach=[...toPts(r.path).reverse(),at]; }); } },
   cancel:()=>{setStep('route');toast('호출을 취소했어요. 다시 불러볼까요?')},
   'cancel-ask':()=>{ pauseFlow('modal'); stopSpeech();
     openModal(confirmHTML('기사님이 오고 있어요. 취소할까요?','취소하고 다시 부르면 더 먼 택시가 올 수 있어요. 실제 앱에서는 택시 종류에 따라 취소 수수료가 나오기도 하니 안내를 꼭 읽어요. 연습이라 돈은 나가지 않아요.','아니요','cancel-yes','호출 취소하기',true),'호출 취소 확인'); },
