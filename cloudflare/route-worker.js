@@ -5,7 +5,7 @@
 const API = 'https://apis-navi.kakaomobility.com/v1/directions';
 const ALLOWED_ORIGINS = new Set(['https://baepu-team.github.io', 'http://127.0.0.1:5500']); // 이 페이지들에서만 부를 수 있어요
 const HOME = { lat: 37.256, lon: 127.0665 }; // 페이지의 ROUTES_ORIGIN과 같아요
-const MAX_FROM_KM = 1.2; // 탑승 핀 범위(1km)보다 조금 넓게 받아요
+const MAX_FROM_KM = 30; // 현재 위치나 검색한 장소에서 출발할 수 있게 넓혔어요. 도착지가 영통 일대라 이보다 먼 출발지는 어림값으로 보여 줘요
 // 페이지의 PLACES와 같은 도착지만 받아요. 이 서버로 다른 경로를 받아 가지 못하게 하려는 거예요
 const PLACES = {
   ajou: [37.2797, 127.0473], ytst: [37.251528, 127.071347], mpst: [37.245799, 127.057364], cmst: [37.259485, 127.078945],
