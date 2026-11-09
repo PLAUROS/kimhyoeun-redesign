@@ -1788,21 +1788,34 @@ function searchHTML(){
 }
 // 카카오 장소 검색. 이전 검색의 늦은 응답이 최신 목록을 덮지 않게 해요.
 const PlaceSearch = {
-  query:'', items:[], status:'idle', id:0, timer:0, timeout:0, composing:false,
+  query:'', items:[], status:'idle', id:0, timer:0, timeout:0, composing:false, cache:new Map(), known:new Map(),
   reset(){ clearTimeout(this.timer); clearTimeout(this.timeout); this.id++; this.query=''; this.items=[]; this.status='idle'; },
   update(){
     if(S.step!=='search'||!$('res')) return;
     $('res').innerHTML=resultsHTML();
   },
   schedule(){
-    this.reset(); this.query=S.q.trim();
+    const queryText=S.q.trim();
+    if(this.query===queryText&&(this.status==='loading'||this.status==='ready'||this.status==='empty')) return;
+    this.reset(); this.query=queryText;
     if(!this.query){ this.update(); return; }
+    const cacheKey=this.query+'|'+S.pick.lat+','+S.pick.lon;
+    if(this.cache.has(cacheKey)){ const hit=this.cache.get(cacheKey); this.items=hit.items; this.status=hit.status; this.update(); return; }
+    const norm=s=>s.replace(/\s/g,'').toLowerCase(), word=norm(this.query);
+    this.items=[...this.known.values()].filter(p=>norm(p.n+' '+p.a).includes(word)).slice(0,15);
     this.status='loading'; this.update();
     const id=this.id, query=this.query;
     this.timer=setTimeout(()=>{
       const finish=(items,status)=>{
         if(id!==this.id||S.step!=='search'||S.q.trim()!==query) return;
-        clearTimeout(this.timeout); this.items=items; this.status=status; this.update();
+        clearTimeout(this.timeout);
+        if(status!=='error'){
+          this.cache.set(cacheKey,{items,status});
+          if(this.cache.size>40) this.cache.delete(this.cache.keys().next().value);
+          items.forEach(p=>this.known.set(p.id,p));
+          while(this.known.size>150) this.known.delete(this.known.keys().next().value);
+        }
+        this.items=items; this.status=status; this.update();
         announce(status==='error'?'장소 검색에 연결하지 못했어요.':`${this.items.length}곳의 장소를 찾았어요.`);
       };
       if(!window.kakao?.maps?.services){ finish([],'error'); return; }
@@ -1816,7 +1829,7 @@ const PlaceSearch = {
           finish(items,items.length?'ready':'empty');
         },{location:new kakao.maps.LatLng(S.pick.lat,S.pick.lon),size:15});
       }catch(e){ finish([],'error'); }
-    },300);
+    },100);
   }
 };
 function resultsHTML(){
@@ -1829,7 +1842,7 @@ function resultsHTML(){
   const seen=new Set(remote.map(p=>norm(p.n)));
   const list=remote.map(p=>row(p,'pick-place',p.id)).join('')+local.filter(([,p])=>!seen.has(norm(p.n))).map(([k,p])=>row(p,'pick',k)).join('');
   const msg=status==='loading'?'장소를 찾고 있어요…':status==='error'?'장소 검색에 연결하지 못했어요. 잠시 후 글자를 다시 입력해 주세요.':!list?'찾은 장소가 없어요. 지역 이름과 장소 이름을 함께 써 보세요.':'';
-  return '<div class="res-h">검색 결과 · 가까운 곳은 직선거리로 표시해요</div>'+ (msg?`<div class="empty" role="status">${msg}</div>`:'')+list;
+  return '<div class="res-h">검색 결과 · 가까운 곳은 직선거리로 표시해요</div>'+ (msg?`<div class="${list?'res-h':'empty'}" role="status">${msg}</div>`:'')+list;
 }
 
 function resultHTML(){
@@ -2168,7 +2181,7 @@ const A = {
     S.listening=true; render(); announce('듣고 있어요.');
     later(()=>{ S.sk.search.mic=1; // 말로 찾기도 실제 앱에 있는 방법이에요. 힌트로 세지 않고, 끝까지 들었을 때만 기록해요
       S.listening=false;S.q=S.missionOn?PLACES[MISSION_KEY].n:'광교호수공원';if(S.step==='search'){ render(); PlaceSearch.schedule(); announce(`${S.q}${eul(S.q)} 찾았어요.`); } },1800); },
-  'pick-place':id=>{ if(PlaceSearch.composing||PlaceSearch.query!==S.q.trim()) return; const p=PlaceSearch.items.find(p=>p.id===id); if(!p) return; const key='place_'+p.id; PLACES[key]={...p}; A.pick(key); },
+  'pick-place':id=>{ if(PlaceSearch.query!==S.q.trim()) return; const p=PlaceSearch.items.find(p=>p.id===id); if(!p) return; const key='place_'+p.id; PLACES[key]={...p}; A.pick(key); },
   pick:v=>{ if(!Object.prototype.hasOwnProperty.call(PLACES,v)) return; if(S.missionOn&&v!==MISSION_KEY){ mistake(`오늘 갈 곳은 "${PLACES[MISSION_KEY].n}"${eyo(PLACES[MISSION_KEY].n)}. 다시 골라 봐요`,'pick:'+v); return; } S.dest=v; setStep('route'); refreshLive(); },
   'route-back':()=>{S.dest=null;setStep('home')},
   car:v=>{S.car=v;render()},
@@ -2228,9 +2241,9 @@ document.addEventListener('input',e=>{ if(e.target.id!=='q') return;
   const changed=e.target.value!==S.q; S.q=e.target.value;
   if(S.listening){ S.listening=false; clearTimers(); const l=document.querySelector('.listen'); if(l) l.remove(); const m=document.querySelector('.mic'); if(m) m.classList.remove('live'); } // 직접 쓰면 듣기를 멈춰요
 
-  if(changed&&!e.isComposing&&!PlaceSearch.composing) PlaceSearch.schedule(); // 값이 같으면 목록을 바꾸지 않아요(누르는 중인 버튼이 사라지지 않게)
+  if(changed) PlaceSearch.schedule(); // 값이 같으면 목록을 바꾸지 않아요(누르는 중인 버튼이 사라지지 않게)
 });
-document.addEventListener('compositionstart',e=>{if(e.target.id==='q'){PlaceSearch.composing=true;PlaceSearch.reset();}});
+document.addEventListener('compositionstart',e=>{if(e.target.id==='q'){PlaceSearch.composing=true;}});
 document.addEventListener('compositionend',e=>{if(e.target.id==='q'){PlaceSearch.composing=false;S.q=e.target.value;PlaceSearch.schedule();}});
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!$('modal').hidden) A['modal-no'](); });
 document.addEventListener('visibilitychange',()=>{ document.hidden?pauseFlow('hidden'):resumeFlow('hidden'); }); // 전화를 받는 시간 등은 걸린 시간에서 빼요
