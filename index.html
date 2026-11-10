@@ -1206,10 +1206,11 @@ function fareOf(k){ // 받은 경로의 값 → 거리 비율로 조정한 값 �
   return {f:4800+Math.max(0,Math.ceil((road-1.6)*1000/131))*100, min:Math.max(3,Math.round(road/0.4)+2), km:road.toFixed(1)};
 }
 const NEARBY = Object.entries(PLACES).sort((a,b)=>km(HOME,a[1])-km(HOME,b[1])); // 집에서 가까운 순서
+// 표시 이름·순서만 변경해요. 기존 결과 key, 연습 차량, 요금 배율은 유지해요.
 const CARS = [
-  {k:'일반', t:'일반택시', d:'추가 요금 없음', eta:3, mul:1},
-  {k:'모범', t:'모범택시', d:'경력이 많은 기사님', eta:6, mul:1.6},
-  {k:'대형', t:'대형택시', d:'여럿이 탈 때', eta:9, mul:1.8}
+  {k:'대형', t:'바로호출', d:'자동배차 차량을 한번에', eta:9, mul:1.8},
+  {k:'모범', t:'블루파트너스', d:'배차될 때까지 찾아주는 제휴 택시', eta:6, mul:1.6},
+  {k:'일반', t:'일반호출', d:'주변 택시 호출', eta:3, mul:1}
 ];
 const carOf = k => CARS.find(x=>x.k===k);
 const carFare = (f,k) => { const c=carOf(k); return c.mul===1 ? f : Math.round(f*c.mul/100)*100; };
@@ -1256,8 +1257,8 @@ const WAIT = {calling:1, approach:1, ride:1}; // 기다리기만 하는 단계 (
 const HINT = {
   home:    ()=>'아래 "어디로 갈까요?" 칸을 눌러요.',
   search:  ()=>S.missionOn ? `"${PLACES[MISSION_KEY].n}"${eul(PLACES[MISSION_KEY].n)} 쓰거나 마이크로 말해요. 아래에 나오면 이름을 눌러요.` : '가고 싶은 곳을 쓰거나 마이크로 말해요. 아래에 나오면 이름을 눌러요.',
-  route:   ()=>S.missionOn&&S.car!=='일반' ? '먼저 "일반택시"를 눌러요.' : S.missionOn ? `"일반택시"와 요금을 보고 맨 아래 "${S.car}택시 선택하기" 버튼을 눌러요.` : `택시 종류와 요금을 보고 맨 아래 "${S.car}택시 선택하기" 버튼을 눌러요.`,
-  origin:  ()=>S.originSearch ? '탑승 위치 이름을 써요. 아래에 나오면 이름을 눌러요.' : `핀 끝이 탑승 위치예요. 맞으면 아래 "${S.car}택시 호출하기"를 눌러요.`,
+  route:   ()=>S.missionOn&&S.car!=='일반' ? '먼저 "일반호출"를 눌러요.' : S.missionOn ? `"일반호출"와 요금을 보고 맨 아래 "${carOf(S.car).t} 선택하기" 버튼을 눌러요.` : `택시 종류와 요금을 보고 맨 아래 "${carOf(S.car).t} 선택하기" 버튼을 눌러요.`,
+  origin:  ()=>S.originSearch ? '탑승 위치 이름을 써요. 아래에 나오면 이름을 눌러요.' : `핀 끝이 탑승 위치예요. 맞으면 아래 "${carOf(S.car).t} 호출하기"를 눌러요.`,
   calling: ()=>'가까운 택시를 찾고 있어요. 잠깐만 기다려요.',
   approach:()=>S.mode==='test'?'기사님이 오고 있어요. 잠깐만 기다려요.':'기사님이 오고 있어요. 차 번호와 차 색깔을 기억해 둬요.',
   plate:   ()=>'내 택시 번호판과 똑같은 차를 골라요. 숫자 하나까지 같아야 해요.',
@@ -1784,7 +1785,7 @@ const quietFocus=el=>{ try{ el.focus({preventScroll:true}); }catch(e){} };
 const announce=t=>{ const e=$('sr'); if(!e) return; e.textContent=''; setTimeout(()=>{e.textContent=t},60); }; // 낭독기에 알려요
 const guided=()=>S.mode==='practice'?PREF.guide:S.hintOpen;
 const tg=c=>guided()&&c?' tgt':'';
-const missionShort=()=>S.missionOn?`${PLACES[MISSION_KEY].n}까지 일반택시 부르기`:'가고 싶은 곳까지 택시 부르기';
+const missionShort=()=>S.missionOn?`${PLACES[MISSION_KEY].n}까지 일반호출 부르기`:'가고 싶은 곳까지 택시 부르기';
 
 const mmss = () => { const t=Math.max(0,Math.floor((flowNow()-S.t0)/1000)); return String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0'); };
 function coachHTML(){
@@ -1816,8 +1817,8 @@ function sheetHTML(){
     <div class="quick">${RECENT.map(k=>`<button data-a="pick" data-v="${k}">${I(PLACES[k].kind==='st'?'station':'clock')}${PLACES[k].n}</button>`).join('')}</div>`;
   case 'route': return `${GRAB()}<h3>${esc(P.n)}</h3>${P.dynamic?`<p class="small muted">${esc(P.a)}</p>`:''}<div class="trip tabnum">약 ${fr.km}km · 약 ${fr.min}분</div>
     ${P.dynamic&&!routeData(d)?'<p class="small muted">거리·시간·요금은 연습용으로 대강 계산한 값이에요.</p>':''}<div class="cars">${CARS.map(c=>`<button class="car${S.car===c.k?' on':''}" data-a="car" data-v="${c.k}" aria-pressed="${S.car===c.k}">
-      <span class="cname"><b>${c.t}</b><small>${c.eta}분 뒤 도착 · ${c.d}</small></span>
-      <span class="cfare tabnum"><small>예상</small>${won(carFare(fr.f,c.k))}</span></button>`).join('')}</div>
+      <span class="cname"><b>${c.t}</b><small>${c.d}</small></span>
+      <span class="cfare tabnum">예상 ${won(carFare(fr.f,c.k))}</span></button>`).join('')}</div>
     <button class="payrow" data-a="pay-open" aria-label="${S.pay==='card'?'연습카드 자동결제':'기사님에게 직접 결제'}. 결제 수단 바꾸기">${I('card')}${S.pay==='card'?'연습카드 ···· 0000':'기사님에게 직접 결제'}<span>${S.pay==='card'?'내릴 때 자동결제':'내릴 때 직접 내요'} ›</span></button>`;
   case 'origin': return `${GRAB()}<div class="pick-h"><h3>어디서 탈까요?</h3><span>도착 <b>${esc(P.n)}</b></span></div>
     <div class="ft" id="pick-ft">${pickRows()}</div>
@@ -1826,7 +1827,7 @@ function sheetHTML(){
   case 'calling': return `<div class="radar">${I('taxi')}</div>
     <h3 style="text-align:center">가까운 택시를 찾고 있어요</h3>
     <p class="muted extra" style="text-align:center">보통 1분 안에 연결돼요</p>
-    <div class="ft"><div class="ft-r"><i class="dot e"></i><span><small>${S.car}택시 · 예상 ${won(carFare(fr.f,S.car))}</small><b>${esc(P.n)}</b></span></div></div>`;
+    <div class="ft"><div class="ft-r"><i class="dot e"></i><span><small>${carOf(S.car).t} · 예상 ${won(carFare(fr.f,S.car))}</small><b>${esc(P.n)}</b></span></div></div>`;
   case 'approach': return `${GRAB()}<div class="eta"><em id="eta">${carOf(S.car).eta}분</em> 뒤 도착해요</div>
     <div class="drv"><span class="av">박</span><div><b>${DRIVER.name} 기사님</b><small>★ ${DRIVER.rating} · ${V.color} ${V.model}</small></div><span class="plate">${V.plate}</span></div>
     <div class="note small extra">택시가 오면 <b>번호판 ${V.plate}</b>${eul(V.plate)} 꼭 확인하고 타요. 뒤 4자리만 기억해도 돼요.</div>
@@ -1840,10 +1841,10 @@ function sheetHTML(){
     <p>도착까지 약 <b id="ride-min" class="tabnum">${fr.min}분</b></p>
     <div class="note small">내리기 전에 휴대폰, 지갑 같은 소지품을 챙겨요.</div>`;
   case 'arrive': { const f=carFare(fr.f,S.car); return `${GRAB()}<h3>${esc(P.n)}에 도착했어요</h3>
-    ${S.pay==='card'?`<div class="receipt tabnum"><div><span>${S.car}택시 요금</span><b>${won(f)}</b></div><div><span>결제 수단</span><span>연습카드 ···· 0000</span></div>
+    ${S.pay==='card'?`<div class="receipt tabnum"><div><span>${carOf(S.car).t} 요금</span><b>${won(f)}</b></div><div><span>결제 수단</span><span>연습카드 ···· 0000</span></div>
       <div class="tot"><span>결제한 금액</span><span>${won(f)}</span></div><span class="paid">${I('check')}자동결제 완료 (연습이라 돈이 나가지 않았어요)</span></div>
     <p class="small muted">실제 앱에서는 등록한 카드로 자동 결제돼서, 내릴 때 기사님에게 따로 돈을 내지 않아도 돼요.</p>`
-    :`<div class="receipt tabnum"><div><span>${S.car}택시 요금</span><b>${won(f)}</b></div><div><span>결제 수단</span><span>기사님에게 직접 결제</span></div>
+    :`<div class="receipt tabnum"><div><span>${carOf(S.car).t} 요금</span><b>${won(f)}</b></div><div><span>결제 수단</span><span>기사님에게 직접 결제</span></div>
       <div class="tot"><span>낼 금액</span><span>${won(f)}</span></div></div>
     <p class="small muted">미터기 금액을 보고 기사님에게 카드나 현금으로 내요. 연습이라 돈이 나가지는 않아요.</p>`}`; }
   }
@@ -1853,8 +1854,8 @@ function sheetHTML(){
 /* 그 화면의 주 버튼. 스크롤과 상관없이 항상 보이게 시트 밖에 둬요 */
 function footHTML(){
   switch(S.step){
-  case 'route':   return `<button class="tx-call${tg(!S.missionOn||S.car==='일반')}" data-a="car-ok">${S.car}택시 선택하기</button>`;
-  case 'origin':  return S.originSearch ? '' : `<button class="tx-call${tg(1)}" data-a="call">${S.car}택시 호출하기</button>`;
+  case 'route':   return `<button class="tx-call${tg(!S.missionOn||S.car==='일반')}" data-a="car-ok">${carOf(S.car).t} 선택하기</button>`;
+  case 'origin':  return S.originSearch ? '' : `<button class="tx-call${tg(1)}" data-a="call">${carOf(S.car).t} 호출하기</button>`;
   case 'calling': return `<button class="btn ghost" data-a="cancel-ask">호출 취소</button>`;
   case 'arrive':  return `<button class="tx-call${tg(1)}" data-a="arrive-ok">확인했어요</button>`;
   }
@@ -2372,7 +2373,7 @@ const A = {
   pick:v=>{ if(!isPlace(v)) return; if(S.missionOn&&v!==MISSION_KEY){ mistake(`오늘 갈 곳은 "${PLACES[MISSION_KEY].n}"${eyo(PLACES[MISSION_KEY].n)}. 다시 골라 봐요`,'pick:'+v); return; } S.dest=v; setStep('route'); refreshLive(); },
   'route-back':()=>{S.dest=null;setStep('home')},
   car:v=>{S.car=v;render()},
-  'car-ok':()=>{ if(S.missionOn&&S.car!=='일반'){ mistake('오늘은 "일반택시"로 불러 봐요. 일반택시를 먼저 눌러요','car-ok'); return; } setStep('origin'); refreshLive(); },
+  'car-ok':()=>{ if(S.missionOn&&S.car!=='일반'){ mistake('오늘은 "일반호출"로 불러 봐요. 일반호출를 먼저 눌러요','car-ok'); return; } setStep('origin'); refreshLive(); },
   'pick-back':()=>setStep('route'),
   'pin-move':v=>{ const d={n:[.00027,0],s:[-.00027,0],w:[0,-.00034],e:[0,.00034]}[v]; if(!d) return; // 한 번에 약 30m
     if(tryPick({lat:S.pick.lat+d[0],lon:S.pick.lon+d[1]})){ MapCtl.impl.refit(); announce(`탑승 위치를 옮겼어요. ${baseName()}에서 약 ${Math.round(km(S.pick,base())*1000)}미터예요.`); } },
