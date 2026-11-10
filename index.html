@@ -2510,7 +2510,31 @@ let toastIsMistake=false;
 function toast(m,kind){ hideMessages(); toastIsMistake=false; announce(m); const t=$('toast'); t.className=kind||''; t.textContent=m; placeMsg(t); t.hidden=false; toast._t=setTimeout(()=>Motion.leave(t), Math.max(5000,m.length*170)); }
 function noti(title,body){ hideMessages(); const n=$('noti'); if(S.step!=='approach'&&S.step!=='plate') announce(`${title}. ${body}`); n.innerHTML=`<span class="ni">${I('taxi')}</span><div><b>${title}</b><p>${body}</p></div>`; placeMsg(n); n.hidden=false; noti._t=setTimeout(()=>Motion.leave(n),5000); }
 function stopSpeech(){ try{ speechSynthesis.cancel(); }catch(e){} }
-function say(t,force){ if((!PREF.voice&&!force)||!t) return; try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='ko-KR';u.rate=.9;speechSynthesis.speak(u)}catch(e){} }
+/* 읽어주기: 기기에 있는 한국어 목소리 중 사람 목소리에 가까운 것을 먼저 골라요. 기본 목소리는 기계음에 가까운 경우가 많아요.
+   온라인 목소리는 읽을 글을 그 목소리를 만든 회사의 서버로 보내요. 소리가 나지 않으면 기기 안의 목소리로 다시 읽어요 */
+const Voice = {
+  pick:null, noRemote:false,
+  score(v){ const n=v.name||''; let s=0;
+    if(/natural|neural|premium|enhanced/i.test(n)) s+=50; // 자연스러운 합성 목소리
+    if(/online/i.test(n)) s+=20;
+    if(/sunhi|kyuri|yuna|sora|seoyeon|google/i.test(n)) s+=30; // 부드러운 편인 목소리
+    if(!v.localService) s+=10;
+    if(v.default) s+=2;
+    return s; },
+  choose(){ let vs=[]; try{ vs=speechSynthesis.getVoices().filter(v=>/^ko([-_]|$)/i.test(v.lang)); }catch(e){}
+    if(this.noRemote) vs=vs.filter(v=>v.localService);
+    this.pick=vs.sort((a,b)=>this.score(b)-this.score(a))[0]||null; return this.pick; }
+};
+try{ speechSynthesis.addEventListener('voiceschanged',()=>Voice.choose()); Voice.choose(); }catch(e){} // 목소리 목록은 늦게 준비되기도 해요
+function say(t,force){ if((!PREF.voice&&!force)||!t) return;
+  try{
+    speechSynthesis.cancel();
+    const v=Voice.pick||Voice.choose(), a=String(t).split(/([.?!]+)(?:\s+|$)/), parts=[];
+    for(let i=0;i<a.length;i+=2){ const s=((a[i]||'')+(a[i+1]||'')).trim(); if(s) parts.push(s); } // 문장마다 끊어서 읽으면 사이에 숨 쉴 틈이 생겨요
+    parts.forEach((s,i)=>{ const u=new SpeechSynthesisUtterance(s); u.lang='ko-KR'; if(v) u.voice=v; u.rate=.9; u.pitch=1; u.volume=.92;
+      if(v&&!v.localService&&!i) u.onerror=e=>{ if(Voice.noRemote||e.error==='interrupted'||e.error==='canceled') return; Voice.noRemote=true; Voice.choose(); say(t,force); };
+      speechSynthesis.speak(u); });
+  }catch(e){} }
 
 /* 안내창: 열려 있는 동안 뒤 화면은 터치도 키보드도 닿지 않아요 */
 let modalFrom=null, lastExitAt=-1e9;
