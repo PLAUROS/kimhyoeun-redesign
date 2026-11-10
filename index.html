@@ -1139,6 +1139,49 @@ button.car:active:not(:disabled),button.res-i:active:not(:disabled){transform:sc
 .grab::after{content:"▲ 더 보기";font-size:.85em;font-weight:800;color:var(--ink-2);opacity:0;pointer-events:none}
 .sheet.down .grab::before{opacity:0}
 .sheet.down .grab::after{opacity:1}
+
+
+/* ---------- 위쪽 안내 다시 짜기 ----------
+   한 줄에 연습 표시 · 제목 · 진행 칸, 그 아래 한 줄에 힌트(또는 기다리는 표시) · 소리 · 글자.
+   높이가 단계마다 같아서 지도가 들썩이지 않고, 힌트는 이 영역 위에 카드로 펼쳐져서 아무것도 밀어내지 않아요 */
+.coach{position:relative;z-index:6;display:flex;flex-direction:column;flex-wrap:nowrap;gap:.55em}
+.c-prog{order:0;flex:none;display:flex;align-items:center;gap:.55em;min-height:1.75em;font-size:1em;line-height:1.3;color:var(--ink)}
+.c-prog .tag{flex:none;font-size:max(12.5px,.76em);padding:.18em .68em;line-height:1.35}
+.c-title{flex:1 1 auto;min-width:0;font-size:1.02em;font-weight:700;letter-spacing:-.028em;line-height:1.3;word-break:keep-all;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.c-bars{flex:0 0 66px;max-width:66px;gap:3px;margin-left:auto}
+.c-bars i{display:block;flex:1;height:4px;border-radius:2px}
+.c-time{flex:none;margin-left:0;font-size:.9em;font-weight:600;color:var(--ink-2)}
+.coach-tools{order:0;flex:none}
+.wait-chip{grid-column:1;justify-self:start;display:inline-flex;align-items:center;gap:.6em;min-height:44px;padding:0 1.05em 0 .95em;border-radius:999px;background:var(--sky-2);color:var(--on-tint);font-weight:600;font-size:max(15px,.86em);letter-spacing:-.015em;white-space:nowrap}
+.wait-chip .dots{display:inline-flex;gap:3px}
+.wait-chip i{width:5px;height:5px;border-radius:50%;background:var(--blue);animation:wait-dot 1.3s ease-in-out infinite}
+.wait-chip i:nth-child(2){animation-delay:.16s}
+.wait-chip i:nth-child(3){animation-delay:.32s}
+@keyframes wait-dot{0%,60%,100%{opacity:.28;transform:none}30%{opacity:1;transform:translateY(-2.5px)}}
+.hint-card{position:absolute;left:.6em;right:.6em;top:.4em;min-height:calc(100% - .8em);z-index:2;box-sizing:border-box;display:flex;flex-direction:column;gap:.1em;padding:.5em .6em .6em 1em;border-radius:22px;background:#FFF0BF;color:#4A3700;box-shadow:0 0 0 .5px rgba(138,97,0,.2),0 10px 28px rgba(90,60,0,.18);outline:0}
+.hint-card.ghost{pointer-events:none}
+.hc-head{display:flex;align-items:center;justify-content:space-between;gap:.6em;min-height:32px;font-size:max(13.5px,.8em);font-weight:600;color:#7A5900}
+.hc-head>span:first-child{display:inline-flex;align-items:center;gap:.4em;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hc-head>span:first-child svg{flex:none;width:1.3em;height:1.3em;color:#A87600;fill:#FFCE3A}
+.hc-acts{flex:none;display:inline-flex;align-items:center;gap:6px}
+.hc-acts button{position:relative;display:inline-grid;place-items:center;min-width:32px;min-height:32px;padding:0 .95em;border:0;border-radius:999px;background:rgba(122,89,0,.13);color:#4A3700;font-family:inherit;font-size:1em;font-weight:600}
+.hc-acts button[data-a=say]{padding:0;background:rgba(255,255,255,.8);color:#7A5900}
+.hc-acts button[data-a=say] svg{width:1.3em;height:1.3em}
+.hc-acts button::after{content:"";position:absolute;inset:-7px -3px}
+.hc-body{flex:1;display:flex;align-items:center;padding-right:.4em}
+.hc-body p{flex:1;min-width:0;margin:0;font-size:1em;font-weight:600;line-height:1.46;letter-spacing:-.012em;word-spacing:.06em;word-break:keep-all;text-wrap:pretty}
+@container (max-height:640px){.coach{gap:.35em;padding-top:.45em;padding-bottom:.45em}}
+
+/* 지도 위 택시: 그림만 돌리고 그림자는 늘 아래로 져요. 주변 택시는 보는 방향으로 조금씩 움직여요 */
+.k-taxi{filter:drop-shadow(0 2px 2px rgba(0,0,0,.25))}
+.k-taxi svg{filter:none}
+@keyframes bob{50%{transform:translate(var(--bx,6px),var(--by,-3px))}}
+
+/* 번호판 고르기: 비스듬히 본 입체 택시 */
+.pc{gap:.75em;padding:.3em 1em .3em .55em}
+.pc svg{width:min(4.7em,82px);height:auto;flex:none;filter:drop-shadow(0 .5px .5px rgba(15,23,35,.38))}
+.drv>div{flex:1 1 6em}
+.pc.tgt::after{left:auto;right:.9em} /* 표시가 택시 그림을 가리지 않게 오른쪽에 둬요 */
 </style>
 </head>
 <body>
@@ -1392,14 +1435,14 @@ const STEP_SAY = {
 const WAIT = {calling:1, approach:1, ride:1}; // 기다리기만 하는 단계 (힌트 횟수에 안 들어가요)
 const HINT = {
   home:    ()=>'아래 "어디로 갈까요?" 칸을 눌러요.',
-  search:  ()=>S.missionOn ? `"${PLACES[MISSION_KEY].n}"${eul(PLACES[MISSION_KEY].n)} 글자로 쓰거나, 파란 마이크를 누르고 말해요. 찾으면 이름을 눌러요.` : '가고 싶은 곳을 글자로 쓰거나, 파란 마이크를 누르고 말해요. 찾으면 이름을 눌러요.',
+  search:  ()=>S.missionOn ? `"${PLACES[MISSION_KEY].n}"${eul(PLACES[MISSION_KEY].n)} 쓰거나 마이크로 말해요. 찾으면 이름을 눌러요.` : '가고 싶은 곳을 쓰거나 마이크로 말해요. 찾으면 이름을 눌러요.',
   route:   ()=>S.missionOn&&S.car!=='일반' ? '먼저 "일반택시"를 눌러요.' : S.missionOn ? `"일반택시"와 요금을 보고 맨 아래 "${S.car}택시 선택하기" 버튼을 눌러요.` : `택시 종류와 요금을 보고 맨 아래 "${S.car}택시 선택하기" 버튼을 눌러요.`,
-  origin:  ()=>`핀 끝이 택시를 탈 곳이에요. 지도를 움직이거나 위치 버튼으로 바꿀 수 있어요. 맞으면 맨 아래 "${S.car}택시 호출하기" 버튼을 눌러요.`,
+  origin:  ()=>'핀 끝이 택시를 탈 곳이에요. 맞으면 맨 아래 파란 버튼을 눌러요.',
   calling: ()=>'가까운 택시를 찾고 있어요. 잠깐만 기다려요.',
   approach:()=>S.mode==='test'?'기사님이 오고 있어요. 잠깐만 기다려요.':'기사님이 오고 있어요. 차 번호와 차 색깔을 기억해 둬요.',
   plate:   ()=>'내 택시 번호판과 똑같은 차를 골라요. 숫자 하나까지 같아야 해요.',
   ride:    ()=>'도착지로 가고 있어요. 내리기 전에 소지품을 챙겨요.',
-  arrive:  ()=>S.pay==='card'?'연습카드로 결제돼요. 연습이라 돈이 나가지 않아요. 금액을 보고 "확인했어요"를 눌러요.':'금액을 보고 기사님에게 직접 내요. 그다음 "확인했어요"를 눌러요.'
+  arrive:  ()=>S.pay==='card'?'연습이라 돈이 나가지 않아요. 금액을 보고 "확인했어요"를 눌러요.':'금액을 보고 기사님에게 직접 내요. 그다음 "확인했어요"를 눌러요.'
 };
 
 /* =====================================================================
@@ -1409,7 +1452,7 @@ const PREF = {guide:PARAMS.guide, voice:PARAMS.voice, big:PARAMS.big};
 let S = fresh(PARAMS.mode, PARAMS.mission!=null, PARAMS.named);
 function fresh(mode, missionOn, named){
   return {screen:'ride', step:'home', mode, missionOn, named, pick:HOME, pickName:'', base:null, originSearch:false, locating:false, approach:[], dest:null, car:'일반', q:'', listening:false, shared:false, booked:false, sheetDown:false,
-    hintOpen:false, t0:0, stepAt:null, mist:0, hints:0, sk:Object.fromEntries(SKILLS.map(([k])=>[k,{m:0,h:0,g:0,ms:0}])),
+    hintOpen:false, hintFor:null, carHeading:0, t0:0, stepAt:null, mist:0, hints:0, sk:Object.fromEntries(SKILLS.map(([k])=>[k,{m:0,h:0,g:0,ms:0}])),
     plates:[], live:null, pay:'card', res:null};
 }
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
@@ -1427,48 +1470,108 @@ const ICONS={back:'M15 5l-7 7 7 7',search:'M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM
 const I=n=>`<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${ICONS[n]}"/></svg>`;
 // 지도 위 택시: 위에서 내려다본 모습(앞이 위쪽). 지붕 표시등에 T
 const cabParts=(fill='#FFD21F')=>`<rect x="-9" y="-8" width="3" height="5" rx="1" fill="#1E2833"/><rect x="6" y="-8" width="3" height="5" rx="1" fill="#1E2833"/><rect x="-9" y="3.5" width="3" height="5" rx="1" fill="#1E2833"/><rect x="6" y="3.5" width="3" height="5" rx="1" fill="#1E2833"/><rect x="-7.2" y="-12" width="14.4" height="24" rx="4.6" fill="${fill}" stroke="#1E2833" stroke-width="1.3"/><path d="M-5.2 -5.2q5.2-2.3 10.4 0l-1 3.2h-8.4z" fill="#8FB2CC" stroke="#1E2833" stroke-width=".9" stroke-linejoin="round"/><path d="M-4.2 5h8.4l1 2.6q-5.2 2.2-10.4 0z" fill="#8FB2CC" stroke="#1E2833" stroke-width=".9" stroke-linejoin="round"/><rect x="-3.2" y="-1" width="6.4" height="4.4" rx="1" fill="#FFD21F" stroke="#1E2833" stroke-width="1"/><path d="M-1.5 .1h3M0 .1v2.2" fill="none" stroke="#1E2833" stroke-width="1" stroke-linecap="round"/><circle cx="-4.4" cy="-10.2" r="1" fill="#FFF7CC" stroke="#1E2833" stroke-width=".5"/><circle cx="4.4" cy="-10.2" r="1" fill="#FFF7CC" stroke="#1E2833" stroke-width=".5"/>`;
-const CAB=fill=>`<svg viewBox="-10 -13 20 26" aria-hidden="true">${cabParts(fill)}</svg>`;
-// 택시 고르기와 번호판 확인에 쓰는 택시: 단순하지만 빛과 그림자로 입체감을 준 모습이에요
+const CAB=(fill,deg=0)=>`<svg viewBox="-10 -13 20 26" aria-hidden="true"${deg?` style="transform:rotate(${deg}deg)"`:''}>${cabParts(fill)}</svg>`;
+const TAXI_HEAD=[-28,118,64,-152,36,-98]; // 주변 택시가 보는 방향(도)이에요
+// 번호판 고르기에 쓰는 택시: 앞과 옆이 함께 보이게 비스듬히 본 입체 모습이에요(앞이 오른쪽 아래).
+// 차종마다 지붕선과 앞모습(램프, 그릴)의 특징을 살려 그려요. 로고는 넣지 않아요
 const shade=(hex,t)=>{ const n=parseInt(hex.slice(1),16), mix=c=>Math.round(t>0?c+(255-c)*t:c*(1+t)); return `rgb(${mix(n>>16&255)},${mix(n>>8&255)},${mix(n&255)})`; };
-let carUid=0; // 그라데이션 id가 겹치지 않게 해요
-const CAR3D=fill=>{
-  const u=++carUid, wheel=x=>`<circle cx="${x}" cy="31" r="5.4" fill="#1A2130"/><circle cx="${x}" cy="31" r="2.7" fill="#C5CAD3"/><circle cx="${x}" cy="31" r=".9" fill="#596373"/>`;
-  return `<svg viewBox="0 0 84 42" aria-hidden="true"><defs>
-    <linearGradient id="cb${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${shade(fill,.3)}"/><stop offset=".55" stop-color="${fill}"/><stop offset="1" stop-color="${shade(fill,-.22)}"/></linearGradient>
-    <linearGradient id="cg${u}" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#7E94AA"/><stop offset="1" stop-color="#2C3B4E"/></linearGradient>
-  </defs>
-  <ellipse cx="42" cy="37" rx="36" ry="2.2" fill="#000" opacity=".14"/>
-  <path d="M5 30.6V26.8C5 24.6 6.5 23.3 9 22.7L21.6 20.2L31.2 13.1C33 11.8 35.1 11.2 37.3 11.2H52.4C54.7 11.2 56.8 12 58.6 13.5L66 19.8L74.8 21.8C77.4 22.4 79 24.2 79 26.6V30.6C79 32 78 33 76.6 33H7.4C6 33 5 32 5 30.6Z" fill="url(#cb${u})"/>
-  <path d="M25.6 19.7L32.9 14.3C34 13.5 35.4 13.1 36.8 13.1H43.2V19.7ZM45.2 13.1H52.1C53.7 13.1 55.2 13.7 56.4 14.7L62 19.7H45.2Z" fill="url(#cg${u})"/>
-  <path d="M6 25.2C25 22.5 58 22.5 78.4 24.9" fill="none" stroke="#fff" stroke-opacity=".28" stroke-width=".8"/>
-  <path d="M44.2 13.2V32" stroke="#000" stroke-opacity=".18" stroke-width=".6"/>
-  <rect x="35" y="24.4" width="4" height=".9" rx=".45" fill="#000" opacity=".3"/><rect x="51" y="24.4" width="4" height=".9" rx=".45" fill="#000" opacity=".3"/>
-  <path d="M5.5 24.6L10.2 23.6V26.2H5.2Z" fill="#F4EFD8"/><rect x="76.6" y="24.8" width="2.2" height="2.6" rx=".8" fill="#C83C3C"/>
-  ${wheel(21)}${wheel(63)}
-  <rect x="39" y="7.8" width="10" height="3.4" rx="1" fill="#EFC24A"/>
-</svg>`;
+// 꺾인 선을 다듬어 매끈한 곡선으로 만들어요(양 끝은 그대로)
+const isoSmooth=(pts,n=2)=>{ for(;n--;){ const o=[pts[0]]; for(let i=0;i<pts.length-1;i++){ const a=pts[i], b=pts[i+1]; o.push([a[0]*.75+b[0]*.25,a[1]*.75+b[1]*.25],[a[0]*.25+b[0]*.75,a[1]*.25+b[1]*.75]); } o.push(pts[pts.length-1]); pts=o; } return pts; };
+const CK='#141A22', CLAMP='#FFFBEA', CLENS='#B4C2D0', CAMBER='#FFAE1A', CSILVER='#C4CAD2';
+// body: 옆에서 본 차체 윤곽 [앞에서 뒤로, 높이], cab: 객실 윤곽, inset: 객실이 아래·지붕에서 안으로 들어간 정도, glass: 앞유리 끝·뒷유리 시작
+// front: 앞모습. r 네모[왼쪽, 오른쪽, 아래, 위], p 다각형, l 선. 가로 위치는 0(가까운 쪽)~1(먼 쪽), 넷째 값이 1이면 반대쪽에도 그려요
+const CAR_SHAPES={
+  // 쏘나타: 낮게 흐르는 지붕, 코 위를 가로지르는 얇은 램프, 그 아래를 가득 채운 검은 그릴
+  sonata:{L:4.9,W:1.86,body:[[.12,.3],[0,.42],[0,.64],[.08,.76],[.5,.84],[1.45,.91],[4.1,.98],[4.76,.96],[4.9,.84],[4.9,.45],[4.82,.3]],cab:[[1.22,.91],[2.2,1.36],[2.85,1.44],[3.62,1.38],[4.55,.98]],inset:[.09,.3],glass:[2.12,3.7],wheels:[.98,3.92],r:.36,pillars:[2.9],seams:[1.75,2.9,3.86],sign:[2.72,2.96],
+    front:[['p',[[.06,.66],[.94,.66],[.86,.36],[.14,.36]],CK],['r',[.07,.2,.52,.62],CLENS,1],['r',[.02,.98,.7,.745],CLAMP],['r',[.43,.57,.42,.49],'#E4E8EC']]},
+  // K5: 더 낮고 날렵한 지붕, 가운데가 잘록한 그릴, 양 끝의 지그재그 주간등, 지붕을 따라 흐르는 은색 선
+  k5:{L:4.9,W:1.86,body:[[.12,.3],[0,.42],[0,.6],[.09,.73],[.52,.82],[1.48,.9],[4.08,.97],[4.74,.96],[4.9,.85],[4.9,.45],[4.82,.3]],cab:[[1.28,.9],[2.3,1.33],[2.95,1.41],[3.72,1.34],[4.6,.97]],inset:[.09,.31],glass:[2.22,3.78],wheels:[.98,3.9],r:.36,pillars:[2.98],seams:[1.8,2.98,3.9],sign:[2.82,3.06],chrome:1,
+    front:[['p',[[.2,.64],[.42,.61],[.58,.61],[.8,.64],[.77,.51],[.58,.53],[.42,.53],[.23,.51]],CK],['p',[[0,.69],[.22,.66],[.2,.56],[.03,.57]],'#3A4553',1],['l',[[.02,.67],[.1,.585],[.09,.665],[.2,.61]],CAMBER,1,.85],['r',[.2,.8,.33,.44],CK],['r',[.44,.56,.455,.51],'#E4E8EC']]},
+  // 그랜저: 길고 반듯한 차체, 코 위를 가로지르는 램프 아래 얼굴 전체를 덮는 큰 그릴과 네모난 전조등, 뒤쪽 작은 옆 유리
+  grandeur:{L:5.03,W:1.88,body:[[.12,.3],[0,.42],[0,.74],[.06,.86],[.42,.92],[1.5,.97],[4.3,1.01],[4.9,.99],[5.03,.86],[5.03,.45],[4.95,.3]],cab:[[1.32,.97],[2.12,1.42],[2.75,1.5],[3.75,1.48],[4.24,1.36],[4.62,1.01]],inset:[.09,.27],glass:[2.06,4.0],wheels:[1.02,4.05],r:.37,pillars:[2.86,3.9],seams:[1.82,2.86,3.9],sign:[2.75,2.99],
+    front:[['r',[.03,.97,.36,.74],CK],['r',[.06,.2,.5,.68],CLENS,1],['r',[0,1,.79,.84],CLAMP],['r',[.43,.57,.43,.5],'#E4E8EC']]},
+  // K8: 길게 떨어지는 뒷모습, 양 끝에 세로로 선 램프와 그 사이를 잇는 가는 선, 차체 색 그릴
+  k8:{L:5.05,W:1.88,body:[[.12,.3],[0,.42],[0,.68],[.07,.8],[.46,.87],[1.5,.94],[4.32,1.0],[4.92,.98],[5.05,.86],[5.05,.45],[4.97,.3]],cab:[[1.32,.94],[2.28,1.39],[2.95,1.46],[3.82,1.39],[4.78,1.0]],inset:[.09,.3],glass:[2.2,3.9],wheels:[1.02,4.06],r:.37,pillars:[2.98],seams:[1.84,2.98,3.98],sign:[2.86,3.1],
+    front:[['p',[[.2,.7],[.8,.7],[.74,.47],[.26,.47]],'rgba(20,26,34,.42)'],['r',[.22,.78,.33,.42],CK],['r',[0,.07,.44,.76],CLAMP,1],['l',[[.07,.745],[.93,.745]],'#FFFFFF',0,.55],['r',[.44,.56,.51,.58],'#E4E8EC']]},
+  // 스타리아: 코에서 지붕까지 한 줄로 이어지는 한 덩어리 모양, 유리 아래 가로 램프, 넓고 낮은 그릴과 네모난 전조등, 낮게 내려온 큰 창
+  staria:{L:5.25,W:1.99,body:[[.12,.3],[0,.44],[0,.74],[.1,.9],[.5,.96],[5.08,.96],[5.25,.86],[5.25,.45],[5.17,.3]],cab:[[.34,.93],[1.5,1.9],[2.3,1.99],[4.75,1.99],[5.17,1.86],[5.23,.96]],inset:[.04,.15],glass:[1.62,9],gk:.86,wheels:[1.0,4.25],r:.37,pillars:[1.9,3.45],seams:[1.9,3.45],sign:[3.1,3.34],
+    front:[['p',[[.05,.74],[.95,.74],[.92,.36],[.08,.36]],CK],['r',[.08,.24,.48,.68],CLENS,1],['r',[0,1,.83,.88],CLAMP],['r',[.43,.57,.43,.5],'#E4E8EC']]},
+  // 카니발: 보닛이 따로 있는 듬직한 모양, 곧게 선 코와 큰 그릴, 양 끝의 세로 램프(ㄱ자 주간등), 은색 아래 가드, 지붕 레일
+  carnival:{L:5.16,W:1.99,body:[[.12,.3],[0,.46],[0,.9],[.06,1.02],[.42,1.08],[1.32,1.13],[5.0,1.13],[5.16,1.0],[5.16,.45],[5.08,.3]],cab:[[1.06,1.12],[1.9,1.7],[2.45,1.78],[4.78,1.78],[5.09,1.66],[5.14,1.13]],inset:[.06,.18],glass:[1.84,9],wheels:[1.04,4.18],r:.38,pillars:[2.5,3.72,4.56],seams:[2.5,3.72],sign:[3.1,3.34],rails:[2.6,4.72],
+    front:[['p',[[.2,.92],[.8,.92],[.76,.56],[.24,.56]],CK],['r',[.01,.17,.6,.94],'#3A4553',1],['l',[[.17,.62],[.17,.93],[.02,.93]],'#FFFFFF',1,.8],['p',[[.24,.44],[.76,.44],[.7,.32],[.3,.32]],CSILVER],['r',[.44,.56,.47,.53],'#E4E8EC']]}
 };
-
-// 대형 택시: 지붕이 높고 앞이 짧은 승합차 모습이에요
+const CAR_KIND={'쏘나타':'sonata','K5':'k5','그랜저':'grandeur','K8':'k8','스타리아':'staria','카니발':'carnival'};
+function carIso(fill,kind){
+  const name=CAR_SHAPES[kind]?kind:'sonata', u=name+fill.slice(1); if(carIso.memo[u]) return carIso.memo[u];
+  const m=CAR_SHAPES[name], W=m.W, ink='rgba(18,26,38,', clamp=v=>Math.max(0,Math.min(1,v));
+  // 차 안의 좌표(l: 앞에서 뒤로, w: 가까운 옆에서 먼 옆으로, z: 높이)를 화면 좌표로 바꾸고, 그림 크기를 재요. 앞이 넓게 보이는 각도예요
+  let x0=1e9, x1=-1e9, y0=1e9, y1=-1e9;
+  const pt=(l,w,z)=>{ const x=(w*.788-l*.616)*10, y=-((w*.616+l*.788)*.407+z*.914)*10; x0=Math.min(x0,x); x1=Math.max(x1,x); y0=Math.min(y0,y); y1=Math.max(y1,y); return x.toFixed(1)+' '+y.toFixed(1); };
+  const poly=(pts,f,more='')=>`<path d="M${pts.map(q=>pt(q[0],q[1],q[2])).join('L')}Z" fill="${f}"${more}/>`;
+  const path=(pts,c,sw)=>`<path d="M${pts.map(q=>pt(q[0],q[1],q[2])).join('L')}" fill="none" stroke="${c}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round"/>`;
+  const dark=parseInt(fill.slice(1,3),16)<96, vTop=dark?.24:0, vSide=dark?.07:-.06, vFront=dark?-.06:-.13; // 어두운 차는 윗면을 밝혀서 면이 구분되게 해요
+  const sk=c=>` stroke="${c}" stroke-width=".7" stroke-linejoin="round"`, face=(pts,c)=>poly(pts,c,sk(c)), tone=v=>shade(fill,v), vEdge=(vSide+vTop)/2;
+  const B=isoSmooth(m.body), C=isoSmooth(m.cab), zb=m.cab[0][1], zr=Math.max(...C.map(q=>q[1])), [ib,ir]=m.inset;
+  const win=z=>ib+(ir-ib)*clamp((z-zb)/(zr-zb)); // 객실은 위로 갈수록 좁아져요
+  const zAt=(P,l)=>{ for(let i=0;i<P.length-1;i++){ const a=P[i], b=P[i+1]; if(b[0]>a[0]&&l>=a[0]&&l<=b[0]) return a[1]+(b[1]-a[1])*(l-a[0])/(b[0]-a[0]); } return P[0][1]; };
+  // 윤곽을 따라 띠를 이어 붙여요. 위를 볼수록 밝고, 보이지 않는 면은 그리지 않아요. 먼 쪽부터 그려요
+  const bands=(P,draw)=>{ for(let i=P.length-2;i>=0;i--){ const a=P[i], b=P[i+1], dl=b[0]-a[0], dz=b[1]-a[1], n=Math.hypot(dl,dz)||1; if((.72*dz+.407*dl)/n>.02) draw(a,b,Math.max(0,dl/n)); } };
+  const g=[`<path d="M${pt(.1,-.05,0)}L${pt(m.L,-.05,0)}L${pt(m.L,W+.05,0)}L${pt(.1,W+.05,0)}Z" fill="${ink}.32)" filter="url(#ch${u})"/>`]; // 바닥 그림자
+  // 차체. 앞 모서리는 둥글게 돌리고(cw), 옆면과 윗면이 만나는 어깨도 한 번 꺾어 굴려요(sh)
+  const cw=q=>q[0]<.5?.22*(1-q[0]/.5):0, sh=q=>.08*clamp((q[0]-.3)/.35)*clamp((m.L-.12-q[0])/.3)*clamp((q[1]-.55)/.2), wn=q=>cw(q)+sh(q);
+  const arc=(q,s,far)=>{ const c=cw(q), th=s*Math.PI/2, w=c*(1-Math.cos(th)); return [q[0]+c*(1-Math.sin(th)),far?W-w:w,q[1]]; };
+  bands(B,(a,b,k)=>{
+    if(cw(a)||cw(b)) for(let j=0;j<2;j++){ const v=vFront-.05-.06*(1-(j+.5)/2); g.push(face([arc(a,j/2+.5,1),arc(b,j/2+.5,1),arc(b,(j+1)/2*.5+.5,1),arc(a,(j+1)/2*.5+.5,1)],tone(v+(vTop-v)*k))); } // 먼 쪽 앞 모서리
+    g.push(face([[a[0],wn(a),a[1]],[b[0],wn(b),b[1]],[b[0],W-wn(b),b[1]],[a[0],W-wn(a),a[1]]],tone(vFront+(vTop-vFront)*k)));
+    if(cw(a)||cw(b)) for(let j=0;j<3;j++){ const v=vSide+(vFront-vSide)*((j+.5)/3); g.push(face([arc(a,j/3),arc(b,j/3),arc(b,(j+1)/3),arc(a,(j+1)/3)],tone(v+(vTop-v)*k))); }
+    if(sh(a)||sh(b)) g.push(face([[a[0],0,a[1]-sh(a)],[b[0],0,b[1]-sh(b)],[b[0],sh(b),b[1]],[a[0],sh(a),a[1]]],tone(vEdge)));
+  });
+  g.push(poly(B.map(q=>[q[0]+cw(q),0,q[1]-sh(q)]),`url(#cb${u})`,sk(tone(vSide))));
+  // 앞모습: 코의 굽은 면을 따라 그려요
+  const lF=z=>{ for(let i=0;i<B.length-1&&B[i][0]<.7;i++){ const a=B[i], b=B[i+1]; if(b[1]>a[1]&&z>=a[1]&&z<=b[1]) return a[0]+(b[0]-a[0])*(z-a[1])/(b[1]-a[1]); } return 0; };
+  const fp=q=>[lF(q[1])-.015,.2+q[0]*(W-.4),q[1]];
+  m.front.forEach(([k,a,c,mir,sw])=>{
+    const pts=k==='r'?[[a[0],a[2]],[a[0],a[3]],[a[1],a[3]],[a[1],a[2]]]:a, st=c[0]==='#'&&c>'#9'?' stroke="rgba(60,70,85,.4)" stroke-width=".25" stroke-linejoin="round"':` stroke="${c}" stroke-width=".5" stroke-linejoin="round"`;
+    const draw=ps=>g.push(k==='l'?path(ps.map(fp),c,sw):poly(ps.map(fp),c,st));
+    draw(pts); if(mir) draw(pts.map(q=>[1-q[0],q[1]]));
+  });
+  // 옆: 문 선, 손잡이, 아래 선
+  m.seams.forEach(l=>g.push(path([[l,0,.44],[l,0,zAt(B,l)-.1]],ink+'.26)',.45)));
+  m.seams.slice(0,-1).forEach(l=>g.push(path([[l+.62,0,zAt(B,l)-.22],[l+.86,0,zAt(B,l)-.22]],ink+'.4)',.7)));
+  g.push(path([[.6,0,.4],[m.L-.4,0,.4]],ink+'.18)',.5));
+  // 옆 거울(먼 쪽 먼저), 객실: 지붕과 유리, 옆면과 옆 유리. 지붕 가장자리도 한 번 꺾어 굴려요(ec)
+  const ml=m.cab[0][0]+.42, mz=zb+.03, mirror=(wa,wb)=>[face([[ml,wa,mz],[ml,wa,mz+.11],[ml,wb,mz+.11],[ml,wb,mz]],tone(dark?-.3:-.5)),face([[ml,wa,mz+.11],[ml+.1,wa,mz+.11],[ml+.1,wb,mz+.11],[ml,wb,mz+.11]],tone(vSide))];
+  g.push(...mirror(W-.04,W+.13));
+  const [gf,gr]=m.glass, ec=q=>.07*clamp((q[1]-zb)/.3), cn=q=>win(q[1])+ec(q);
+  const quad=(a,b,d)=>[[a[0],cn(a)+d,a[1]],[b[0],cn(b)+d,b[1]],[b[0],W-cn(b)-d,b[1]],[a[0],W-cn(a)-d,a[1]]];
+  bands(C,(a,b,k)=>{ g.push(face(quad(a,b,0),tone(vFront+(vTop-vFront)*k)));
+    if(ec(a)||ec(b)) g.push(face([[a[0],win(a[1]),a[1]-ec(a)],[b[0],win(b[1]),b[1]-ec(b)],[b[0],cn(b),b[1]],[a[0],cn(a),a[1]]],tone(vEdge))); });
+  bands(C,(a,b)=>{ const mid=(a[0]+b[0])/2; if(mid<gf||mid>gr) g.push(poly(quad(a,b,.08),`url(#cw${u})`,` stroke="url(#cw${u})" stroke-width=".7" stroke-linejoin="round"`)); });
+  g.push(face(C.map(q=>[q[0],win(q[1]),q[1]-ec(q)]),tone(vSide)));
+  const lc=(C[0][0]+C[C.length-1][0])/2, gk=m.gk||.78, gz=z=>zb+.07+(z-zb)*gk, glassPt=q=>[lc+(q[0]-lc)*.93,win(gz(q[1]))-.012,gz(q[1])];
+  g.push(poly(C.map(glassPt),`url(#cs${u})`,sk('#4A5B70')));
+  m.pillars.forEach(l=>{ const src=lc+(l-lc)/.93, q=glassPt([src,zAt(C,src)]); g.push(`<path d="M${pt(l,win(zb+.07)-.014,zb+.04)}L${pt(q[0],q[1]-.004,q[2]+.04)}" fill="none" stroke="${tone(vSide)}" stroke-width="1.5"/>`); });
+  if(m.chrome) g.push(path(C.filter(q=>q[1]>zb+.12).map(q=>[q[0],win(q[1])-.01,q[1]-ec(q)]),'#E6EAEE',.6)); // 지붕을 따라 흐르는 은색 선
+  if(m.rails) g.push(path([[m.rails[0],win(zr)+.2,zAt(C,m.rails[0])+.05],[m.rails[1],win(zr)+.2,zAt(C,m.rails[1])+.05]],'#3A4553',.8)); // 지붕 레일
+  g.push(...mirror(-.13,.04));
+  // 지붕 표시등
+  const [s0,s1]=m.sign, w0=W/2-.34, w1=W/2+.34, sb=zAt(C,(s0+s1)/2)-.02, sz=sb+.19;
+  g.push(face([[s0,w0,sb],[s0,w0,sz],[s0,w1,sz],[s0,w1,sb]],'#F7BC0A'),face([[s0,w0,sb],[s0,w0,sz],[s1,w0,sz],[s1,w0,sb]],'#DFA200'),face([[s0,w0,sz],[s1,w0,sz],[s1,w1,sz],[s0,w1,sz]],'#FFDD5C'));
+  // 바퀴
+  const ring=(cl,r,f)=>{ let d=''; for(let i=0;i<24;i++){ const a=i/24*2*Math.PI; d+=(i?'L':'M')+pt(cl+r*Math.cos(a),-.03,m.r+r*Math.sin(a)); } return `<path d="${d}Z" fill="${f}"/>`; };
+  m.wheels.forEach(cl=>{ let d=''; for(let i=0;i<=14;i++){ const a=Math.PI*i/14; d+=(i?'L':'M')+pt(cl+(m.r+.09)*Math.cos(a),0,m.r+.02+(m.r+.09)*Math.sin(a)); }
+    g.push(`<path d="${d}Z" fill="${ink}.6)"/>`,ring(cl,m.r,'#161C26'),ring(cl,m.r*.62,'#D2D7DE'),ring(cl,m.r*.5,'#A9B1BC'),ring(cl,m.r*.2,'#5E6875')); });
+  const bx=x0-3, by=y0-2.5, bw=x1-x0+6, bh=y1-y0+5.5;
+  return carIso.memo[u]=`<svg viewBox="${bx.toFixed(1)} ${by.toFixed(1)} ${bw.toFixed(1)} ${bh.toFixed(1)}" aria-hidden="true"><defs>
+    <linearGradient id="cb${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${tone(vSide+.03)}"/><stop offset="1" stop-color="${tone(vSide-.08)}"/></linearGradient>
+    <linearGradient id="cs${u}" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#62788F"/><stop offset="1" stop-color="#2F3D50"/></linearGradient>
+    <linearGradient id="cw${u}" gradientUnits="userSpaceOnUse" x1="${(bx+bw*.3).toFixed(1)}" y1="${by.toFixed(1)}" x2="${(bx+bw).toFixed(1)}" y2="${(by+bh*.8).toFixed(1)}"><stop offset="0" stop-color="#B9CBDA"/><stop offset="1" stop-color="#5A728A"/></linearGradient>
+    <filter id="ch${u}" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.4"/></filter>
+  </defs>${g.join('')}</svg>`;
+}
+carIso.memo={}; // 같은 차는 한 번만 그려요
 const VAN_MODELS=['스타리아','카니발'];
-const VAN3D=fill=>{
-  const u=++carUid, wheel=x=>`<circle cx="${x}" cy="31" r="5.2" fill="#1A2130"/><circle cx="${x}" cy="31" r="2.6" fill="#C5CAD3"/><circle cx="${x}" cy="31" r=".9" fill="#596373"/>`;
-  return `<svg viewBox="0 0 84 42" aria-hidden="true"><defs>
-    <linearGradient id="cb${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${shade(fill,.3)}"/><stop offset=".5" stop-color="${fill}"/><stop offset="1" stop-color="${shade(fill,-.22)}"/></linearGradient>
-    <linearGradient id="cg${u}" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#7E94AA"/><stop offset="1" stop-color="#2C3B4E"/></linearGradient>
-  </defs>
-  <ellipse cx="42" cy="37" rx="37" ry="2.2" fill="#000" opacity=".14"/>
-  <path d="M4 30.5V25.6C4 23.6 5.2 22.2 7.2 21.6L13 20L20.2 8.4C21.3 6.7 23.2 5.6 25.3 5.6H72C75.2 5.6 77.6 7.6 78.2 10.8L80 24V30.5C80 32 79 33 77.6 33H6.4C5 33 4 32 4 30.5Z" fill="url(#cb${u})"/>
-  <path d="M15.6 20L22 9.6C22.7 8.5 23.9 7.9 25.2 7.9H32.5V20ZM34.3 7.9H51.5V20H34.3ZM53.3 7.9H72C74 7.9 75.4 9 75.9 11L77.2 20H53.3Z" fill="url(#cg${u})"/>
-  <path d="M5 24.5C25 22.4 58 22.4 79.6 24.2" fill="none" stroke="#fff" stroke-opacity=".28" stroke-width=".8"/>
-  <path d="M33.4 8V32M52.4 8V32" stroke="#000" stroke-opacity=".16" stroke-width=".6"/>
-  <path d="M34.5 21.6H78" stroke="#000" stroke-opacity=".12" stroke-width=".6"/>
-  <rect x="27" y="24.2" width="4" height=".9" rx=".45" fill="#000" opacity=".3"/><rect x="46" y="24.2" width="4" height=".9" rx=".45" fill="#000" opacity=".3"/>
-  <path d="M4.4 24.4L9.6 23.2V26.2H4.1Z" fill="#F4EFD8"/><rect x="77.7" y="14" width="1.8" height="8" rx=".8" fill="#C83C3C"/>
-  ${wheel(20)}${wheel(65)}
-  <rect x="44" y="2.6" width="10" height="3" rx="1" fill="#EFC24A"/>
-</svg>`;
-};
+const CAR3D=fill=>carIso(fill,'sonata'), VAN3D=fill=>carIso(fill,'staria');
 
 /* =====================================================================
    8. 지도 — 카카오맵 / 그림 지도(SVG) 두 가지를 같은 방식으로 다뤄요
@@ -1479,7 +1582,7 @@ const VAN3D=fill=>{
 const SvgMap = {
   name:'svg', el:null, view:null, carPos:null, k:1,
   init(el){ this.el=el; return Promise.resolve(); },
-  show(v){ this.view=v; this.carPos=v.car?(v.carAt||v.at):null; this.carHeading=samplePath(v.approachLine||v.route||[v.at],0).heading; this.draw(); },
+  show(v){ this.view=v; this.carPos=v.car?(v.carAt||v.at):null; this.carHeading=v.heading!=null?v.heading:samplePath(v.approachLine||v.route||[v.at],0).heading; this.draw(); },
   pickBox(){ // 탑승 위치를 고를 때는 그 위치가 정확히 지도 가운데에 와요
     const q=prj(S.pick), ar=(this.el.clientWidth||360)/(this.el.clientHeight||300);
     let w=130, h=w/ar; if(h<100){ h=100; w=h*ar; } // 조금 끌어도 잘 맞추도록 가깝게 보여줘요
@@ -1536,7 +1639,7 @@ const SvgMap = {
     if(v.radar){[0,1].forEach(i=>g.push(`<circle cx="${O.x}" cy="${O.y}" r="${10*k}" fill="rgba(255,210,31,.3)" stroke="#E3AE00" stroke-width="${1.5*k}"><animate attributeName="r" values="${10*k};${70*k}" dur="2s" begin="${i}s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0" dur="2s" begin="${i}s" repeatCount="indefinite"/></circle>`))}
     // 주변 택시
     if(v.taxis) TAXIS.forEach((p,i)=>{const q=prj(p),dx=(i%2?14:-14)*k,dy=(i%2?6:-5)*k;
-      g.push(`<g transform="translate(${q.x} ${q.y})"><animateTransform attributeName="transform" type="translate" values="${q.x} ${q.y};${q.x+dx} ${q.y+dy};${q.x} ${q.y}" dur="${3+i*.7}s" repeatCount="indefinite"/><g transform="scale(${k*.9})">${cabParts()}</g></g>`)});
+      g.push(`<g transform="translate(${q.x} ${q.y})"><animateTransform attributeName="transform" type="translate" values="${q.x} ${q.y};${q.x+dx} ${q.y+dy};${q.x} ${q.y}" dur="${3+i*.7}s" repeatCount="indefinite"/><g transform="scale(${k*.9}) rotate(${TAXI_HEAD[i%TAXI_HEAD.length]})">${cabParts()}</g></g>`)});
     // 도착지
     if(v.dest){const q=prj(PLACES[v.dest]);g.push(`<g transform="translate(${q.x} ${q.y}) scale(${k})"><path d="M0 0c-6-7-10-11-10-16a10 10 0 0 1 20 0c0 5-4 9-10 16z" fill="#C8492F" stroke="#fff" stroke-width="1.5"/><circle cy="-16" r="3.6" fill="#fff"/></g>`);g.push(txt(esc(PLACES[v.dest].n),q.x,q.y-31*k,10.5,'#C8492F'))}
     // 탑승 위치
@@ -1584,12 +1687,12 @@ const KakaoMap = {
   line(path,color,w,style='solid',op=1){ const l=new kakao.maps.Polyline({path:path.map(p=>this.LL(p)),strokeWeight:w,strokeColor:color,strokeOpacity:op,strokeStyle:style}); l.setMap(this.map); this.lines.push(l); },
   show(v){
     this.view=v; this.clear();
-    this.carHeading=samplePath(v.approachLine||v.route||[v.at],0).heading;
+    this.carHeading=v.heading!=null?v.heading:samplePath(v.approachLine||v.route||[v.at],0).heading;
     this.lock();
     if(v.approachLine) this.line(v.approachLine,'#1E2833',3,'shortdash',.6);
     if(v.route){ this.line(v.route,'#1E2833',10,'solid',.22); this.line(v.route,'#F5B800',6); }
     if(v.radar) this.add(v.at,'<div class="k-radar"><i></i><i></i></div>',.5,1);
-    if(v.taxis) TAXIS.forEach((p,i)=>this.add(p,`<div class="k-taxi bob" style="animation-delay:${i*.4}s">${CAB()}</div>`,.5,2));
+    if(v.taxis) TAXIS.forEach((p,i)=>{ const h=TAXI_HEAD[i%TAXI_HEAD.length], r=h*Math.PI/180; this.add(p,`<div class="k-taxi bob" style="animation-delay:${i*.4}s;--bx:${(Math.sin(r)*6).toFixed(1)}px;--by:${(-Math.cos(r)*6).toFixed(1)}px">${CAB(undefined,h)}</div>`,.5,2); });
     if(v.dest){ const d=PLACES[v.dest]; this.add(d,`<div class="k-pin d"><b>${v.bar?`도착 · 약 ${fareOf(v.dest).min}분`:esc(d.n)}</b><span></span></div>`,1,5); }
     if(v.bar) this.add(v.at,'<div class="k-tag">출발</div>',1.9,5);
     if(v.origin) this.add(v.at,'<div class="k-dot"></div>',.5,4);
@@ -1696,9 +1799,9 @@ function viewOf(){
     case 'origin':   return {key:'pick', at:base(), pick:1, origin:1, taxis:1, fit:[at]};
     case 'calling':  return {key:'calling', at, origin:1, radar:1, taxis:1, fit:[at,...TAXIS]};
     case 'approach': return {key:'approach', at, origin:1, car:1, carAt:S.approach[0], approachLine:S.approach, fit:[at,...S.approach]};
-    case 'plate':    return {key:'plate', at, origin:1, car:1, carAt:at, fit:[at]};
+    case 'plate':    return {key:'plate', at, origin:1, car:1, carAt:at, heading:S.carHeading, fit:[at]};
     case 'ride':     return {key:'ride'+d, at, dest:d, route:r, car:1, carAt:r[0], fit:[at,PLACES[d],...r]};
-    case 'arrive':   return {key:'arrive'+d, at, dest:d, car:1, carAt:PLACES[d], fit:[PLACES[d]]};
+    case 'arrive':   return {key:'arrive'+d, at, dest:d, car:1, carAt:PLACES[d], heading:S.carHeading, fit:[PLACES[d]]};
   }
 }
 
@@ -1714,7 +1817,7 @@ function pickRows(){
 }
 const barFrom=()=>km(S.pick,base())<0.01?baseName():'고른 위치';
 const setMapLabel=()=>$('map').setAttribute('aria-label',S.dest?`택시 호출 지도. 도착 ${PLACES[S.dest].n}. 출발 ${barFrom()}.`:'택시 호출 지도. 도착지를 아직 고르지 않았어요.');
-const showPick=()=>{ const e=$('pick-ft'), f=$('bar-from'); if(e) e.innerHTML=pickRows(); if(f) f.textContent=barFrom(); setMapLabel(); };
+const showPick=()=>{ const e=$('pick-ft'), f=$('bar-from'); if(e) e.innerHTML=pickRows(); if(f){ f.textContent=barFrom(); render.mapUi=null; } setMapLabel(); };
 function setPick(p){
   if(S.step!=='origin'||km(p,S.pick)<0.003) return; // 지도를 다시 맞출 때 생기는 아주 작은 차이는 옮긴 것으로 보지 않아요
   S.pick={lat:p.lat,lon:p.lon}; S.pickName='';
@@ -1822,19 +1925,26 @@ function taxiHeading(a,b){
   const east=(b.lon-a.lon)*Math.cos((a.lat+b.lat)*Math.PI/360), north=b.lat-a.lat;
   return Math.atan2(east,north)*180/Math.PI;
 }
-function samplePath(path,t){
-  const points=path.filter((p,i)=>!i||km(path[i-1],p)>1e-8);
-  if(points.length<2) return {p:points[0]||path[0],heading:0};
-  const seg=[0];for(let i=1;i<points.length;i++) seg.push(seg[i-1]+km(points[i-1],points[i]));
-  const d=Math.max(0,Math.min(1,t))*seg.at(-1);let i=1;while(i<seg.length-1&&seg[i]<=d)i++;
-  const a=points[i-1],b=points[i],u=(d-seg[i-1])/(seg[i]-seg[i-1]);
-  return {p:{lat:a.lat+(b.lat-a.lat)*u,lon:a.lon+(b.lon-a.lon)*u},heading:taxiHeading(a,b)};
+// 방향은 지나온 곳과 갈 곳을 함께 보고 정해서, 꺾이는 곳에서 툭 돌지 않고 부드럽게 돌아요
+function makeTrack(path){
+  const pts=path.filter((q,i)=>!i||km(path[i-1],q)>1e-8), seg=[0];
+  for(let i=1;i<pts.length;i++) seg.push(seg[i-1]+km(pts[i-1],pts[i]));
+  const total=seg[seg.length-1]||0, win=Math.max(total*.012,.012); // 앞뒤로 이만큼(km) 떨어진 두 점을 이은 방향이에요
+  const at=d=>{
+    if(pts.length<2) return pts[0]||path[0];
+    d=Math.max(0,Math.min(total,d)); let lo=1, hi=seg.length-1;
+    while(lo<hi){ const mid=(lo+hi)>>1; if(seg[mid]<d) lo=mid+1; else hi=mid; }
+    const a=pts[lo-1], b=pts[lo], u=(d-seg[lo-1])/((seg[lo]-seg[lo-1])||1);
+    return {lat:a.lat+(b.lat-a.lat)*u,lon:a.lon+(b.lon-a.lon)*u};
+  };
+  return {pose(t){ const d=Math.max(0,Math.min(1,t))*total; return {p:at(d),heading:total?taxiHeading(at(d-win),at(d+win)):0}; }};
 }
+const samplePath=(path,t)=>makeTrack(path).pose(t);
 function runAlong(path, ms, onTick, onDone){
-  const id=++animId, t0=flowNow();
+  const id=++animId, t0=flowNow(), track=makeTrack(path);
   (function f(){ if(id!==animId) return; if(flow.reasons.size){ requestAnimationFrame(f); return; }
-    const t=Math.max(0,Math.min(1,(flowNow()-t0)/ms)), pose=samplePath(path,t);
-    if(pose.p) MapCtl.moveCar(pose.p,pose.heading);
+    const t=Math.max(0,Math.min(1,(flowNow()-t0)/ms)), pose=track.pose(t);
+    if(pose.p){ S.carHeading=pose.heading; MapCtl.moveCar(pose.p,pose.heading); } // 멈춘 뒤에도 오던 방향을 그대로 봐요
     onTick&&onTick(t); if(t<1) requestAnimationFrame(f); else onDone&&onDone(); })();
 }
 const stopAnim=()=>{animId++};
@@ -1851,21 +1961,23 @@ const missionShort=()=>S.missionOn?`${PLACES[MISSION_KEY].n}까지 일반택시 
 const missionText=()=>S.missionOn?`우리 집에서 ${PLACES[MISSION_KEY].n}까지 일반택시를 불러 봐요`:'가고 싶은 곳까지 택시를 불러 봐요';
 
 const mmss = () => { const t=Math.max(0,Math.floor((flowNow()-S.t0)/1000)); return String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0'); };
-const helpBtn = () => `<button class="help-btn" data-a="hint" ${S.hintOpen?'disabled':''}>${I('light')+(S.named?(S.hintOpen?'도움 보는 중':'도움 요청'):(S.hintOpen?'힌트 보는 중':'힌트 보기'))}</button>`;
 function coachHTML(){
-  const st=S.step, sk=SKILL_OF[st], idx=SKILLS.findIndex(x=>x[0]===sk), test=S.mode==='test';
-  const island = test && !WAIT[st]; // 힌트 버튼과 내용을 한 덩어리로 합쳐요
-  const showHint = (WAIT[st] || guided()) && !island;
-  const hintBody = `<div class="hint${WAIT[st]?' wait':''}">${I('light')}<span>${HINT[st]().replace(/([요다]\.)\s+/g,'$1<br>')}</span><button data-a="say" aria-label="읽어주기">${I('speaker')}</button></div>`;
-  const islandHTML = `<div class="island${S.hintOpen?' open':''}">${helpBtn()}${S.hintOpen?`<div class="island-body">${hintBody}</div>`:''}</div>`;
-  const tag = test ? (S.named?'<span class="tag test">테스트<span class="tag-more"> · 혼자 해봐요</span></span>':'<span class="tag">연습</span>') : `<span class="tag">연습 모드<span class="tag-more"> · 힌트 ${PREF.guide?'켬':'끔'}</span></span>`;
-  const tools = (test ? (WAIT[st]?'':islandHTML) : `<button class="${PREF.guide?'on':''}" aria-pressed="${!!PREF.guide}" data-a="guide">힌트 ${PREF.guide?'켜짐':'꺼짐'}</button>`)
+  const st=S.step, sk=SKILL_OF[st], idx=SKILLS.findIndex(x=>x[0]===sk), test=S.mode==='test', wait=!!WAIT[st];
+  const hintText=HINT[st]().replace(/([요다]\.)\s+/g,'$1<br>'), sayBtn=`<button data-a="say" aria-label="읽어주기">${I('speaker')}</button>`, word=S.named?'도움':'힌트';
+  const tag = test ? `<span class="tag${S.named?' test':''}">${S.named?'테스트':'연습'}</span>` : '<span class="tag">연습 모드</span>';
+  // 한 줄: 연습 표시 · 제목 · 진행 칸. 단계 이름은 낭독기와 힌트 카드에서 알려 줘요
+  const head = `<div class="c-prog">${tag}<b class="c-title">${missionShort()}</b><span class="c-bars" role="img" aria-label="${SKILLS.length}단계 중 ${idx+1}단계 · ${SKILLS[idx][1]}">${SKILLS.map((x,i)=>`<i class="${i<idx?'done':i===idx?'on':''}"></i>`).join('')}</span>${test&&S.named?`<b class="c-time tabnum" role="timer" aria-label="걸린 시간"><span id="timer">${mmss()}</span></b>`:''}</div>`;
+  // 왼쪽 자리: 힌트 버튼. 기다리는 단계에는 기다리라는 표시만 둬서, 위쪽 높이가 단계마다 같아요
+  const lead = !test ? `<button class="${PREF.guide?'on':''}" aria-pressed="${!!PREF.guide}" data-a="guide">힌트 ${PREF.guide?'켜짐':'꺼짐'}</button>`
+    : wait ? `<span class="wait-chip" role="status"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>잠깐만 기다려요</span>`
+    : `<div class="island"><button class="help-btn" data-a="hint" aria-expanded="${!!S.hintOpen}">${I('light')}${S.named?'도움 요청':'힌트 보기'}</button></div>`;
+  const tools = lead
     + `<button class="${PREF.voice?'on':''}" aria-pressed="${!!PREF.voice}" data-a="voice">소리 ${PREF.voice?'켜짐':'꺼짐'}</button>`
     + `<button class="${PREF.big?'on':''}" aria-pressed="${!!PREF.big}" data-a="big">글자 크게</button>`;
-  return `<div class="c-prog">${tag}<span class="c-bars" role="img" aria-label="${idx+1}단계 / ${SKILLS.length}단계">${SKILLS.map((x,i)=>`<i class="${i<idx?'done':i===idx?'on':''}"></i>`).join('')}</span><span class="c-step">${idx+1}/${SKILLS.length} · ${SKILLS[idx][1]}</span>${test&&S.named?`<b class="c-time tabnum" role="timer" aria-label="걸린 시간"><span id="timer">${mmss()}</span></b>`:''}</div>
-    <div class="c-row"><span class="m-full">${missionText()}</span><span class="m-short">${missionShort()}</span></div>
-    ${showHint?hintBody:''}
-    <div class="coach-tools${island&&S.hintOpen?' hint-on':''}">${tools}</div>`;
+  const flowHint = !test&&(wait||PREF.guide) ? `<div class="hint${wait?' wait':''}">${I('light')}<span>${hintText}</span>${sayBtn}</div>` : '';
+  // 힌트 카드: 위쪽 안내 위에 펼쳐져요. 지도와 버튼을 밀어내지 않아요
+  const card = test&&!wait&&S.hintOpen ? `<div class="hint-card" id="hint-card" role="group" aria-label="${word}" tabindex="-1"><div class="hc-head"><span>${I('light')}${word} · ${SKILLS[idx][1]}</span><span class="hc-acts">${sayBtn}<button data-a="hint-close">닫기</button></span></div><div class="hc-body"><p>${hintText}</p></div></div>` : '';
+  return `${head}${flowHint}<div class="coach-tools"${card?' inert':''}>${tools}</div>${card}`;
 }
 
 const grabLabel = down => down?'아래 내용 펴기':'아래 내용 접기';
@@ -1896,7 +2008,7 @@ function sheetHTML(){
   case 'plate': return `<h3>택시가 도착했어요!</h3>
     <p>내 택시는 <span class="plate sm">${V.plate}</span> ${V.color} ${V.model}${eyo(V.model)}.</p>
     <p class="small muted extra">앞에 택시가 여러 대 서 있어요. 어떤 차가 내 택시일까요?</p>
-    <div class="plates">${S.plates.map((o,i)=>`<button class="pc${tg(o.ok)}${S.plateBad===i?' wrong':''}" data-a="plate" data-v="${i}">${VAN_MODELS.includes(o.model)?VAN3D(o.c):CAR3D(o.c)}<span class="plate">${o.plate}</span><small>${S.plateBad===i?'번호판이 달라요':`${o.color} ${o.model}`}</small></button>`).join('')}</div>`;
+    <div class="plates">${S.plates.map((o,i)=>`<button class="pc${tg(o.ok)}${S.plateBad===i?' wrong':''}" data-a="plate" data-v="${i}">${carIso(o.c,CAR_KIND[o.model])}<span class="plate">${o.plate}</span><small>${S.plateBad===i?'번호판이 달라요':`${o.color} ${o.model}`}</small></button>`).join('')}</div>`;
   case 'ride': return `${GRAB()}<h3>${esc(P.n)}${ro(P.n)} 가는 중</h3>
     <div class="ridebar"><i id="ride-bar"></i></div>
     <p>도착까지 약 <b id="ride-min" class="tabnum">${fr.min}분</b></p>
@@ -2063,24 +2175,27 @@ const Motion = {
     try{
       if(!this.ok()) return null;
       const box=s=>{ const el=document.querySelector(s); return el?el.getBoundingClientRect():null; };
-      const isl=document.querySelector('#coach .island'), sel=document.querySelector('#sheet .car.on'), bars=[...document.querySelectorAll('#coach .c-bars i')];
-      return {key:render.key, island:isl?isl.getBoundingClientRect():null, open:!!(isl&&isl.classList.contains('open')), sheetTop:$('sheet').firstElementChild?$('sheet').getBoundingClientRect().top:null,
-        search:box('#sheet .tx-search'), field:box('#q'), car:sel?sel.getBoundingClientRect():null, carV:sel?sel.dataset.v:null, bar:bars.findIndex(b=>b.classList.contains('on')), tgt:this.tgtKey, tools:[...document.querySelectorAll('#coach .coach-tools>button')].map(b=>({a:b.dataset.a,r:b.getBoundingClientRect()}))};
+      const pill=document.querySelector('#coach .help-btn'), card=$('hint-card'), sel=document.querySelector('#sheet .car.on'), bars=[...document.querySelectorAll('#coach .c-bars i')];
+      return {key:render.key, pill:pill?pill.getBoundingClientRect():null, card:card?card.innerHTML:null, sheetTop:$('sheet').firstElementChild?$('sheet').getBoundingClientRect().top:null,
+        search:box('#sheet .tx-search'), field:box('#q'), car:sel?sel.getBoundingClientRect():null, carV:sel?sel.dataset.v:null, bar:bars.findIndex(b=>b.classList.contains('on')), tgt:this.tgtKey};
     }catch(e){ return null; }
   },
   after(p){ try{ if(p) this.run(p); }catch(e){} },
   run(p){
     const key=render.key, changed=p.key!==key, panelOpen=!$('panel').hidden, app=$('app');
-    // 힌트: 버튼이 내용까지 품은 한 덩어리로 커지고 작아져요
-    const isl=$('coach').querySelector('.island');
-    if(isl&&p.island){
-      const open=isl.classList.contains('open');
-      if(open!==p.open){
-        const r=isl.getBoundingClientRect(), c=isl.classList; c.add('morphing');
-        const a=this.play(isl,[{width:p.island.width+'px',height:p.island.height+'px'},{width:r.width+'px',height:r.height+'px'}],{duration:open?520:380});
-        this.done(a,()=>c.remove('morphing'));
-        (p.tools||[]).forEach(t=>{ const b=$('coach').querySelector(`.coach-tools>button[data-a="${t.a}"]`); if(!b) return; const n=b.getBoundingClientRect(), dx=t.r.left-n.left, dy=t.r.top-n.top; if(dx||dy) this.play(b,[{transform:`translate(${dx}px,${dy}px)`},{transform:'none'}],{duration:open?520:380}); });
-      }
+    // 힌트: 버튼 자리에서 카드가 펼쳐지고, 닫을 때는 그 자리로 접혀요. 다른 것은 움직이지 않아요
+    const card=$('hint-card'), pill=document.querySelector('#coach .help-btn'), full='inset(-30px -30px -30px -30px round 52px)';
+    const clip=(b,r)=>`inset(${(b.top-r.top).toFixed(1)}px ${(r.right-b.right).toFixed(1)}px ${(r.bottom-b.bottom).toFixed(1)}px ${(b.left-r.left).toFixed(1)}px round ${(b.height/2).toFixed(1)}px)`;
+    if(card&&!p.card&&p.pill){
+      this.play(card,[{clipPath:clip(p.pill,card.getBoundingClientRect())},{clipPath:full}],{duration:520});
+      [...card.children].forEach((el,i)=>this.play(el,[{opacity:0,transform:'translateY(5px)'},{opacity:1,transform:'none'}],{duration:300,delay:110+i*50,easing:'ease-out',fill:'backwards'}));
+    }
+    if(!card&&p.card&&!$('coach').hidden){
+      const g=document.createElement('div'); g.className='hint-card ghost'; g.setAttribute('aria-hidden','true'); g.inert=true; g.innerHTML=p.card;
+      $('coach').appendChild(g);
+      const to=pill?clip(pill.getBoundingClientRect(),g.getBoundingClientRect()):'inset(0 0 100% 0 round 22px)';
+      const a=this.play(g,[{clipPath:full,opacity:1},{clipPath:to,opacity:1,offset:.78},{clipPath:to,opacity:0}],{duration:pill?400:260,easing:'cubic-bezier(.3,0,.15,1)',fill:'forwards'});
+      this.done(a,()=>g.remove());
     }
     // 눌러야 할 곳을 처음 가리킬 때만 등장 움직임을 줘요. 같은 화면을 다시 그릴 때는 되풀이하지 않아요
     const tk=key+'|'+(guided()?1:0);
@@ -2097,7 +2212,7 @@ const Motion = {
     if(!changed) return;
     // 진행 표시: 지금 단계의 칸이 왼쪽부터 차올라요
     const bars=[...document.querySelectorAll('#coach .c-bars i')], idx=bars.findIndex(b=>b.classList.contains('on'));
-    if(idx>=0&&idx!==p.bar){ this.play(bars[idx],[{transform:'scaleX(0)',transformOrigin:'left'},{transform:'scaleX(1)',transformOrigin:'left'}],{duration:520}); this.play(document.querySelector('#coach .c-step'),[{opacity:0,transform:'translateY(4px)'},{opacity:1,transform:'none'}],{duration:320,easing:'ease-out'}); }
+    if(idx>=0&&idx!==p.bar){ this.play(bars[idx],[{transform:'scaleX(0)',transformOrigin:'left'},{transform:'scaleX(1)',transformOrigin:'left'}],{duration:520}); }
     // 검색칸은 사라졌다 나타나는 대신 제자리에서 옮겨 가요
     if(key==='search'&&p.search){ const f=$('q'), bar=$('panel').querySelector('.tx-sh'); if(f&&bar){ const r=f.getBoundingClientRect(); this.play(bar,[{transform:`translate(${p.search.left-r.left}px,${p.search.top-r.top}px)`},{transform:'none'}],{duration:520}); this.play($('panel'),[{backgroundColor:'rgba(255,255,255,0)'},{backgroundColor:'rgba(255,255,255,1)'}],{duration:260,easing:'ease-out'}); } }
     if(p.key==='search'&&key==='home'&&p.field){ const w=$('sheet').querySelector('.tx-search-wrap'); if(w){ const r=w.getBoundingClientRect(); this.play(w,[{transform:`translate(${p.field.left-r.left}px,${p.field.top-r.top}px)`},{transform:'none'}],{duration:480}); } }
@@ -2142,7 +2257,8 @@ function render(){
   const panelKey=ride?(S.originSearch?'origin-search':S.step):S.screen, samePanel=panelKey===render.key; render.key=panelKey;
   const oldScroller=scroller(), panelTop=samePanel&&oldScroller?oldScroller.scrollTop:0;
   const focusA=samePanel&&ae&&$('app').contains(ae)&&ae.dataset?ae.dataset.a:null, focusV=focusA?ae.dataset.v:null;
-  $('coach').hidden=!ride; if(ride) $('coach').innerHTML=coachHTML();
+  $('coach').hidden=!ride;
+  { const h=ride?coachHTML():''; if(h!==render.coach){ $('coach').innerHTML=h; render.coach=h; } } // 내용이 같으면 그대로 둬요
   setMapLabel();
   $('banner-txt').textContent = S.screen==='result' ? '연습 끝 · 실제 호출과 결제는 일어나지 않았어요' : '연습 화면 · 진짜로 호출·결제되지 않아요';
   $('area').dataset.step = ride ? S.step : '';
@@ -2150,7 +2266,7 @@ function render(){
   applySheet();
   const foot = ride ? footHTML() : '';
   $('foot').hidden=!foot; $('foot').innerHTML=foot;
-  $('mapui').innerHTML = mapUiHTML();
+  { const h=mapUiHTML(); if(h!==render.mapUi){ $('mapui').innerHTML=h; render.mapUi=h; } } // 고를 때마다 지도 위 버튼이 다시 나타나지 않게 해요
   const panel = S.screen==='result' ? resultHTML() : (ride&&(S.step==='search'||S.originSearch)) ? searchHTML() : '';
   $('panel').classList.toggle('same',samePanel); $('panel').hidden=!panel; if(panel) $('panel').innerHTML=panel;
   document.querySelector('.map-wrap').inert=!!panel; $('sheet').inert=!!panel; // 패널 뒤의 버튼에는 키보드도 닿지 않아요
@@ -2256,7 +2372,7 @@ function setStep(st){
   if(st==='ride'){ clearTimeout(noti._t); $('noti').hidden=true; }
   if(toastIsMistake) hideMessages(); // 고친 뒤에도 "다시 골라 봐요"가 남지 않게 해요
   if(st!=='search') PlaceSearch.reset();
-  S.step=st; S.originSearch=false; S.locating=false; S.hintOpen=false; S.listening=false; S.sheetDown=false; sheetDrag=null; liveDirty=false;
+  S.step=st; S.originSearch=false; S.locating=false; S.hintOpen=false; S.hintFor=null; S.listening=false; S.sheetDown=false; sheetDrag=null; liveDirty=false;
   markGuide();
   render();
   { const sh=$('sheet'); sh.setAttribute('role','group'); sh.setAttribute('aria-label',STEP_SAY[st]()); sh.classList.remove('enter'); void sh.offsetWidth; sh.classList.add('enter'); clearTimeout(setStep.enterT); setStep.enterT=setTimeout(()=>sh.classList.remove('enter'),700); }
@@ -2397,7 +2513,9 @@ const A = {
   plate:v=>{ if(S.plates[+v].ok){ toast('맞아요! 번호판을 확인하고 탔어요','good'); setStep('ride'); } else { S.plateBad=+v; mistake('번호판이 달라요. 내 택시 번호를 다시 봐요','plate:'+S.plates[+v].plate); render(); } },
   'arrive-ok':()=>finish(),
   'sheet-toggle':()=>{ if(!sheetJustDragged) setSheet(!S.sheetDown); },
-  hint:()=>{ if(S.hintOpen) return; S.hintOpen=true; S.hints++; S.sk[SKILL_OF[S.step]].h++; render(); announce(HINT[S.step]()); const h=document.querySelector('#coach .hint'); if(h&&S.step!=='search'){ h.tabIndex=-1; quietFocus(h); } if(PREF.voice) say(HINT[S.step]()); },
+  hint:()=>{ if(S.hintOpen) return; S.hintOpen=true; if(S.hintFor!==S.step){ S.hintFor=S.step; S.hints++; S.sk[SKILL_OF[S.step]].h++; } // 같은 단계에서 닫았다 다시 열어도 한 번으로 세요
+    render(); announce(HINT[S.step]()); const h=$('hint-card'); if(h&&!searching()) quietFocus(h); if(PREF.voice) say(HINT[S.step]()); },
+  'hint-close':()=>{ if(!S.hintOpen) return; S.hintOpen=false; render(); const b=document.querySelector('#coach .help-btn'); if(b&&!searching()) quietFocus(b); },
   guide:()=>{PREF.guide=!PREF.guide;markGuide();render()},
   voice:()=>{PREF.voice=!PREF.voice;render();if(PREF.voice)say('소리 안내를 켰어요');else stopSpeech()},
   big:()=>{PREF.big=!PREF.big;render()},
@@ -2437,7 +2555,7 @@ document.addEventListener('input',e=>{ if(e.target.id!=='q') return;
 });
 document.addEventListener('compositionstart',e=>{if(e.target.id==='q'){PlaceSearch.composing=true;}});
 document.addEventListener('compositionend',e=>{if(e.target.id==='q'){PlaceSearch.composing=false;S.q=e.target.value;PlaceSearch.schedule();}});
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!$('modal').hidden) A['modal-no'](); });
+document.addEventListener('keydown',e=>{ if(e.key!=='Escape') return; if(!$('modal').hidden) A['modal-no'](); else if(S.screen==='ride'&&S.hintOpen) A['hint-close'](); });
 document.addEventListener('visibilitychange',()=>{ document.hidden?pauseFlow('hidden'):resumeFlow('hidden'); }); // 전화를 받는 시간 등은 걸린 시간에서 빼요
 if(document.hidden) pauseFlow('hidden');
 
