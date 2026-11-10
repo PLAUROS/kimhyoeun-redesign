@@ -1479,14 +1479,14 @@ const VAN3D=fill=>{
 const SvgMap = {
   name:'svg', el:null, view:null, carPos:null, k:1,
   init(el){ this.el=el; return Promise.resolve(); },
-  show(v){ this.view=v; this.carPos=v.car?(v.carAt||v.at):null; this.draw(); },
+  show(v){ this.view=v; this.carPos=v.car?(v.carAt||v.at):null; this.carHeading=samplePath(v.approachLine||v.route||[v.at],0).heading; this.draw(); },
   pickBox(){ // 탑승 위치를 고를 때는 그 위치가 정확히 지도 가운데에 와요
     const q=prj(S.pick), ar=(this.el.clientWidth||360)/(this.el.clientHeight||300);
     let w=130, h=w/ar; if(h<100){ h=100; w=h*ar; } // 조금 끌어도 잘 맞추도록 가깝게 보여줘요
     return [q.x-w/2, q.y-h/2, w, h];
   },
   refit(){ this.draw(); },
-  moveCar(p){ this.carPos=p; const g=this.el.querySelector('#svgcar'); if(g){const q=prj(p); g.setAttribute('transform',`translate(${q.x.toFixed(1)} ${q.y.toFixed(1)}) scale(${this.k.toFixed(3)})`);} },
+  moveCar(p,heading=0){ this.carPos=p; this.carHeading=heading; const g=this.el.querySelector('#svgcar'); if(g){const q=prj(p); g.setAttribute('transform',`translate(${q.x.toFixed(1)} ${q.y.toFixed(1)}) scale(${this.k.toFixed(3)}) rotate(${this.carHeading})`);} },
   box(points){
     const ps=points.map(prj), xs=ps.map(p=>p.x), ys=ps.map(p=>p.y);
     const ar=(this.el.clientWidth||360)/(this.el.clientHeight||300);
@@ -1542,7 +1542,7 @@ const SvgMap = {
     // 탑승 위치
     if(v.origin){g.push(`<circle cx="${O.x}" cy="${O.y}" r="${12*k}" fill="rgba(44,119,186,.18)"><animate attributeName="r" values="${8*k};${15*k};${8*k}" dur="2s" repeatCount="indefinite"/></circle><circle cx="${O.x}" cy="${O.y}" r="${6*k}" fill="#2C77BA" stroke="#fff" stroke-width="${2.4*k}"/>`)}
     // 내 택시
-    if(this.carPos){const q=prj(this.carPos);g.push(`<g id="svgcar" transform="translate(${q.x.toFixed(1)} ${q.y.toFixed(1)}) scale(${k.toFixed(3)})"><g transform="scale(1.25)">${cabParts(myCar().c)}</g></g>`)}
+    if(this.carPos){const q=prj(this.carPos);g.push(`<g id="svgcar" transform="translate(${q.x.toFixed(1)} ${q.y.toFixed(1)}) scale(${k.toFixed(3)}) rotate(${this.carHeading||0})"><g transform="scale(1.25)">${cabParts(myCar().c)}</g></g>`)}
     this.el.innerHTML=`<svg viewBox="${vb.map(n=>n.toFixed(1)).join(' ')}" preserveAspectRatio="xMidYMid meet" aria-hidden="true">${g.join('')}</svg>`;
   }
 };
@@ -1584,6 +1584,7 @@ const KakaoMap = {
   line(path,color,w,style='solid',op=1){ const l=new kakao.maps.Polyline({path:path.map(p=>this.LL(p)),strokeWeight:w,strokeColor:color,strokeOpacity:op,strokeStyle:style}); l.setMap(this.map); this.lines.push(l); },
   show(v){
     this.view=v; this.clear();
+    this.carHeading=samplePath(v.approachLine||v.route||[v.at],0).heading;
     this.lock();
     if(v.approachLine) this.line(v.approachLine,'#1E2833',3,'shortdash',.6);
     if(v.route){ this.line(v.route,'#1E2833',10,'solid',.22); this.line(v.route,'#F5B800',6); }
@@ -1594,6 +1595,7 @@ const KakaoMap = {
     if(v.origin) this.add(v.at,'<div class="k-dot"></div>',.5,4);
     if(v.car){ this.carAnchor=v.carAt||v.at; this.car=this.add(this.carAnchor,`<div class="k-taxi big">${CAB(myCar().c)}</div>`,.5,6); }
     this.fit();
+    if(v.car) this.moveCar(this.carAnchor,this.carHeading);
   },
   fit(){
     const v=this.view; if(!v) return;
@@ -1628,13 +1630,14 @@ const KakaoMap = {
     const c=pick?m.getCenter():m.getProjection().coordsFromContainerPoint(new kakao.maps.Point(this.el.clientWidth/2,this.el.clientHeight/2));
     m.relayout(); m.setCenter(c);
   },
-  moveCar(p){
+  moveCar(p,heading=0){
+    this.carHeading=heading;
     if(!this.car) return;
     const a=this.carAnchor, el=this.map.getNode().querySelector('.k-taxi.big');
     if(!a||!el){ this.car.setPosition(this.LL(p)); return; }
-    const pr=this.map.getProjection(), o=pr.containerPointFromCoords(this.LL(a)), b=pr.containerPointFromCoords(this.LL({lat:a.lat+.02,lon:a.lon+.02}));
-    const kx=(b.x-o.x)/.02, ky=(b.y-o.y)/.02;
-    el.style.transform=`translate3d(${((p.lon-a.lon)*kx).toFixed(2)}px,${((p.lat-a.lat)*ky).toFixed(2)}px,0)`;
+    const pr=this.map.getProjection(), o=pr.containerPointFromCoords(this.LL(a)), q=pr.containerPointFromCoords(this.LL(p));
+    el.style.transform=`translate3d(${(q.x-o.x).toFixed(2)}px,${(q.y-o.y).toFixed(2)}px,0)`;
+    const icon=el.querySelector('svg'); if(icon){ icon.style.transformOrigin='50% 50%'; icon.style.transform=`rotate(${heading}deg)`; }
   }
 };
 
@@ -1681,7 +1684,7 @@ const MapCtl = {
     this.sizeCls();
     try{ this.impl.show(v); this.lastKey=v.key; }catch(e){ console.warn('[배프] 지도 표시 오류:',e.message); }
   },
-  moveCar(p){ this.impl.moveCar(p); }
+  moveCar(p,heading){ this.impl.moveCar(p,heading); }
 };
 
 function viewOf(){
@@ -1796,12 +1799,25 @@ function resumeFlow(why){ if(!flow.reasons.delete(why)||flow.reasons.size) retur
 
 /* 경로를 따라 택시 움직이기 */
 let animId=0;
+function taxiHeading(a,b){
+  if(!a||!b) return 0;
+  const east=(b.lon-a.lon)*Math.cos((a.lat+b.lat)*Math.PI/360), north=b.lat-a.lat;
+  return Math.atan2(east,north)*180/Math.PI;
+}
+function samplePath(path,t){
+  const points=path.filter((p,i)=>!i||km(path[i-1],p)>1e-8);
+  if(points.length<2) return {p:points[0]||path[0],heading:0};
+  const seg=[0];for(let i=1;i<points.length;i++) seg.push(seg[i-1]+km(points[i-1],points[i]));
+  const d=Math.max(0,Math.min(1,t))*seg.at(-1);let i=1;while(i<seg.length-1&&seg[i]<=d)i++;
+  const a=points[i-1],b=points[i],u=(d-seg[i-1])/(seg[i]-seg[i-1]);
+  return {p:{lat:a.lat+(b.lat-a.lat)*u,lon:a.lon+(b.lon-a.lon)*u},heading:taxiHeading(a,b)};
+}
 function runAlong(path, ms, onTick, onDone){
-  const id=++animId, seg=[0];
-  for(let i=1;i<path.length;i++) seg.push(seg[i-1]+km(path[i-1],path[i]));
-  const total=seg[seg.length-1]||1, t0=flowNow();
-  const at=t=>{const d=t*total;let i=1;while(i<seg.length-1&&seg[i]<d)i++;const a=path[i-1],b=path[i],u=(d-seg[i-1])/((seg[i]-seg[i-1])||1);return {lat:a.lat+(b.lat-a.lat)*u,lon:a.lon+(b.lon-a.lon)*u}};
-  (function f(){ if(id!==animId) return; if(flow.reasons.size){ requestAnimationFrame(f); return; } const t=Math.max(0,Math.min(1,(flowNow()-t0)/ms)); MapCtl.moveCar(at(t)); onTick&&onTick(t); if(t<1) requestAnimationFrame(f); else onDone&&onDone(); })();
+  const id=++animId, t0=flowNow();
+  (function f(){ if(id!==animId) return; if(flow.reasons.size){ requestAnimationFrame(f); return; }
+    const t=Math.max(0,Math.min(1,(flowNow()-t0)/ms)), pose=samplePath(path,t);
+    if(pose.p) MapCtl.moveCar(pose.p,pose.heading);
+    onTick&&onTick(t); if(t<1) requestAnimationFrame(f); else onDone&&onDone(); })();
 }
 const stopAnim=()=>{animId++};
 
@@ -1898,6 +1914,8 @@ function searchHTML(){
 }
 // 카카오 장소 검색. 이전 검색의 늦은 응답이 최신 목록을 덮지 않게 해요.
 const searching=()=>S.step==='search'||S.originSearch;
+const placeNorm=s=>String(s).normalize('NFKD').replace(/\s/g,'').toLowerCase();
+const placeMatches=(p,q)=>placeNorm(p.n+' '+p.a).includes(placeNorm(q));
 const PlaceSearch = {
   query:'', items:[], status:'idle', id:0, timer:0, timeout:0, composing:false, cache:new Map(), known:new Map(),
   reset(){ clearTimeout(this.timer); clearTimeout(this.timeout); this.id++; this.query=''; this.items=[]; this.status='idle'; },
@@ -1912,15 +1930,17 @@ const PlaceSearch = {
     if(!this.query){ this.update(); return; }
     const cacheKey=this.query+'|'+S.pick.lat+','+S.pick.lon;
     if(this.cache.has(cacheKey)){ const hit=this.cache.get(cacheKey); this.items=hit.items; this.status=hit.status; this.update(); return; }
-    const norm=s=>s.replace(/\s/g,'').toLowerCase(), word=norm(this.query);
-    this.items=[...this.known.values()].filter(p=>norm(p.n+' '+p.a).includes(word)).slice(0,15);
+    this.items=[...this.known.values()].filter(p=>placeMatches(p,this.query)).slice(0,15);
     this.status='loading'; this.update();
     const id=this.id, query=this.query;
     this.timer=setTimeout(()=>{
       const finish=(items,status)=>{
         if(id!==this.id||!searching()||S.q.trim()!==query) return;
         clearTimeout(this.timeout);
-        if(status!=='error'){
+        const matches=[...this.known.values()].filter(p=>placeMatches(p,query));
+        items=[...new Map([...items,...matches].map(p=>[p.id,p])).values()].slice(0,15);
+        if(status==='empty'&&items.length) status='ready';
+        if(status!=='error'&&items.length){
           this.cache.set(cacheKey,{items,status});
           if(this.cache.size>40) this.cache.delete(this.cache.keys().next().value);
           items.forEach(p=>this.known.set(p.id,p));
@@ -1932,19 +1952,29 @@ const PlaceSearch = {
       if(!window.kakao?.maps?.services){ finish([],'error'); return; }
       this.timeout=setTimeout(()=>{ finish([],'error'); this.id++; },6000);
       try{
-        new kakao.maps.services.Places().keywordSearch(query,(rows,status)=>{
-          if(status===kakao.maps.services.Status.ZERO_RESULT){ finish([],'empty'); return; }
+        const service=new kakao.maps.services.Places();
+        const search=(keyword,fallback=false)=>service.keywordSearch(keyword,(rows,status)=>{
+          if(id!==this.id||!searching()||S.q.trim()!==query) return;
+          if(status===kakao.maps.services.Status.ZERO_RESULT){
+            const short=[...query.replace(/\s/g,'')].slice(0,2).join('');
+            if(!fallback&&short.length===2&&short!==query){ search(short,true); return; }
+            finish([],'empty'); return;
+          }
           if(status!==kakao.maps.services.Status.OK){ finish([],'error'); return; }
-          const items=rows.map(p=>({id:String(p.id),n:String(p.place_name||''),a:String(p.road_address_name||p.address_name||''),lat:Number(p.y),lon:Number(p.x),kind:'place',dynamic:true}))
+          let items=rows.map(p=>({id:String(p.id),n:String(p.place_name||''),a:String(p.road_address_name||p.address_name||''),lat:Number(p.y),lon:Number(p.x),kind:'place',dynamic:true}))
             .filter(p=>/^\d+$/.test(p.id)&&p.n&&Number.isFinite(p.lat)&&Number.isFinite(p.lon)&&p.lat>=33&&p.lat<=39&&p.lon>=124&&p.lon<=132);
+          items.forEach(p=>this.known.set(p.id,p));
+          while(this.known.size>150) this.known.delete(this.known.keys().next().value);
+          if(fallback) items=items.filter(p=>placeMatches(p,query));
           finish(items,items.length?'ready':'empty');
         },{location:new kakao.maps.LatLng(S.pick.lat,S.pick.lon),size:15});
+        search(query);
       }catch(e){ finish([],'error'); }
     },100);
   }
 };
 function resultsHTML(){
-  const norm=s=>s.replace(/\s/g,'').toLowerCase(), q=norm(S.q.trim());
+  const norm=placeNorm, q=norm(S.q.trim());
   const local=NEARBY.filter(([,p])=>!q||norm(p.n+p.a+(p.kw||'')).includes(q));
   const row=(p,action,key)=>`<button class="res-i" data-a="${action}" data-v="${key}">${I('pin')}<span><b>${esc(p.n)}</b><small>${esc(p.a)}</small></span><em class="tabnum">${km(S.pick,p).toFixed(1)}km</em></button>`;
   const pickAct=S.originSearch?'origin-local':'pick', placeAct=S.originSearch?'origin-place':'pick-place';
@@ -2403,4 +2433,5 @@ MapCtl.init($('map')).catch(e=>{ console.warn('[배프] 지도 준비 오류:',e
 </script>
 </body>
 </html>
+
 
