@@ -2051,8 +2051,8 @@ function footHTML(){
 function searchHTML(){
   return `<div class="tx-sh"><button class="ic-btn" data-a="search-back" aria-label="뒤로">${I('back')}</button>
     <input id="q" placeholder="${S.originSearch?'어디서 탈까요?':'어디로 갈까요?'}" value="${esc(S.q)}" autocomplete="off" aria-label="${S.originSearch?'탑승 장소 검색':'도착지 검색'}">
-    ${S.originSearch?'':`<button class="mic${S.listening?' live':''}${tg(!S.q&&!S.listening)}" data-a="mic" aria-label="말로 찾기">${I('mic')}</button>`}</div>
-    ${S.listening?`<div class="listen"><div class="wave"><i></i><i></i><i></i><i></i><i></i></div><b>듣고 있어요… 가고 싶은 곳을 말해 봐요</b><small>연습 화면이라 말하지 않아도 예시 장소가 채워져요</small></div>`:''}
+    ${S.originSearch?'':`<button class="mic${S.listening?' live':''}${tg(!S.q&&!S.listening)}" data-a="mic" aria-label="${S.listening?'듣기 멈추기':'말로 찾기'}">${I('mic')}</button>`}</div>
+    ${S.listening?`<div class="listen"><div class="wave"><i></i><i></i><i></i><i></i><i></i></div><b>듣고 있어요… 가고 싶은 곳을 말해 봐요</b><small>${Mic.supported()?'말이 끝나면 자동으로 찾아요':'이 기기는 말을 알아듣지 못해서 예시 장소가 채워져요'}</small></div>`:''}
     <div class="res" id="res">${resultsHTML()}</div>`;
 }
 // 카카오 장소 검색. 이전 검색의 늦은 응답이 최신 목록을 덮지 않게 해요.
@@ -2377,7 +2377,40 @@ document.addEventListener('pointercancel',endSheetDrag);
    10. 진행
    ===================================================================== */
 let lastStepAt=-1e9; // 빠른 두 번 탭이 다음 화면의 같은 자리 버튼을 누르지 않게 해요
-const haltStep=()=>{ clearTimers(); stopAnim(); lastStepAt=performance.now(); };
+/* 말로 찾기: 브라우저의 음성 인식을 써요. 지원하지 않는 브라우저이거나 마이크를 허용하지 않으면 예시 장소를 채워 줘요.
+   말한 소리는 글자로 바꾸려고 브라우저 회사의 서버로 보내져요(페이지는 소리를 저장하지 않아요). 마이크 권한은 버튼을 눌렀을 때만 물어요 */
+const Mic = {
+  rec:null, timer:0,
+  supported(){ return !!(window.SpeechRecognition||window.webkitSpeechRecognition)&&window.isSecureContext!==false; },
+  stop(){ clearTimeout(this.timer); const r=this.rec; this.rec=null; if(r){ r.onresult=r.onerror=r.onend=null; try{ r.abort(); }catch(e){} } },
+  // 예시 장소를 채워요. 말로 찾기도 실제 앱에 있는 방법이라 힌트로 세지 않고, 끝까지 들었을 때만 기록해요
+  example(ms){ later(()=>{ if(!S.listening) return; S.sk.search.mic=1; S.listening=false; S.q=S.missionOn?PLACES[MISSION_KEY].n:'광교호수공원';
+    if(S.step==='search'){ render(); PlaceSearch.schedule(); announce(`${S.q}${eul(S.q)} 찾았어요.`); } },ms); },
+  start(){
+    const R=window.SpeechRecognition||window.webkitSpeechRecognition, run=S; let r, heard='', settled=false;
+    try{ r=new R(); }catch(e){ this.example(1800); return; }
+    r.lang='ko-KR'; r.interimResults=true; r.maxAlternatives=1; r.continuous=false;
+    const live=()=>S===run&&S.listening&&S.step==='search'&&this.rec===r;
+    const done=text=>{ if(settled) return; settled=true; this.stop(); if(S!==run||!S.listening) return; S.listening=false;
+      text=String(text||'').replace(/[.?!。]+$/,'').trim();
+      if(S.step!=='search') return;
+      if(text){ S.sk.search.mic=1; S.q=text; render(); PlaceSearch.schedule(); announce(`${S.q}${eul(S.q)} 찾았어요.`); }
+      else { render(); toast('소리가 잘 들리지 않았어요. 마이크를 다시 누르거나 글자로 써 봐요'); } };
+    r.onresult=e=>{ if(!live()) return; let fin='', tmp='';
+      for(let i=0;i<e.results.length;i++){ const x=e.results[i]; if(x.isFinal) fin+=x[0].transcript; else tmp+=x[0].transcript; }
+      heard=(fin+tmp).trim(); const q=$('q'); if(q) q.value=heard; // 듣는 동안 알아들은 말을 바로 보여 줘요
+      if(fin.trim()) done(fin); };
+    r.onerror=e=>{ if(!live()) return; const k=e&&e.error;
+      if(k==='no-speech'||k==='aborted'){ done(heard); return; }
+      settled=true; this.stop(); // 마이크를 허용하지 않았거나 인식 서버에 닿지 못했어요. 예시 장소로 이어 가요
+      toast(k==='not-allowed'||k==='service-not-allowed'?'마이크 사용을 허용하면 말로 찾을 수 있어요. 이번에는 예시 장소를 넣어 드려요':'지금은 말을 알아듣지 못했어요. 예시 장소를 넣어 드려요');
+      this.example(700); };
+    r.onend=()=>{ if(live()) done(heard); };
+    this.rec=r; this.timer=setTimeout(()=>{ if(!live()) return; try{ r.stop(); }catch(e){ done(heard); } },9000); // 말이 길어져도 9초 뒤에는 마무리해요
+    try{ r.start(); }catch(e){ this.rec=null; clearTimeout(this.timer); this.example(1800); }
+  }
+};
+const haltStep=()=>{ clearTimers(); stopAnim(); Mic.stop(); lastStepAt=performance.now(); };
 const markGuide=()=>{ if(S.mode==='practice'&&PREF.guide&&!WAIT[S.step]) S.sk[SKILL_OF[S.step]].g=1; };
 const tickStep=()=>{ const now=flowNow(); if(S.stepAt!=null&&!WAIT[S.step]) S.sk[SKILL_OF[S.step]].ms+=now-S.stepAt; S.stepAt=now; }; // 기다리는 단계를 뺀 단계별 시간
 function setStep(st){
@@ -2498,10 +2531,10 @@ const A = {
   'origin-search':()=>{ if(!canChooseBase()) return; S.originSearch=true; S.q=''; PlaceSearch.reset(); render(); announce('탈 곳을 검색해요.'); later(()=>{const q=$('q');if(q)quietFocus(q)},60); },
   'origin-place':id=>{ if(PlaceSearch.query!==S.q.trim()) return; const p=PlaceSearch.items.find(x=>x.id===id); if(!p) return; setBase({lat:p.lat,lon:p.lon,n:p.n,kind:'place'}); toast(`${p.n}${eul(p.n)} 탑승 위치로 골랐어요`,'good'); },
   'origin-local':k=>{ if(!Object.prototype.hasOwnProperty.call(PLACES,k)) return; const p=PLACES[k]; setBase({lat:p.lat,lon:p.lon,n:p.n,kind:'place'}); toast(`${p.n}${eul(p.n)} 탑승 위치로 골랐어요`,'good'); },
-  mic:()=>{ if(S.listening) return;
+  mic:()=>{
+    if(S.listening){ Mic.stop(); clearTimers(); S.listening=false; render(); announce('듣기를 멈췄어요.'); return; } // 듣는 중에 다시 누르면 멈춰요
     S.listening=true; render(); announce('듣고 있어요.');
-    later(()=>{ S.sk.search.mic=1; // 말로 찾기도 실제 앱에 있는 방법이에요. 힌트로 세지 않고, 끝까지 들었을 때만 기록해요
-      S.listening=false;S.q=S.missionOn?PLACES[MISSION_KEY].n:'광교호수공원';if(S.step==='search'){ render(); PlaceSearch.schedule(); announce(`${S.q}${eul(S.q)} 찾았어요.`); } },1800); },
+    if(Mic.supported()) Mic.start(); else Mic.example(1800); },
   'pick-place':id=>{ if(PlaceSearch.query!==S.q.trim()) return; const p=PlaceSearch.items.find(p=>p.id===id); if(!p) return; const key='place_'+p.id; PLACES[key]={...p}; A.pick(key); },
   pick:v=>{ if(!Object.prototype.hasOwnProperty.call(PLACES,v)) return; if(S.missionOn&&v!==MISSION_KEY){ mistake(`오늘 갈 곳은 "${PLACES[MISSION_KEY].n}"${eyo(PLACES[MISSION_KEY].n)}. 다시 골라 봐요`,'pick:'+v); return; } S.dest=v; setStep('route'); refreshLive(); },
   'route-back':()=>{S.dest=null;setStep('home')},
@@ -2562,7 +2595,7 @@ document.addEventListener('click',e=>{
 let resAnnounce=0;
 document.addEventListener('input',e=>{ if(e.target.id!=='q') return;
   const changed=e.target.value!==S.q; S.q=e.target.value;
-  if(S.listening){ S.listening=false; clearTimers(); const l=document.querySelector('.listen'); if(l) l.remove(); const m=document.querySelector('.mic'); if(m) m.classList.remove('live'); } // 직접 쓰면 듣기를 멈춰요
+  if(S.listening){ S.listening=false; clearTimers(); Mic.stop(); const l=document.querySelector('.listen'); if(l) l.remove(); const m=document.querySelector('.mic'); if(m) m.classList.remove('live'); } // 직접 쓰면 듣기를 멈춰요
 
   if(changed) PlaceSearch.schedule(); // 값이 같으면 목록을 바꾸지 않아요(누르는 중인 버튼이 사라지지 않게)
 });
