@@ -996,6 +996,28 @@ button.mic-ic:active:not(:disabled){transform:translateY(-50%) scale(.94)}
 @container (min-width:341px) and (max-width:400px){.big .coach-tools>button{padding:.3em .6em}.big .wait-chip{padding:0 .7em}.big .wait-chip .dots{display:none}}
 @container (max-width:400px){.big .hc-body p{font-size:.92em}}
 @container (max-height:760px){.pc{padding:.15em 1em .15em .55em}}
+
+/* 차종 아이콘과 이름·예상 요금. 설명은 두 열을 합쳐 읽기 쉽게 보여줘요. */
+.car{grid-template-columns:52px minmax(0,1fr) auto;column-gap:8px;row-gap:3px}
+.car .call-type-icon{grid-column:1;grid-row:1 / 3;display:grid;place-items:center;align-self:center}
+.car .call-type-icon svg{display:block;width:52px;height:auto}
+.car .cname{display:contents}
+.car .cname b{grid-column:2;grid-row:1;min-width:0;align-self:center}
+.car .cname small{grid-column:2 / -1;grid-row:2;white-space:normal;overflow:visible;text-overflow:clip}
+.car .cfare{grid-column:3;grid-row:1;align-self:center}
+@container (max-width:360px){
+  .car{grid-template-columns:40px minmax(0,1fr)}
+  .car .call-type-icon{grid-row:1 / 4}
+  .car .call-type-icon svg{width:40px}
+  .car .cfare{grid-column:2;grid-row:2;text-align:left}
+  .car .cname small{grid-column:2;grid-row:3}
+}
+.big .car{grid-template-columns:44px minmax(0,1fr)}
+.big .car .call-type-icon{grid-row:1 / 4}
+.big .car .call-type-icon svg{width:44px}
+.big .car .cfare{grid-column:2;grid-row:2;text-align:left}
+.big .car .cname small{grid-column:2;grid-row:3}
+
 </style>
 </head>
 <body>
@@ -1212,6 +1234,28 @@ const CARS = [
   {k:'모범', t:'블루파트너스', d:'배차될 때까지 찾아주는 제휴 택시', eta:6, mul:1.6},
   {k:'일반', t:'일반호출', d:'주변 택시 호출', eta:3, mul:1}
 ];
+// 차종 선택용 작은 그림: 여러 대+번개 / 제휴 택시 / 일반 택시
+function callTypeIcon(key){
+  const car=(x,y,scale,fill,partner=false)=>`<g transform="translate(${x} ${y}) scale(${scale})">
+    <ellipse cx="40" cy="48" rx="35" ry="3" fill="#1E2833" opacity=".12"/>
+    <path d="M7 30 10 20 26 18 35 7 56 9 67 24 77 29 80 42 74 46 12 44 6 38Z" fill="${fill}" stroke="#8D99A8" stroke-width="1"/>
+    <path d="M30 19 38 10 54 12 62 24Z" fill="#263442"/>
+    <path d="M14 21 24 20 30 12 21 12Z" fill="#384956"/>
+    <path d="M7 30 62 33 77 29 79 40 63 45 10 40Z" fill="#D2D8E1"/>
+    <path d="M62 33 77 29 79 40 63 45Z" fill="#B9C3D1"/>
+    ${partner?'<path d="m19 20 7 1 12 22-8-1Z" fill="#FFC400"/><path d="m30 22 5 1 12 21-6-.5Z" fill="#FFD544"/>':''}
+    <path d="m65 35 10-2 1 4-10 2Z" fill="#FFF4B4"/><path d="m68 42 8-2" stroke="#D5A400" stroke-width="2"/>
+    <path d="M12 35 17 35" stroke="#9EABB8" stroke-width="1.5"/>
+    <ellipse cx="20" cy="40" rx="7" ry="10" fill="#263442"/><ellipse cx="20" cy="40" rx="3.5" ry="6" fill="#B7C4D1"/>
+    <ellipse cx="64" cy="43" rx="7" ry="10" fill="#263442"/><ellipse cx="64" cy="43" rx="3.5" ry="6" fill="#B7C4D1"/>
+    <path d="M39 6V2h12v5" fill="#FFD21F"/>
+  </g>`;
+  const body=key==='대형'
+    ?car(26,8,.72,'#DDE3EA',true)+car(15,13,.72,'#E8EDF3',true)+car(3,18,.72,'#F3F5F8',true)+'<path d="m88 1-16 22h10l-5 17 19-25H85Z" fill="#4285EF"/>'
+    :car(5,10,1.05,key==='모범'?'#F2F5F9':'#B7C1CF',key==='모범');
+  return `<svg viewBox="0 0 100 70" aria-hidden="true" focusable="false">${body}</svg>`;
+}
+
 const carOf = k => CARS.find(x=>x.k===k);
 const carFare = (f,k) => { const c=carOf(k); return c.mul===1 ? f : Math.round(f*c.mul/100)*100; };
 const won = n => n.toLocaleString('ko-KR')+'원';
@@ -1817,7 +1861,7 @@ function sheetHTML(){
     <div class="quick">${RECENT.map(k=>`<button data-a="pick" data-v="${k}">${I(PLACES[k].kind==='st'?'station':'clock')}${PLACES[k].n}</button>`).join('')}</div>`;
   case 'route': return `${GRAB()}<h3>${esc(P.n)}</h3>${P.dynamic?`<p class="small muted">${esc(P.a)}</p>`:''}<div class="trip tabnum">약 ${fr.km}km · 약 ${fr.min}분</div>
     ${P.dynamic&&!routeData(d)?'<p class="small muted">거리·시간·요금은 연습용으로 대강 계산한 값이에요.</p>':''}<div class="cars">${CARS.map(c=>`<button class="car${S.car===c.k?' on':''}" data-a="car" data-v="${c.k}" aria-pressed="${S.car===c.k}">
-      <span class="cname"><b>${c.t}</b><small>${c.d}</small></span>
+      <span class="call-type-icon" aria-hidden="true">${callTypeIcon(c.k)}</span><span class="cname"><b>${c.t}</b><small>${c.d}</small></span>
       <span class="cfare tabnum">예상 ${won(carFare(fr.f,c.k))}</span></button>`).join('')}</div>
     <button class="payrow" data-a="pay-open" aria-label="${S.pay==='card'?'연습카드 자동결제':'기사님에게 직접 결제'}. 결제 수단 바꾸기">${I('card')}${S.pay==='card'?'연습카드 ···· 0000':'기사님에게 직접 결제'}<span>${S.pay==='card'?'내릴 때 자동결제':'내릴 때 직접 내요'} ›</span></button>`;
   case 'origin': return `${GRAB()}<div class="pick-h"><h3>어디서 탈까요?</h3><span>도착 <b>${esc(P.n)}</b></span></div>
