@@ -1257,7 +1257,7 @@ const WAIT = {calling:1, approach:1, ride:1}; // 기다리기만 하는 단계 (
 const HINT = {
   home:    ()=>'아래 "어디로 갈까요?" 칸을 눌러요.',
   search:  ()=>S.missionOn ? `"${PLACES[MISSION_KEY].n}"${eul(PLACES[MISSION_KEY].n)} 쓰거나 마이크로 말해요. 아래에 나오면 이름을 눌러요.` : '가고 싶은 곳을 쓰거나 마이크로 말해요. 아래에 나오면 이름을 눌러요.',
-  route:   ()=>S.missionOn&&S.car!=='일반' ? '먼저 "일반호출"를 눌러요.' : S.missionOn ? `"일반호출"와 요금을 보고 맨 아래 "${carOf(S.car).t} 선택하기" 버튼을 눌러요.` : `택시 종류와 요금을 보고 맨 아래 "${carOf(S.car).t} 선택하기" 버튼을 눌러요.`,
+  route:   ()=>S.missionOn&&S.car!=='일반' ? '먼저 "일반호출"을 눌러요.' : S.missionOn ? `"일반호출"과 요금을 보고 맨 아래 "${carOf(S.car).t} 선택하기" 버튼을 눌러요.` : `택시 종류와 요금을 보고 맨 아래 "${carOf(S.car).t} 선택하기" 버튼을 눌러요.`,
   origin:  ()=>S.originSearch ? '탑승 위치 이름을 써요. 아래에 나오면 이름을 눌러요.' : `핀 끝이 탑승 위치예요. 맞으면 아래 "${carOf(S.car).t} 호출하기"를 눌러요.`,
   calling: ()=>'가까운 택시를 찾고 있어요. 잠깐만 기다려요.',
   approach:()=>S.mode==='test'?'기사님이 오고 있어요. 잠깐만 기다려요.':'기사님이 오고 있어요. 차 번호와 차 색깔을 기억해 둬요.',
@@ -2373,7 +2373,7 @@ const A = {
   pick:v=>{ if(!isPlace(v)) return; if(S.missionOn&&v!==MISSION_KEY){ mistake(`오늘 갈 곳은 "${PLACES[MISSION_KEY].n}"${eyo(PLACES[MISSION_KEY].n)}. 다시 골라 봐요`,'pick:'+v); return; } S.dest=v; setStep('route'); refreshLive(); },
   'route-back':()=>{S.dest=null;setStep('home')},
   car:v=>{S.car=v;render()},
-  'car-ok':()=>{ if(S.missionOn&&S.car!=='일반'){ mistake('오늘은 "일반호출"로 불러 봐요. 일반호출를 먼저 눌러요','car-ok'); return; } setStep('origin'); refreshLive(); },
+  'car-ok':()=>{ if(S.missionOn&&S.car!=='일반'){ mistake('오늘은 "일반호출"로 불러 봐요. 일반호출을 먼저 눌러요','car-ok'); return; } setStep('origin'); refreshLive(); },
   'pick-back':()=>setStep('route'),
   'pin-move':v=>{ const d={n:[.00027,0],s:[-.00027,0],w:[0,-.00034],e:[0,.00034]}[v]; if(!d) return; // 한 번에 약 30m
     if(tryPick({lat:S.pick.lat+d[0],lon:S.pick.lon+d[1]})){ MapCtl.impl.refit(); announce(`탑승 위치를 옮겼어요. ${baseName()}에서 약 ${Math.round(km(S.pick,base())*1000)}미터예요.`); } },
