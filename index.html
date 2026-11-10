@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <title>배프 · 택시 부르기 연습</title>
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
@@ -1111,8 +1111,8 @@ button.car:active:not(:disabled),button.res-i:active:not(:disabled){transform:sc
 .c-bars i{transition:background-color .3s ease}
 
 
-[data-step=route] .map-wrap{--map-min:clamp(180px,30cqh,300px)}
-.big [data-step=route] .map-wrap{--map-min:120px}
+/* 큰 화면에서만 지도를 넉넉히 둬요. 낮은 화면은 위쪽의 낮은 화면용 규칙을 그대로 따라요 */
+@container (min-height:761px){[data-step=route] .map-wrap{--map-min:clamp(180px,30cqh,300px)}.big [data-step=route] .map-wrap{--map-min:120px}}
 
 /* 안내 위쪽: 연습 표시와 진행 칸을 한 줄로, 제목은 그 아래 넓게 */
 .c-prog{gap:.6em;line-height:1.35}
@@ -1182,6 +1182,58 @@ button.car:active:not(:disabled),button.res-i:active:not(:disabled){transform:sc
 .pc svg{width:min(4.7em,82px);height:auto;flex:none;filter:drop-shadow(0 .5px .5px rgba(15,23,35,.38))}
 .drv>div{flex:1 1 6em}
 .pc.tgt::after{left:auto;right:.9em} /* 표시가 택시 그림을 가리지 않게 오른쪽에 둬요 */
+
+
+/* ---------- 정밀 점검 반영 (2026-11-11): 시각·움직임·접근성·화면 크기 ---------- */
+/* 누를 때 제자리에서 눌려요 */
+button.mic-ic:active:not(:disabled){transform:translateY(-50%) scale(.94)}
+/* 고른 택시의 체크 표시: 이름과 띄우고, 새로 골랐을 때만 튀어요 */
+.car.on .cname b::after{content:"✓";margin-left:.3em;animation:none}
+.car.on.sel-new .cname b::after{animation:check-pop .4s var(--pop) backwards}
+.sheet.enter>.tx-search-wrap{animation:none}
+.listen{animation:lift .32s var(--spring) backwards;border-bottom:0;box-shadow:0 .5px 0 var(--hair)}
+@media (prefers-reduced-motion:reduce){.wave i{height:55%}}
+/* 손잡이가 없는 시트는 위를 조금 띄워요 */
+.sheet>h3:first-child{margin-top:.5em}
+.sheet>.radar:first-child{margin-top:.7em}
+/* 결제 방법 창의 닫기는 선택지처럼 보이지 않게 */
+.pay-opts+.btn.ghost{background:none;color:var(--blue)}
+/* 작은 글자 크기와 모서리를 한 가지로 */
+.res-i small,.res-i em,.car .cname small,.drv small,.listen small{font-size:.85em}
+.payrow span{font-size:1em}
+.k-pin b,.k-tag{font-size:13.5px}
+.pbody>.note{border-radius:20px}
+.origin-actions button{border-radius:16px}
+@supports (corner-shape:squircle){.origin-actions button,.row3 button,.car-ghost{corner-shape:squircle;border-radius:22px}}
+#toast{border-radius:20px;box-shadow:0 0 0 .5px rgba(0,0,0,.05),0 12px 32px rgba(0,0,0,.14)}
+.res-i+.res-i::before{left:3.74em}
+.receipt .tot{border-top:.5px solid var(--hair)}
+.dot.s{box-shadow:0 0 0 3px var(--sky)}
+.grab::after{font-weight:600}
+/* 끝난 일의 버튼은 차분하게 */
+.btn:disabled{opacity:1;background:var(--fill);color:var(--ink-2);box-shadow:none}
+/* 경계가 또렷하게: 검색칸 테두리, 손잡이, 남은 진행 칸 */
+.tx-search,.tx-sh input{box-shadow:inset 0 0 0 1px rgba(60,60,67,.3)}
+.grab::before{background:rgba(60,60,67,.45)}
+.c-bars i{background:rgba(118,118,128,.32)}
+/* 힌트 카드의 버튼은 누르는 자리를 44px로 */
+.hc-acts{gap:12px}
+.hc-acts button::after{inset:-6px}
+/* 힌트 카드가 검색 화면 위에서도 가려지지 않게 */
+.panel{z-index:5}
+.hint{order:0;flex:none}
+/* 출발지 이름이 길어도 도착지 이름이 보이게 */
+.route-bar .from{max-width:42%;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* 화면 가장자리(위 상태 표시줄, 아래 홈 표시)에 닿지 않게 */
+.prac-banner{border-top:env(safe-area-inset-top,0px) solid transparent}
+.area:has(+ .foot[hidden]) .sheet{border-bottom:env(safe-area-inset-bottom,0px) solid var(--paper)}
+.modal-in{border-bottom:env(safe-area-inset-bottom,0px) solid var(--paper)}
+/* 좁은 화면과 큰 글씨: 제목은 아랫줄로 내려 잘리지 않게, 기다림 표시는 옆 버튼과 겹치지 않게 */
+@container (max-width:340px){.coach-tools .wait-chip{grid-column:1 / -1}.c-prog{flex-wrap:wrap;row-gap:.1em}.c-title{order:1;flex:1 1 100%}}
+@container (max-width:420px){.big .c-prog{flex-wrap:wrap;row-gap:.1em}.big .c-title{order:1;flex:1 1 100%}}
+@container (min-width:341px) and (max-width:400px){.big .coach-tools>button{padding:.3em .6em}.big .wait-chip{padding:0 .7em}.big .wait-chip .dots{display:none}}
+@container (max-width:400px){.big .hc-body p{font-size:.92em}}
+@container (max-height:760px){.pc{padding:.15em 1em .15em .55em}}
 </style>
 </head>
 <body>
@@ -1355,12 +1407,12 @@ function flushLive(){ // 안내창이나 시트 끌기를 방해하지 않게 �
   if(!liveDirty||!$('modal').hidden||sheetDrag) return;
   liveDirty=false;
   if(S.step!=='route'||!S.live) return;
-  MapCtl.lastKey=null; render(); announce('예상 요금을 새로 맞췄어요.');
+  $('sheet').classList.remove('enter'); render(); announce('예상 요금을 새로 맞췄어요.');
 }
 function refreshLive(){ // 지금 탑승 위치에서 목적지까지의 실제 경로를 받아요. 늦게 온 옛 응답은 버려요
   if(!CONFIG.ROUTE_API||(S.step!=='origin'&&S.step!=='route')||!S.dest||routeData(S.dest)) return;
   const req=++liveReq, at=S.pick, dest=S.dest;
-  fetchRoute(at,dest).then(r=>{ if(r&&req===liveReq&&(S.step==='origin'||S.step==='route')&&S.pick===at&&S.dest===dest){ S.live={dest,at,...r}; if(S.step!=='route') showPick(); else { MapCtl.lastKey=null; liveDirty=true; flushLive(); } } });
+  fetchRoute(at,dest).then(r=>{ if(r&&req===liveReq&&(S.step==='origin'||S.step==='route')&&S.pick===at&&S.dest===dest){ S.live={dest,at,...r}; if(S.step!=='route') showPick(); else { liveDirty=true; flushLive(); } } });
 }
 const toPts = p => p.map(([lat,lon])=>({lat,lon}));
 // 배차되는 택시는 지도에 보이던 주변 택시 중 하나예요. 너무 가까우면 움직임이 안 보여서 250m 넘게 떨어진 택시부터 골라요
@@ -1404,9 +1456,9 @@ const VEHICLES = {
 const myCar = () => VEHICLES[S.car];
 const plateOpts = k => { const {decoys,...v}=VEHICLES[k]; return shuffle([{...v,ok:true},...decoys]); };
 // 조사: 앞말 받침에 맞춰 골라요
-const lastJong = w => { const t=String(w).trim(), c=t.charCodeAt(t.length-1);
+const lastJong = w => { const t=String(w).trim().replace(/[^0-9A-Za-z\uAC00-\uD7A3]+$/,''), c=t.charCodeAt(t.length-1);
   if(c>=0xAC00&&c<=0xD7A3) return (c-0xAC00)%28;
-  return /[013678]$/.test(t) ? 1 : 0; }; // 숫자는 읽는 소리 기준
+  return /[013678lmnrLMNR]$/.test(t) ? 1 : 0; }; // 숫자는 읽는 소리 기준
 const eul = w => lastJong(w) ? '을' : '를';
 const ro = w => { const j=lastJong(w); return (j===0||j===8) ? '로' : '으로'; };
 const eyo = w => lastJong(w) ? '이에요' : '예요';
@@ -1435,9 +1487,9 @@ const STEP_SAY = {
 const WAIT = {calling:1, approach:1, ride:1}; // 기다리기만 하는 단계 (힌트 횟수에 안 들어가요)
 const HINT = {
   home:    ()=>'아래 "어디로 갈까요?" 칸을 눌러요.',
-  search:  ()=>S.missionOn ? `"${PLACES[MISSION_KEY].n}"${eul(PLACES[MISSION_KEY].n)} 쓰거나 마이크로 말해요. 찾으면 이름을 눌러요.` : '가고 싶은 곳을 쓰거나 마이크로 말해요. 찾으면 이름을 눌러요.',
+  search:  ()=>S.missionOn ? `"${PLACES[MISSION_KEY].n}"${eul(PLACES[MISSION_KEY].n)} 쓰거나 마이크로 말해요. 아래에 나오면 이름을 눌러요.` : '가고 싶은 곳을 쓰거나 마이크로 말해요. 아래에 나오면 이름을 눌러요.',
   route:   ()=>S.missionOn&&S.car!=='일반' ? '먼저 "일반택시"를 눌러요.' : S.missionOn ? `"일반택시"와 요금을 보고 맨 아래 "${S.car}택시 선택하기" 버튼을 눌러요.` : `택시 종류와 요금을 보고 맨 아래 "${S.car}택시 선택하기" 버튼을 눌러요.`,
-  origin:  ()=>'핀 끝이 택시를 탈 곳이에요. 맞으면 맨 아래 파란 버튼을 눌러요.',
+  origin:  ()=>S.originSearch ? '탑승 위치 이름을 써요. 아래에 나오면 이름을 눌러요.' : `핀 끝이 탑승 위치예요. 맞으면 아래 "${S.car}택시 호출하기"를 눌러요.`,
   calling: ()=>'가까운 택시를 찾고 있어요. 잠깐만 기다려요.',
   approach:()=>S.mode==='test'?'기사님이 오고 있어요. 잠깐만 기다려요.':'기사님이 오고 있어요. 차 번호와 차 색깔을 기억해 둬요.',
   plate:   ()=>'내 택시 번호판과 똑같은 차를 골라요. 숫자 하나까지 같아야 해요.',
@@ -1799,7 +1851,7 @@ function viewOf(){
     case 'origin':   return {key:'pick', at:base(), pick:1, origin:1, taxis:1, fit:[at]};
     case 'calling':  return {key:'calling', at, origin:1, radar:1, taxis:1, fit:[at,...TAXIS]};
     case 'approach': return {key:'approach', at, origin:1, car:1, carAt:S.approach[0], approachLine:S.approach, fit:[at,...S.approach]};
-    case 'plate':    return {key:'plate', at, origin:1, car:1, carAt:at, heading:S.carHeading, fit:[at]};
+    case 'plate':  { const end=S.approach.length?S.approach[S.approach.length-1]:at; return {key:'plate', at, origin:1, car:1, carAt:end, heading:S.carHeading, fit:km(at,end)>.03?[at,end]:[at]}; }
     case 'ride':     return {key:'ride'+d, at, dest:d, route:r, car:1, carAt:r[0], fit:[at,PLACES[d],...r]};
     case 'arrive':   return {key:'arrive'+d, at, dest:d, car:1, carAt:PLACES[d], heading:S.carHeading, fit:[PLACES[d]]};
   }
@@ -1815,9 +1867,9 @@ function pickRows(){
   return `<div class="ft-r"><i class="dot s"></i><span><small>탑승 위치${m>=10?` · ${esc(baseName())}에서 약 ${m}m`:''}</small><b>${pickLabel()}</b></span></div>
     <div class="ft-r extra"><i class="dot n"></i><span><small>예상 요금 · 약 ${fr.km}km</small><b class="tabnum">${won(carFare(fr.f,S.car))}</b></span></div>`;
 }
-const barFrom=()=>km(S.pick,base())<0.01?baseName():'고른 위치';
+const barFrom=()=>km(S.pick,base())<0.01?baseName():'고른 곳';
 const setMapLabel=()=>$('map').setAttribute('aria-label',S.dest?`택시 호출 지도. 도착 ${PLACES[S.dest].n}. 출발 ${barFrom()}.`:'택시 호출 지도. 도착지를 아직 고르지 않았어요.');
-const showPick=()=>{ const e=$('pick-ft'), f=$('bar-from'); if(e) e.innerHTML=pickRows(); if(f){ f.textContent=barFrom(); render.mapUi=null; } setMapLabel(); };
+const showPick=()=>{ const e=$('pick-ft'), f=$('bar-from'); if(e) e.innerHTML=pickRows(); if(f){ f.textContent=barFrom(); render.mapUi=mapUiHTML(); } setMapLabel(); };
 function setPick(p){
   if(S.step!=='origin'||km(p,S.pick)<0.003) return; // 지도를 다시 맞출 때 생기는 아주 작은 차이는 옮긴 것으로 보지 않아요
   S.pick={lat:p.lat,lon:p.lon}; S.pickName='';
@@ -1835,7 +1887,7 @@ function setPick(p){
 const pickRange = () => Math.max(MAX_PICK_KM, Math.min(3, (base().acc||0)/1000+0.5)); // 위치 오차가 크면 핀을 더 멀리 옮길 수 있어요(최대 3km)
 function tryPick(p){
   const r=pickRange();
-  if(km(p,base())>r){ toast(`탑승 위치는 ${baseName()}에서 ${+r.toFixed(1)}km 안에서 골라요`); MapCtl.impl.refit(); return false; }
+  if(km(p,base())>r){ toast(`${baseName()}에서 ${+r.toFixed(1)}km 안으로 골라요.${canChooseBase()?' 더 먼 곳은 "위치 검색"으로 찾아요':''}`); MapCtl.impl.refit(); return false; }
   setPick(p); return true;
 }
 // 기준 위치 바꾸기: 실제 현재 위치나 검색한 장소로 옮겨요. 위치 값은 결과에 넣지 않고 옮겼는지만 기록해요
@@ -1863,7 +1915,7 @@ function useGps(){
   if(S.locating) return;
   if(!navigator.geolocation){ toast('이 기기에서는 현재 위치를 확인할 수 없어요'); return; }
   const run=S, open=()=>S===run&&(S.step==='home'||S.step==='origin'), geo=navigator.geolocation, t0=Date.now();
-  S.locating=true; render(); announce('현재 위치를 찾고 있어요.');
+  S.locating=true; render(); toast('현재 위치를 찾고 있어요. 잠깐만 기다려요');
   let best=null, id=null, timer=0, done=false, used=null;
   const stop=()=>{ clearTimeout(timer); if(id!==null){ geo.clearWatch(id); id=null; } };
   const inKorea=g=>g.coords.latitude>=33&&g.coords.latitude<=39&&g.coords.longitude>=124&&g.coords.longitude<=132;
@@ -1872,11 +1924,11 @@ function useGps(){
     if(done) return; done=true; clearTimeout(timer);
     if(!open()){ stop(); if(S===run) S.locating=false; return; }
     S.locating=false;
-    if(!best){ stop(); render(); toast(err&&err.code===1?'위치 사용을 허용하면 실제 위치로 맞출 수 있어요':'현재 위치를 찾지 못했어요. 장소를 검색해 봐요'); return; }
+    if(!best){ stop(); render(); toast(err&&err.code===1?'현재 위치를 쓸 수 없어요. 탑승 위치는 그대로예요':'현재 위치를 찾지 못했어요. "위치 검색"으로 찾아봐요'); return; }
     if(!inKorea(best)){ stop(); render(); toast('국내에서만 현재 위치를 쓸 수 있어요'); return; }
     const acc=apply(best);
     if(acc<=GPS_OK_M){ stop(); toast('현재 위치로 맞췄어요','good'); return; }
-    toast(`이 기기는 위치가 ${gpsErrText(acc)}쯤 어긋날 수 있어요. ${S.step==='origin'?'지도를 끌거나 "다른 곳 검색"으로 맞춰요':'탈 곳은 다음 화면에서 다시 맞출 수 있어요'}`);
+    toast(`이 기기는 위치가 ${gpsErrText(acc)}쯤 어긋날 수 있어요. ${S.step==='origin'?'지도를 끌거나 "위치 검색"으로 맞춰요':'탑승 위치는 다음 화면에서 다시 맞출 수 있어요'}`);
     timer=setTimeout(stop,GPS_REFINE_MS); // 더 나은 값이 오는지 조금 더 지켜봐요
   };
   const better=g=>{ // 어긋난 값으로 맞춘 뒤에 더 정확한 값이 왔어요. 그사이 핀을 옮겼거나 다른 곳을 골랐으면 건드리지 않아요
@@ -1956,7 +2008,7 @@ const samplePath=(path,t)=>makeTrack(path).pose(t);
 function runAlong(path, ms, onTick, onDone){
   const id=++animId, t0=flowNow(), track=makeTrack(path);
   (function f(){ if(id!==animId) return; if(flow.reasons.size){ requestAnimationFrame(f); return; }
-    const t=Math.max(0,Math.min(1,(flowNow()-t0)/ms)), pose=track.pose(t);
+    const t=Math.max(0,Math.min(1,(flowNow()-t0)/ms)), pose=track.pose(t*t*(3-2*t));
     if(pose.p){ S.carHeading=pose.heading; MapCtl.moveCar(pose.p,pose.heading); } // 멈춘 뒤에도 오던 방향을 그대로 봐요
     onTick&&onTick(t); if(t<1) requestAnimationFrame(f); else onDone&&onDone(); })();
 }
@@ -1976,14 +2028,14 @@ const missionText=()=>S.missionOn?`우리 집에서 ${PLACES[MISSION_KEY].n}까�
 const mmss = () => { const t=Math.max(0,Math.floor((flowNow()-S.t0)/1000)); return String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0'); };
 function coachHTML(){
   const st=S.step, sk=SKILL_OF[st], idx=SKILLS.findIndex(x=>x[0]===sk), test=S.mode==='test', wait=!!WAIT[st];
-  const hintText=HINT[st]().replace(/([요다]\.)\s+/g,'$1<br>'), sayBtn=`<button data-a="say" aria-label="읽어주기">${I('speaker')}</button>`, word=S.named?'도움':'힌트';
+  const hintText=HINT[st]().replace(/([요다]\.)\s+/g,'$1<br>'), sayBtn=`<button data-a="say" aria-label="읽어주기">${I('speaker')}</button>`, word='힌트';
   const tag = test ? `<span class="tag${S.named?' test':''}">${S.named?'테스트':'연습'}</span>` : '<span class="tag">연습 모드</span>';
   // 한 줄: 연습 표시 · 제목 · 진행 칸. 단계 이름은 낭독기와 힌트 카드에서 알려 줘요
   const head = `<div class="c-prog">${tag}<b class="c-title">${missionShort()}</b><span class="c-bars" role="img" aria-label="${SKILLS.length}단계 중 ${idx+1}단계 · ${SKILLS[idx][1]}">${SKILLS.map((x,i)=>`<i class="${i<idx?'done':i===idx?'on':''}"></i>`).join('')}</span>${test&&S.named?`<b class="c-time tabnum" role="timer" aria-label="걸린 시간"><span id="timer">${mmss()}</span></b>`:''}</div>`;
   // 왼쪽 자리: 힌트 버튼. 기다리는 단계에는 기다리라는 표시만 둬서, 위쪽 높이가 단계마다 같아요
   const lead = !test ? `<button class="${PREF.guide?'on':''}" aria-pressed="${!!PREF.guide}" data-a="guide">힌트 ${PREF.guide?'켜짐':'꺼짐'}</button>`
     : wait ? `<span class="wait-chip" role="status"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>잠깐만 기다려요</span>`
-    : `<div class="island"><button class="help-btn" data-a="hint" aria-expanded="${!!S.hintOpen}">${I('light')}${S.named?'도움 요청':'힌트 보기'}</button></div>`;
+    : `<div class="island"><button class="help-btn" data-a="hint" aria-expanded="${!!S.hintOpen}">${I('light')}힌트 보기</button></div>`;
   const tools = lead
     + `<button class="${PREF.voice?'on':''}" aria-pressed="${!!PREF.voice}" data-a="voice">소리 ${PREF.voice?'켜짐':'꺼짐'}</button>`
     + `<button class="${PREF.big?'on':''}" aria-pressed="${!!PREF.big}" data-a="big">글자 크게</button>`;
@@ -2002,13 +2054,13 @@ function sheetHTML(){
     <div class="res-h">최근 도착지</div>
     <div class="quick">${RECENT.map(k=>`<button data-a="pick" data-v="${k}">${I(PLACES[k].kind==='st'?'station':'clock')}${PLACES[k].n}</button>`).join('')}</div>`;
   case 'route': return `${GRAB()}<h3>${esc(P.n)}</h3>${P.dynamic?`<p class="small muted">${esc(P.a)}</p>`:''}<div class="trip tabnum">약 ${fr.km}km · 약 ${fr.min}분</div>
-    ${P.dynamic&&!routeData(d)?'<p class="small muted">거리·시간·요금은 연습용 어림값이에요.</p>':''}<div class="cars">${CARS.map(c=>`<button class="car${S.car===c.k?' on':''}" data-a="car" data-v="${c.k}" aria-pressed="${S.car===c.k}">
+    ${P.dynamic&&!routeData(d)?'<p class="small muted">거리·시간·요금은 연습용으로 대강 계산한 값이에요.</p>':''}<div class="cars">${CARS.map(c=>`<button class="car${S.car===c.k?' on':''}" data-a="car" data-v="${c.k}" aria-pressed="${S.car===c.k}">
       <span class="cimg">${c.k==='대형'?VAN3D(VEHICLES[c.k].c):CAR3D(VEHICLES[c.k].c)}</span><span class="cname"><b>${c.t}</b><small>${c.eta}분 뒤 도착 · ${c.d}</small></span>
       <span class="cfare tabnum"><small>예상</small>${won(carFare(fr.f,c.k))}</span></button>`).join('')}</div>
-    <button class="payrow" data-a="pay-open" aria-label="결제 수단 바꾸기. 지금은 ${S.pay==='card'?'연습카드 자동결제':'기사님에게 직접 결제'}">${I('card')}${S.pay==='card'?'연습카드 ···· 0000':'기사님에게 직접 결제'}<span>${S.pay==='card'?'내릴 때 자동결제':'내릴 때 직접 내요'} ›</span></button>`;
+    <button class="payrow" data-a="pay-open" aria-label="${S.pay==='card'?'연습카드 자동결제':'기사님에게 직접 결제'}. 결제 수단 바꾸기">${I('card')}${S.pay==='card'?'연습카드 ···· 0000':'기사님에게 직접 결제'}<span>${S.pay==='card'?'내릴 때 자동결제':'내릴 때 직접 내요'} ›</span></button>`;
   case 'origin': return `${GRAB()}<div class="pick-h"><h3>어디서 탈까요?</h3><span>도착 <b>${esc(P.n)}</b></span></div>
     <div class="ft" id="pick-ft">${pickRows()}</div>
-    ${canChooseBase()?`<div class="origin-actions"><button data-a="use-gps"${S.locating?' disabled':''}>${I('loc')}${S.locating?'찾는 중…':'현재 위치로'}</button><button data-a="origin-search">${I('search')}다른 곳 검색</button></div>`:''}
+    ${canChooseBase()?`<div class="origin-actions"><button data-a="use-gps"${S.locating?' disabled':''}>${I('loc')}${S.locating?'찾는 중…':'현재 위치로'}</button><button data-a="origin-search">${I('search')}위치 검색</button></div>`:''}
     <p class="small muted extra">지도를 움직이거나 누르면 핀이 옮겨져요. 찾기 쉬운 곳으로 골라 봐요.</p><div class="pin-move" role="group" aria-label="핀 옮기기">${[['n','위로','↑'],['s','아래로','↓'],['w','왼쪽으로','←'],['e','오른쪽으로','→']].map(([v,t,g])=>`<button data-a="pin-move" data-v="${v}" aria-label="핀을 ${t} 옮기기">${g}</button>`).join('')}</div>`;
   case 'calling': return `<div class="radar">${I('taxi')}</div>
     <h3 style="text-align:center">가까운 택시를 찾고 있어요</h3>
@@ -2020,17 +2072,17 @@ function sheetHTML(){
     <div class="row3"><button data-a="fake" data-v="safe">${I('phone')}전화</button><button data-a="fake" data-v="safe">${I('msg')}메시지</button><button data-a="fake" data-v="share">${I('share')}위치 공유</button></div>`;
   case 'plate': return `<h3>택시가 도착했어요!</h3>
     <p>내 택시는 <span class="plate sm">${V.plate}</span> ${V.color} ${V.model}${eyo(V.model)}.</p>
-    <p class="small muted extra">앞에 택시가 여러 대 서 있어요. 어떤 차가 내 택시일까요?</p>
+    <p class="small muted">번호판이 같은 차를 눌러요.</p>
     <div class="plates">${S.plates.map((o,i)=>`<button class="pc${tg(o.ok)}${S.plateBad===i?' wrong':''}" data-a="plate" data-v="${i}">${carIso(o.c,CAR_KIND[o.model])}<span class="plate">${o.plate}</span><small>${S.plateBad===i?'번호판이 달라요':`${o.color} ${o.model}`}</small></button>`).join('')}</div>`;
   case 'ride': return `${GRAB()}<h3>${esc(P.n)}${ro(P.n)} 가는 중</h3>
     <div class="ridebar"><i id="ride-bar"></i></div>
     <p>도착까지 약 <b id="ride-min" class="tabnum">${fr.min}분</b></p>
     <div class="note small">내리기 전에 휴대폰, 지갑 같은 소지품을 챙겨요.</div>`;
   case 'arrive': { const f=carFare(fr.f,S.car); return `${GRAB()}<h3>${esc(P.n)}에 도착했어요</h3>
-    ${S.pay==='card'?`<div class="receipt tabnum"><div><span>${S.car}택시 요금</span><b>${won(f)}</b></div><div><span>결제수단</span><span>연습카드 ···· 0000</span></div>
+    ${S.pay==='card'?`<div class="receipt tabnum"><div><span>${S.car}택시 요금</span><b>${won(f)}</b></div><div><span>결제 수단</span><span>연습카드 ···· 0000</span></div>
       <div class="tot"><span>결제한 금액</span><span>${won(f)}</span></div><span class="paid">${I('check')}자동결제 완료 (연습이라 돈이 나가지 않았어요)</span></div>
     <p class="small muted">실제 앱에서는 등록한 카드로 자동 결제돼서, 내릴 때 기사님에게 따로 돈을 내지 않아도 돼요.</p>`
-    :`<div class="receipt tabnum"><div><span>${S.car}택시 요금</span><b>${won(f)}</b></div><div><span>결제수단</span><span>기사님에게 직접 결제</span></div>
+    :`<div class="receipt tabnum"><div><span>${S.car}택시 요금</span><b>${won(f)}</b></div><div><span>결제 수단</span><span>기사님에게 직접 결제</span></div>
       <div class="tot"><span>낼 금액</span><span>${won(f)}</span></div></div>
     <p class="small muted">미터기 금액을 보고 기사님에게 카드나 현금으로 내요. 연습이라 돈이 나가지는 않아요.</p>`}`; }
   }
@@ -2041,8 +2093,8 @@ function sheetHTML(){
 function footHTML(){
   switch(S.step){
   case 'route':   return `<button class="tx-call${tg(!S.missionOn||S.car==='일반')}" data-a="car-ok">${S.car}택시 선택하기</button>`;
-  case 'origin':  return `<button class="tx-call${tg(1)}" data-a="call">${S.car}택시 호출하기</button>`;
-  case 'calling': return `<button class="btn ghost" data-a="cancel">호출 취소</button>`;
+  case 'origin':  return S.originSearch ? '' : `<button class="tx-call${tg(1)}" data-a="call">${S.car}택시 호출하기</button>`;
+  case 'calling': return `<button class="btn ghost" data-a="cancel-ask">호출 취소</button>`;
   case 'arrive':  return `<button class="tx-call${tg(1)}" data-a="arrive-ok">확인했어요</button>`;
   }
   return '';
@@ -2050,9 +2102,9 @@ function footHTML(){
 
 function searchHTML(){
   return `<div class="tx-sh"><button class="ic-btn" data-a="search-back" aria-label="뒤로">${I('back')}</button>
-    <input id="q" placeholder="${S.originSearch?'어디서 탈까요?':'어디로 갈까요?'}" value="${esc(S.q)}" autocomplete="off" aria-label="${S.originSearch?'탑승 장소 검색':'도착지 검색'}">
+    <input id="q" placeholder="${S.originSearch?'어디서 탈까요?':'어디로 갈까요?'}" value="${esc(S.q)}" autocomplete="off" aria-label="${S.originSearch?'탑승 위치 검색':'도착지 검색'}">
     ${S.originSearch?'':`<button class="mic${S.listening?' live':''}${tg(!S.q&&!S.listening)}" data-a="mic" aria-label="${S.listening?'듣기 멈추기':'말로 찾기'}">${I('mic')}</button>`}</div>
-    ${S.listening?`<div class="listen"><div class="wave"><i></i><i></i><i></i><i></i><i></i></div><b>듣고 있어요… 가고 싶은 곳을 말해 봐요</b><small>${Mic.supported()?'말이 끝나면 자동으로 찾아요':'이 기기는 말을 알아듣지 못해서 예시 장소가 채워져요'}</small></div>`:''}
+    ${S.listening?`<div class="listen"><div class="wave"><i></i><i></i><i></i><i></i><i></i></div><b>${Mic.supported()?'듣고 있어요… 가고 싶은 곳을 말해 봐요':'이 기기는 말로 찾기가 안 돼요'}</b><small>${Mic.supported()?'말이 끝나면 자동으로 찾아요':'연습용 장소를 대신 넣어 드려요'}</small></div>`:''}
     <div class="res" id="res">${resultsHTML()}</div>`;
 }
 // 카카오 장소 검색. 이전 검색의 늦은 응답이 최신 목록을 덮지 않게 해요.
@@ -2064,6 +2116,7 @@ const PlaceSearch = {
   reset(){ clearTimeout(this.timer); clearTimeout(this.timeout); this.id++; this.query=''; this.items=[]; this.status='idle'; },
   update(){
     if(!searching()||!$('res')) return;
+    if(render.resFresh) render.resFresh=false; else $('panel').classList.add('same'); // 처음 열릴 때만 떠오르고, 글자를 칠 때는 그대로 바뀌어요
     $('res').innerHTML=resultsHTML();
   },
   schedule(){
@@ -2090,7 +2143,7 @@ const PlaceSearch = {
           while(this.known.size>150) this.known.delete(this.known.keys().next().value);
         }
         this.items=items; this.status=status; this.update();
-        announce(status==='error'?'장소 검색에 연결하지 못했어요.':`${this.items.length}곳의 장소를 찾았어요.`);
+        announce(status==='error'?'지금은 장소를 찾지 못했어요.':this.items.length?`${this.items.length}곳을 찾았어요.`:'찾은 곳이 없어요.');
       };
       if(!window.kakao?.maps?.services){ finish([],'error'); return; }
       this.timeout=setTimeout(()=>{ finish([],'error'); this.id++; },6000);
@@ -2121,39 +2174,39 @@ function resultsHTML(){
   const local=NEARBY.filter(([,p])=>!q||norm(p.n+p.a+(p.kw||'')).includes(q));
   const row=(p,action,key)=>`<button class="res-i" data-a="${action}" data-v="${key}">${I('pin')}<span><b>${esc(p.n)}</b><small>${esc(p.a)}</small></span><em class="tabnum">${km(S.pick,p).toFixed(1)}km</em></button>`;
   const pickAct=S.originSearch?'origin-local':'pick', placeAct=S.originSearch?'origin-place':'pick-place';
-  const gps=S.originSearch&&!q?`<button class="res-i gps-row" data-a="use-gps">${I('loc')}<span><b>현재 위치로 설정</b><small>이 기기의 위치를 사용해요</small></span></button>`:'';
+  const gps=S.originSearch&&!q?`<button class="res-i gps-row" data-a="use-gps">${I('loc')}<span><b>현재 위치로</b><small>이 기기의 위치를 사용해요</small></span></button>`:'';
   if(!q) return gps+'<div class="res-h">가까운 곳</div>'+local.map(([k,p])=>row(p,pickAct,k)).join('');
   const current=PlaceSearch.query===S.q.trim(), status=current?PlaceSearch.status:'loading';
   const remote=current?PlaceSearch.items:[];
   const seen=new Set(remote.map(p=>norm(p.n)));
   const list=remote.map(p=>row(p,placeAct,p.id)).join('')+local.filter(([,p])=>!seen.has(norm(p.n))).map(([k,p])=>row(p,pickAct,k)).join('');
-  const msg=status==='loading'?'장소를 찾고 있어요…':status==='error'?'장소 검색에 연결하지 못했어요. 잠시 후 글자를 다시 입력해 주세요.':!list?'찾은 장소가 없어요. 지역 이름과 장소 이름을 함께 써 보세요.':'';
-  return '<div class="res-h">검색 결과 · 가까운 곳은 직선거리로 표시해요</div>'+ (msg?`<div class="${list?'res-h':'empty'}" role="status">${msg}</div>`:'')+list;
+  const msg=status==='loading'?'장소를 찾고 있어요…':status==='error'?'지금은 장소를 찾지 못했어요. 조금 뒤에 다시 써 봐요.':!list?'찾은 곳이 없어요. 동네 이름을 함께 써 봐요.':'';
+  return '<div class="res-h">찾은 곳 · 오른쪽은 여기서부터의 거리예요</div>'+ (msg?`<div class="${list?'res-h':'empty'}" role="status">${msg}</div>`:'')+list;
 }
 
 function resultHTML(){
   const r=S.res, test=r.mode==='test', solo=r.solo;
   // 점수는 숙지도 계산용으로 결과 값에만 담고, 화면에는 PDF처럼 성공 여부·시간·힌트를 쉬운 말로 보여줘요
   const head = !test
-    ? `<div class="okmark">${I('check')}</div><h2>연습을 끝까지 했어요!</h2><p class="muted" style="margin:0">${SKILLS.some(([k])=>r.steps[k].guided)?'힌트를 따라 했어요. 다음엔 테스트 모드로 혼자 해봐요.':'힌트 없이 끝까지 했어요. 이번엔 테스트 모드로 해봐요.'}</p>`
+    ? `<div class="okmark">${I('check')}</div><h2>연습을 끝까지 했어요!</h2><p class="muted" style="margin:0">${SKILLS.some(([k])=>r.steps[k].guided)?'힌트를 따라 했어요. 다음엔 테스트 모드로 혼자 해 봐요.':'힌트 없이 끝까지 했어요. 이번엔 테스트 모드로 해 봐요.'}</p>`
     : solo ? `<div class="okmark">${I('check')}</div><h2>혼자 해냈어요!</h2>`
     : `<div class="okmark retry">${I('light')}</div><h2>끝까지 해냈어요. 한 번 더 연습해 봐요</h2>`;
   const time=r.sec<60?`${r.sec}초`:`${Math.floor(r.sec/60)}분 ${r.sec%60}초`;
-  const report = `<div class="card report"><div class="r-top"><b>택시 부르기</b>${test?`<span class="r-badge ${solo?'solo':'retry'}">${solo?'혼자 성공':S.named?'다시 연습':'한 번 더'}</span>`:''}</div>
-    <p>${time}${test?` · 힌트 ${r.hints}번`:''}${test&&r.stuckAt?` · '${STUCK_NAME[r.stuckAt]}'에서 어려웠어요`:''}</p></div>`;
+  const report = `<div class="card report"><div class="r-top"><b>택시 부르기</b>${test?`<span class="r-badge ${solo?'solo':'retry'}">${solo?'혼자 성공':S.named?'다시 연습':'조금 더 연습'}</span>`:''}</div>
+    <p>${time}${test?` · 힌트 ${r.hints}번`:''}${test&&r.stuckAt?` · '${STUCK_NAME[r.stuckAt]}' 단계가 조금 어려웠어요`:''}</p></div>`;
   const rows=SKILLS.map(([k,t])=>{const s=r.steps[k];
     const [cls,ic,sub]= s.mist ? ['h','light', S.named?`다시 연습해요 (잘못 누름 ${s.mist}번)`:'다시 해보면 좋아요']
       : (test&&s.hints) ? ['h','light','힌트를 보고 했어요']
       : ['y','check',s.mic?'말로 찾았어요':s.moved?'탑승 위치를 옮겨서 해냈어요':(!test&&s.guided)?'힌트 따라 해냈어요':'혼자 해냈어요'];
     return `<div class="rec"><span class="rec-ic s-${k}">${I({search:'search',fare:'card',origin:'pin',car:'taxi'}[k])}</span><span class="t">${t}<small>${sub}</small></span><span class="ck ${cls}">${I(ic)}</span></div>`}).join('');
   const who = PARAMS.tutor ? `${esc(PARAMS.tutor)} 프렌드` : '담당 프렌드', host = hasHost();
-  const next = r.stuckAt ? `<b>다음 수업 추천</b><br>${r.recommend} 15분`
-    : test ? '힌트 없이 혼자 해냈어요! 다음엔 프렌드와 실제 택시 앱으로 해봐요.' : '모든 단계를 해냈어요. 이번엔 테스트 모드로 혼자 해볼까요?';
+  const next = r.stuckAt ? `<b>다음 수업 추천</b><br>${r.recommend} (약 15분)`
+    : test ? '힌트 없이 혼자 해냈어요! 다음엔 프렌드와 실제 택시 앱으로 해 봐요.' : '모든 단계를 해냈어요. 이번엔 테스트 모드로 혼자 해 볼까요?';
   const count = test&&solo ? soloCount() : 0;
   const foot = !test
-    ? `<div class="row2"><button class="btn ghost" data-a="again">한 번 더</button><button class="btn y" data-a="to-test">테스트로 해보기</button></div><button class="link" data-a="exit-now">마치기</button>`
+    ? `<div class="row2"><button class="btn ghost" data-a="again">한 번 더</button><button class="btn y" data-a="to-test">테스트로 해 보기</button></div><button class="link" data-a="exit-now">${hasHost()?'마치기':'처음으로'}</button>`
     : (host?`<div class="row2"><button class="btn ghost" data-a="share" ${S.shared?'disabled':''}>${S.shared?'자녀에게 공유했어요':'자녀에게 공유'}</button><button class="btn y" data-a="book" ${S.booked?'disabled':''}>${S.booked?'예약을 요청했어요':'다음 수업 예약'}</button></div>`:'')
-      + `<div class="row2"><button class="btn ${solo?'ghost':'dark'}" data-a="again">한 번 더</button><button class="btn ${solo?'dark':'ghost'}" data-a="exit-now">마치기</button></div>`;
+      + `<div class="row2"><button class="btn ${solo?'ghost':'dark'}" data-a="again">한 번 더</button><button class="btn ${solo?'dark':'ghost'}" data-a="exit-now">${hasHost()?'마치기':'처음으로'}</button></div>`;
   return `<div class="pbody">
     <div class="result-hd">${head}</div>
     ${report}
@@ -2167,7 +2220,7 @@ function mapUiHTML(){
   if(S.screen!=='ride') return '';
   let h='';
   const bar=(act,label)=>`<div class="route-bar"><button data-a="${act}" aria-label="${label}">${I('back')}</button><span class="from"><small>출발</small> <em id="bar-from">${esc(barFrom())}</em></span><i aria-hidden="true">›</i><span class="to"><small>도착</small> ${esc(PLACES[S.dest].n)}</span></div>`;
-  if(S.step==='route') h+=`<div class="route-bar"><button data-a="route-back" aria-label="도착지 다시 고르기">${I('back')}</button><span>${esc(PLACES[S.dest].n)}</span></div><button class="fab loc" data-a="dest-locate" aria-label="목적지로 지도 맞추기">${I('loc')}</button>`;
+  if(S.step==='route') h+=`<div class="route-bar"><button data-a="route-back" aria-label="도착지 다시 고르기">${I('back')}</button><span>${esc(PLACES[S.dest].n)}</span></div><button class="fab loc" data-a="dest-locate" aria-label="도착지로 지도 맞추기">${I('loc')}</button>`;
   if(S.step==='approach') h+=`<button class="cancel-chip" data-a="cancel-ask">호출 취소</button>`;
   if(S.step==='origin') h+=`<div class="center-pin k-pin o"><b>여기서 타요</b><span></span></div>${bar('pick-back','택시 종류 다시 고르기')}`;
   if(S.step==='origin'||S.step==='home') h+=`<button class="fab loc" data-a="locate" aria-label="${canChooseBase()?'현재 위치로 지도 맞추기':'연습 위치로 지도 맞추기'}">${I('loc')}</button>`;
@@ -2218,7 +2271,7 @@ const Motion = {
     if(!changed&&p.car&&sel&&sel.dataset.v!==p.carV){
       const box=sel.parentNode, g=document.createElement('i'), r=sel.getBoundingClientRect();
       g.className='car-ghost'; g.setAttribute('aria-hidden','true'); g.style.top=sel.offsetTop+'px'; g.style.height=sel.offsetHeight+'px';
-      box.appendChild(g); sel.classList.add('sel-moving');
+      box.appendChild(g); sel.classList.add('sel-moving','sel-new');
       const a=this.play(g,[{transform:`translateY(${p.car.top-r.top}px)`},{transform:'none'}],{duration:420});
       this.done(a,()=>{ g.remove(); sel.classList.remove('sel-moving'); });
     }
@@ -2234,10 +2287,10 @@ const Motion = {
     if(!panelOpen&&p.sheetTop!=null&&sh.firstElementChild&&!S.sheetDown&&!sheetDrag){
       const dy=p.sheetTop-sh.getBoundingClientRect().top;
       if(Math.abs(dy)>2&&Math.abs(dy)<700){
-        if(this.sheetA) this.sheetA.cancel();
+        if(this.sheetA){ this.sheetA.onfinish=this.sheetA.oncancel=null; this.sheetA.cancel(); }
         area.classList.add('morph'); sh.classList.add('morph');
         const a=this.play(sh,[{transform:`translateY(${dy}px)`},{transform:'none'}],{duration:560});
-        this.sheetA=a; this.done(a,()=>{ area.classList.remove('morph'); sh.classList.remove('morph'); });
+        this.sheetA=a; this.done(a,()=>{ if(this.sheetA!==a) return; area.classList.remove('morph'); sh.classList.remove('morph'); });
       }
     }
     if(!panelOpen) this.play($('foot').firstElementChild,[{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'none'}],{duration:360});
@@ -2264,14 +2317,14 @@ const Motion = {
 function render(){
   document.documentElement.classList.toggle('big',PREF.big);
   const ride=S.screen==='ride', scroller=()=>$('panel').querySelector('.pbody,.res');
-  const ae=document.activeElement, qFocus=ae&&ae.id==='q', qPos=qFocus?ae.selectionStart:0; // 다시 그려도 입력 칸의 커서를 지켜요
+  const ae=document.activeElement, hadFocus=!!ae&&ae!==document.body&&$('phone').contains(ae), qFocus=ae&&ae.id==='q', qPos=qFocus?ae.selectionStart:0; // 다시 그려도 입력 칸의 커서를 지켜요
   // 같은 화면을 다시 그릴 때는 스크롤 위치와 누른 버튼의 초점도 지켜요
   const motion=Motion.before();
   const panelKey=ride?(S.originSearch?'origin-search':S.step):S.screen, samePanel=panelKey===render.key; render.key=panelKey;
   const oldScroller=scroller(), panelTop=samePanel&&oldScroller?oldScroller.scrollTop:0;
   const focusA=samePanel&&ae&&$('app').contains(ae)&&ae.dataset?ae.dataset.a:null, focusV=focusA?ae.dataset.v:null;
   $('coach').hidden=!ride;
-  { const h=ride?coachHTML():''; if(h!==render.coach){ $('coach').innerHTML=h; render.coach=h; } } // 내용이 같으면 그대로 둬요
+  { const h=ride?coachHTML():'', k=h.replace(/<span id="timer">[^<]*<\/span>/,''); if(k!==render.coach){ $('coach').innerHTML=h; render.coach=k; } } // 내용이 같으면 그대로 둬요
   setMapLabel();
   $('banner-txt').textContent = S.screen==='result' ? '연습 끝 · 실제 호출과 결제는 일어나지 않았어요' : '연습 화면 · 진짜로 호출·결제되지 않아요';
   $('area').dataset.step = ride ? S.step : '';
@@ -2281,12 +2334,13 @@ function render(){
   $('foot').hidden=!foot; $('foot').innerHTML=foot;
   { const h=mapUiHTML(); if(h!==render.mapUi){ $('mapui').innerHTML=h; render.mapUi=h; } } // 고를 때마다 지도 위 버튼이 다시 나타나지 않게 해요
   const panel = S.screen==='result' ? resultHTML() : (ride&&(S.step==='search'||S.originSearch)) ? searchHTML() : '';
-  $('panel').classList.toggle('same',samePanel); $('panel').hidden=!panel; if(panel) $('panel').innerHTML=panel;
+  $('panel').classList.toggle('same',samePanel); render.resFresh=!samePanel; $('panel').hidden=!panel; if(panel) $('panel').innerHTML=panel;
   document.querySelector('.map-wrap').inert=!!panel; $('sheet').inert=!!panel; // 패널 뒤의 버튼에는 키보드도 닿지 않아요
   $('area').classList.toggle('lock',!!panel); if(panel) $('area').scrollTop=0;
   if(qFocus){ const q=$('q'); if(q){ quietFocus(q); q.setSelectionRange(qPos,qPos); } }
   if(panel&&panelTop){ const sc=scroller(); if(sc) sc.scrollTop=panelTop; }
   if(focusA){ const b=[...$('app').querySelectorAll('[data-a]')].find(x=>x.dataset.a===focusA&&x.dataset.v===focusV); if(b) quietFocus(b); }
+  if(hadFocus&&$('modal').hidden&&(!document.activeElement||document.activeElement===document.body)) quietFocus(panel?$('panel'):$('sheet'));
   Motion.after(motion);
   requestAnimationFrame(()=>MapCtl.show(viewOf()));
 }
@@ -2385,7 +2439,7 @@ const Mic = {
   stop(){ clearTimeout(this.timer); const r=this.rec; this.rec=null; if(r){ r.onresult=r.onerror=r.onend=null; try{ r.abort(); }catch(e){} } },
   // 예시 장소를 채워요. 말로 찾기도 실제 앱에 있는 방법이라 힌트로 세지 않고, 끝까지 들었을 때만 기록해요
   example(ms){ later(()=>{ if(!S.listening) return; S.sk.search.mic=1; S.listening=false; S.q=S.missionOn?PLACES[MISSION_KEY].n:'광교호수공원';
-    if(S.step==='search'){ render(); PlaceSearch.schedule(); announce(`${S.q}${eul(S.q)} 찾았어요.`); } },ms); },
+    if(S.step==='search'){ render(); PlaceSearch.schedule(); announce(`${S.q}${eul(S.q)} 찾아볼게요.`); } },ms); },
   start(){
     const R=window.SpeechRecognition||window.webkitSpeechRecognition, run=S; let r, heard='', settled=false;
     try{ r=new R(); }catch(e){ this.example(1800); return; }
@@ -2394,7 +2448,7 @@ const Mic = {
     const done=text=>{ if(settled) return; settled=true; this.stop(); if(S!==run||!S.listening) return; S.listening=false;
       text=String(text||'').replace(/[.?!。]+$/,'').trim();
       if(S.step!=='search') return;
-      if(text){ S.sk.search.mic=1; S.q=text; render(); PlaceSearch.schedule(); announce(`${S.q}${eul(S.q)} 찾았어요.`); }
+      if(text){ S.sk.search.mic=1; S.q=text; render(); PlaceSearch.schedule(); announce(`${S.q}${eul(S.q)} 찾아볼게요.`); }
       else { render(); toast('소리가 잘 들리지 않았어요. 마이크를 다시 누르거나 글자로 써 봐요'); } };
     r.onresult=e=>{ if(!live()) return; let fin='', tmp='';
       for(let i=0;i<e.results.length;i++){ const x=e.results[i]; if(x.isFinal) fin+=x[0].transcript; else tmp+=x[0].transcript; }
@@ -2421,14 +2475,14 @@ function setStep(st){
   S.step=st; S.originSearch=false; S.locating=false; S.hintOpen=false; S.hintFor=null; S.listening=false; S.sheetDown=false; sheetDrag=null; liveDirty=false;
   markGuide();
   render();
-  { const sh=$('sheet'); sh.setAttribute('role','group'); sh.setAttribute('aria-label',STEP_SAY[st]()); sh.classList.remove('enter'); void sh.offsetWidth; sh.classList.add('enter'); clearTimeout(setStep.enterT); setStep.enterT=setTimeout(()=>sh.classList.remove('enter'),700); }
+  { const sh=$('sheet'); sh.setAttribute('role','group'); sh.setAttribute('aria-label',(SKILLS.find(x=>x[0]===SKILL_OF[st])||[])[1]||'택시 부르기'); sh.classList.remove('enter'); void sh.offsetWidth; sh.classList.add('enter'); clearTimeout(setStep.enterT); setStep.enterT=setTimeout(()=>sh.classList.remove('enter'),700); }
   $('area').scrollTop=0; $('app').scrollTop=0; // 앞 단계에서 내린 스크롤이 다음 단계로 이어지지 않게 해요
   if(PREF.voice) say(WAIT[st]||guided() ? HINT[st]() : STEP_SAY[st]());
   announce(STEP_SAY[st]());
   if(st!=='search') quietFocus($('sheet')); // 누른 버튼이 사라져도 키보드와 낭독기가 새 단계에서 이어 가요
   if(st==='search') PlaceSearch.schedule();
   if(st==='search') later(()=>{const q=$('q');if(q&&!S.listening)quietFocus(q)},60);
-  if(st==='calling') later(()=>{ setStep('approach'); const V=myCar(); noti('택시가 배정됐어요 (연습)',`${V.plate} · ${V.color} ${V.model} · ${carOf(S.car).eta}분 뒤 도착해요`); },4000);
+  if(st==='calling') later(()=>{ setStep('approach'); const V=myCar(); noti('택시를 찾았어요 (연습)',`${V.plate} · ${V.color} ${V.model} · ${carOf(S.car).eta}분 뒤 도착해요`); },4000);
   if(st==='approach'){ const eta=carOf(S.car).eta;
     later(()=>runAlong(S.approach,7000,t=>{const e=$('eta');if(e)e.textContent=Math.max(1,Math.ceil(eta*(1-t)))+'분'},
       ()=>{ const V=myCar(); setStep('plate'); noti('택시가 도착했어요 (연습)',`${V.plate} ${V.color} ${V.model}${eul(V.model)} 찾아서 타요`); }),300); }
@@ -2498,7 +2552,7 @@ function exitNow(){
   haltStep(); stopSpeech(); hideMessages();
   postToHost({type:'baepu:practice-exit',kind:'taxi'});
   S=fresh(S.mode,S.missionOn,S.named); begin(); // 부모가 iframe을 다시 보여 줘도 멈춘 화면이 남지 않게 처음으로 돌려요
-  if(!hasHost()) toast('처음 화면으로 돌아왔어요.');
+  if(!hasHost()) toast('처음 화면으로 돌아왔어요. 끝내려면 이 창을 닫아요');
 }
 
 /* =====================================================================
@@ -2552,7 +2606,7 @@ const A = {
   'open-mic':()=>{ setStep('search'); A.mic(); },
   'search-back':()=>{ if(S.originSearch){ S.originSearch=false; S.q=''; PlaceSearch.reset(); render(); return; } setStep('home'); },
   'use-gps':()=>useGps(),
-  'origin-search':()=>{ if(!canChooseBase()) return; S.originSearch=true; S.q=''; PlaceSearch.reset(); render(); announce('탈 곳을 검색해요.'); later(()=>{const q=$('q');if(q)quietFocus(q)},60); },
+  'origin-search':()=>{ if(!canChooseBase()) return; S.originSearch=true; S.q=''; PlaceSearch.reset(); render(); announce('탑승 위치를 검색해요.'); later(()=>{const q=$('q');if(q)quietFocus(q)},60); },
   'origin-place':id=>{ if(PlaceSearch.query!==S.q.trim()) return; const p=PlaceSearch.items.find(x=>x.id===id); if(!p) return; setBase({lat:p.lat,lon:p.lon,n:p.n,kind:'place'}); toast(`${p.n}${eul(p.n)} 탑승 위치로 골랐어요`,'good'); },
   'origin-local':k=>{ if(!Object.prototype.hasOwnProperty.call(PLACES,k)) return; const p=PLACES[k]; setBase({lat:p.lat,lon:p.lon,n:p.n,kind:'place'}); toast(`${p.n}${eul(p.n)} 탑승 위치로 골랐어요`,'good'); },
   mic:()=>{
@@ -2573,9 +2627,9 @@ const A = {
     S.plates=plateOpts(S.car); S.plateBad=-1; S.approach=approachPath(); setStep('calling');
     // 기사님이 오는 길은 호출 중(4초)에 실제 도로로 받아서, 그 안에 오면 바꿔요
     if(MapCtl.impl===KakaoMap){ const at=S.pick; fetchApproach(at).then(p=>{ if(p&&S.step==='calling'&&S.pick===at) S.approach=p; }); } },
-  cancel:()=>{setStep('route');toast('호출을 취소했어요. 다시 불러볼까요?')},
+  cancel:()=>{setStep('route');toast('호출을 취소했어요. 택시 종류부터 다시 골라요')},
   'cancel-ask':()=>{ pauseFlow('modal'); stopSpeech();
-    openModal(confirmHTML('기사님이 오고 있어요. 취소할까요?','취소하고 다시 부르면 더 먼 택시가 올 수 있어요. 실제 앱에서는 택시 종류에 따라 취소 수수료가 나오기도 하니 안내를 꼭 읽어요. 연습이라 돈은 나가지 않아요.','아니요','cancel-yes','호출 취소하기',true),'호출 취소 확인'); },
+    openModal(confirmHTML(S.step==='calling'?'택시를 찾고 있어요. 취소할까요?':'기사님이 오고 있어요. 취소할까요?','실제 앱에서는 취소하면 돈(취소 수수료)을 낼 수도 있어요. 연습이라 돈은 나가지 않아요.','계속 기다리기','cancel-yes','호출 취소하기',true),'호출 취소 확인'); },
   'cancel-yes':()=>{ closeModal(); resumeFlow('modal'); A.cancel(); },
   'pay-open':()=>{ openModal(`<div class="modal-in"><h3>어떻게 낼까요?</h3><p id="modal-desc">카드를 등록해 두면 내릴 때 자동으로 결제돼요. 직접 내는 방법도 있어요.</p><div class="pay-opts">${[['card','연습카드 자동결제','내릴 때 알아서 결제돼요'],['direct','기사님에게 직접','내릴 때 직접 내요']].map(([k,t,d])=>`<button class="pay-opt${S.pay===k?' on':''}" data-a="pay-set" data-v="${k}" aria-pressed="${S.pay===k}"><span><b>${t}</b><small>${d}</small></span>${S.pay===k?I('check'):''}</button>`).join('')}</div><button class="btn ghost" data-a="modal-no">닫기</button></div>`,'결제 수단 고르기'); },
   'pay-set':v=>{ closeModal(); S.pay=v==='direct'?'direct':'card'; render(); },
@@ -2594,6 +2648,7 @@ const A = {
   'to-test':()=>{ S=fresh('test',S.missionOn,true); begin(); },
   exit:()=>{ if(S.screen!=='ride'){
       if(performance.now()-lastExitAt<800) return; lastExitAt=performance.now(); exitNow(); return; }
+    if(S.step==='home'&&!hasHost()){ toast('여기가 처음 화면이에요. 끝내려면 이 창을 닫아요'); return; } // 아직 시작하지 않았으면 그만둘 것도 없어요
     pauseFlow('modal'); stopSpeech();
     openModal(confirmHTML(`${S.named?'테스트를':'연습을'} 그만할까요?`,hasHost()?'여기까지 한 것을 기록해서 다음 수업에 반영해요.':'여기까지 한 것을 이 기기에 기록해 둬요.','계속하기','modal-yes','그만하기',true),'그만할지 확인'); },
   'modal-no':()=>{closeModal();resumeFlow('modal')},
@@ -2613,7 +2668,7 @@ document.addEventListener('click',e=>{
   if(!el||!$('phone').contains(el)||!MapCtl.ready) return; // 지도 준비 중에는 누르지 않아요
   if(!$('modal').hidden&&!$('modal').contains(el)) return; // 안내창 뒤는 누를 수 없어요
   if(!$('panel').hidden&&el.closest('#sheet,#mapui')) return; // 패널 뒤도 마찬가지예요
-  if(el.dataset.a!=='exit'&&performance.now()-lastStepAt<350) return;
+  if(el.dataset.a!=='exit'&&performance.now()-lastStepAt<350&&el.closest('#sheet,#foot,#panel,#mapui,#modal')) return;
   const f=A[el.dataset.a]; if(f) f(el.dataset.v);
 });
 let resAnnounce=0;
