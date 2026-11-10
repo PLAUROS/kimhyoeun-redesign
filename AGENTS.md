@@ -10,7 +10,7 @@
 |---|---|---|---|
 | 코드 저장, 페이지 공개 | GitHub `baepu-team/kimhyoeun-redesign`, GitHub Pages | 조직 `baepu-team` (Owner: `PLAUROS`, `he040826-dotcom`) | `main` 브랜치 루트가 그대로 공개돼요 |
 | 지도 표시 | 카카오맵 JavaScript SDK | 카카오 개발자 앱 `배프` (`PLAUROS` 쪽 사용자 소유) | JavaScript 키는 `index.html`에 있어요 |
-| 실제 경로·요금 | Cloudflare Worker `baepu-route` | `PLAUROS` 쪽 사용자의 Cloudflare 계정 | REST 키는 Worker Secret `KAKAO_REST_KEY`에만 있어요 |
+| 실제 경로·요금 | Cloudflare Worker `baepu-route` | `PLAUROS` 쪽 사용자의 Cloudflare 계정 (공동 소유자도 멤버로 들어와 있어요) | REST 키는 Worker Secret `KAKAO_REST_KEY`에만 있어요 |
 
 동작 순서:
 
@@ -72,8 +72,10 @@
 문제가 생겼을 때: 페이지 콘솔에 `그림 지도로 바꿨어요`가 나오면 카카오 스크립트를 불러오지 못한 거예요. 2026-11-09에는 키만 바꾸고 도메인을 등록하지 않아서 이 증상이 났어요. 브라우저에는 503으로 보였고, 원인은 `domain mismatched`(401)였어요. 사용량 초과와 혼동하지 마세요.
 
 ### Cloudflare
-**방법 A. 계정 멤버로 추가**
-- Cloudflare 계정의 멤버 초대 기능을 써요. 무료 플랜에서 어디까지 권한을 줄 수 있는지는 아직 확인하지 못했어요.
+**방법 A. 계정 멤버로 추가 (지금 이 방식이에요)**
+- 2026-11-09에 공동 소유자(`he040826-dotcom` 쪽 사용자)를 이 Cloudflare 계정의 멤버(Super Administrator)로 초대했고 수락됐어요. 2026-11-10에 두 사람 모두 Active인 것을 확인했어요.
+- 공동 소유자는 자기 Cloudflare 로그인으로 들어가서 같은 Worker `baepu-route`의 코드와 설정을 고치고 Deploy할 수 있어요. 서버를 다른 계정으로 옮길 필요가 없어요.
+- Secret 값은 누구도 다시 볼 수 없고, 새 값으로 덮어쓸 수만 있어요.
 
 **방법 B. 새 사람 계정에 다시 만들기**
 1. 새 계정에서 Workers를 **Start with Hello World**로 만들어요.
