@@ -2564,37 +2564,25 @@ let toastIsMistake=false;
 function toast(m,kind){ hideMessages(); toastIsMistake=false; announce(m); const t=$('toast'); t.className=kind||''; t.textContent=m; placeMsg(t); t.hidden=false; toast._t=setTimeout(()=>Motion.leave(t), Math.max(5000,m.length*170)); }
 function noti(title,body){ hideMessages(); const n=$('noti'); if(S.step!=='approach'&&S.step!=='plate') announce(`${title}. ${body}`); n.innerHTML=`<span class="ni">${I('taxi')}</span><div><b>${title}</b><p>${body}</p></div>`; placeMsg(n); n.hidden=false; noti._t=setTimeout(()=>Motion.leave(n),5000); }
 function stopSpeech(){ try{ speechSynthesis.cancel(); }catch(e){} }
-/* 읽어주기: 기기에 있는 한국어 목소리 중 사람 목소리에 가까운 것을 먼저 골라요. 기본 목소리는 기계음에 가까운 경우가 많아요.
-   온라인 목소리는 읽을 글을 그 목소리를 만든 회사의 서버로 보내요. 소리가 나지 않으면 기기 안의 목소리로 다시 읽어요 */
+/* 읽어주기: 브라우저마다 목소리가 달라지지 않게, 기기에 있는 마이크로소프트 한국어 목소리(Heami)로 읽어요.
+   그 목소리가 없는 기기(맥, 휴대폰 등)에서는 그 기기의 기본 목소리로 읽어요 */
 const Voice = {
-  pick:null, bad:new Set(), warned:false,
-  score(v){ const n=v.name||''; let s=0;
-    if(/natural|neural|premium|enhanced/i.test(n)) s+=50; // 자연스러운 합성 목소리
-    if(/online/i.test(n)) s+=20;
-    if(/sunhi|kyuri|yuna|sora|seoyeon|google/i.test(n)) s+=30; // 부드러운 편인 목소리
-    if(!v.localService) s+=10;
-    if(v.default) s+=2;
-    return s; },
-  choose(){ let vs=[]; try{ vs=speechSynthesis.getVoices().filter(v=>/^ko([-_]|$)/i.test(v.lang)&&!this.bad.has(v.name)); }catch(e){}
-    this.pick=vs.sort((a,b)=>this.score(b)-this.score(a))[0]||null; return this.pick; }
+  pick:null, warned:false,
+  choose(){ let vs=[]; try{ vs=speechSynthesis.getVoices().filter(v=>/^ko([-_]|$)/i.test(v.lang)&&v.localService&&/microsoft/i.test(v.name||'')); }catch(e){}
+    this.pick=vs.find(v=>/heami/i.test(v.name))||vs[0]||null; return this.pick; }
 };
 try{ speechSynthesis.addEventListener('voiceschanged',()=>Voice.choose()); Voice.choose(); }catch(e){} // 목소리 목록은 늦게 준비되기도 해요
-// 어떤 브라우저는 오류도 내지 않고 소리 없이 바로 끝나요(2026-11-11 이 노트북의 Whale: 모든 목소리가 그랬어요).
-// 그러면 다음 목소리로 다시 읽고, 끝내 안 되면 한 번만 알려 줘요
-function say(t,force,tried){ if((!PREF.voice&&!force)||!t) return;
+// 어떤 브라우저는 오류도 내지 않고 소리 없이 바로 끝나요(2026-11-11 이 노트북의 Whale). 그때는 한 번만 알려 줘요
+function say(t,force){ if((!PREF.voice&&!force)||!t) return;
   try{
     speechSynthesis.cancel();
-    const gen=say.gen=(say.gen||0)+1, t0=performance.now(), v=Voice.pick||Voice.choose(), a=String(t).split(/([.?!]+)(?:\s+|$)/), parts=[]; let started=false;
-    for(let i=0;i<a.length;i+=2){ const s=((a[i]||'')+(a[i+1]||'')).trim(); if(s) parts.push(s); } // 문장마다 끊어서 읽으면 사이에 숨 쉴 틈이 생겨요
-    const fail=()=>{ if(gen!==say.gen) return; // 그사이 다른 글을 읽기 시작했으면 상관없어요
-      if(v) Voice.bad.add(v.name); Voice.choose();
-      if((tried||0)<3&&Voice.pick){ say(t,force,(tried||0)+1); return; }
-      if(!Voice.warned){ Voice.warned=true; toast('이 브라우저에서는 소리 안내가 나오지 않아요. 다른 브라우저에서 열면 들을 수 있어요'); } };
-    parts.forEach((s,i)=>{ const u=new SpeechSynthesisUtterance(s); u.lang='ko-KR'; if(v) u.voice=v; u.rate=.9; u.pitch=1; u.volume=.92;
-      if(!i){ u.onstart=()=>{ started=true; };
-        u.onend=()=>{ if(!started&&performance.now()-t0<300) fail(); };
-        u.onerror=e=>{ if(e.error!=='interrupted'&&e.error!=='canceled') fail(); }; }
-      speechSynthesis.speak(u); });
+    const gen=say.gen=(say.gen||0)+1, t0=performance.now(), u=new SpeechSynthesisUtterance(t), v=Voice.pick||Voice.choose(); let started=false;
+    u.lang='ko-KR'; u.rate=.9; if(v) u.voice=v;
+    const silent=()=>{ if(gen!==say.gen||Voice.warned) return; Voice.warned=true; toast('이 브라우저에서는 소리 안내가 나오지 않아요. 다른 브라우저에서 열면 들을 수 있어요'); };
+    u.onstart=()=>{ started=true; };
+    u.onend=()=>{ if(!started&&performance.now()-t0<300) silent(); };
+    u.onerror=e=>{ if(e.error!=='interrupted'&&e.error!=='canceled') silent(); };
+    speechSynthesis.speak(u);
   }catch(e){} }
 
 /* 안내창: 열려 있는 동안 뒤 화면은 터치도 키보드도 닿지 않아요 */
