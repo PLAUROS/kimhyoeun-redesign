@@ -39,16 +39,7 @@
 -->
 <style>
 /* 시안 방향: 밤 도로를 달리는 택시. 깊은 남색과 절제한 금색, 넓은 여백과 얇은 경계선으로 어른스럽게 */
-:root{
-  --sky:#E8EEF8; --sky-2:#F1F4F9; --blue:#1F66E5; --blue-ink:#1A4FB0;
-  --butter:#F3E2B3; --butter-2:#F8F3E6; --gold:#D9A520;
-  --ink:#111827; --ink-2:#566072; --ink-3:#8791A1; --line:#E5E8EE; --paper:#FFFFFF; --bg:#F5F6F8; --night:#0D1320;
-  --mint:#14865F; --mint-2:#DDF3EA; --coral:#DE3B3B; --coral-2:#FBE4E4;
-  --stage:#E4E6EA; --taxi:#EFC24A; --map:#E9EBE6;
-  --f-display:"Pretendard Variable",Pretendard,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
-  --f-body:"Pretendard Variable",Pretendard,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
-  color-scheme:light;
-}
+:root{color-scheme:light}
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;background:var(--stage);color:var(--ink)}
 body{font-family:var(--f-body);-webkit-font-smoothing:antialiased}
@@ -58,13 +49,11 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--blue);outline-o
 svg.i{width:1.35em;height:1.35em;flex:none}
 
 /* ---------- 폰 프레임 ---------- */
-.stage{min-height:100%;display:flex;justify-content:center;align-items:center;padding:24px 16px;
-  background-image:radial-gradient(circle at 1px 1px,#cfe0ee 1px,transparent 1.5px);background-size:22px 22px}
-.phone{container-type:size;width:392px;height:min(820px,calc(100vh - 48px));height:min(820px,calc(100dvh - 48px));border:10px solid #1E2833;border-radius:46px;background:var(--bg);
-  overflow:hidden;position:relative;display:flex;flex-direction:column;box-shadow:0 30px 60px -20px rgba(31,61,96,.35)}
-.sb{flex:none;display:flex;justify-content:space-between;align-items:center;padding:.55em 1.6em .3em;font-size:13px;font-weight:700;background:var(--paper)}
+.stage{min-height:100%;display:flex;justify-content:center;align-items:center;padding:24px 16px;background-size:22px 22px}
+.phone{container-type:size;width:392px;height:min(820px,calc(100vh - 48px));height:min(820px,calc(100dvh - 48px));border:10px solid #1E2833;border-radius:46px;overflow:hidden;position:relative;display:flex;flex-direction:column;box-shadow:0 30px 60px -20px rgba(31,61,96,.35)}
+.sb{flex:none;display:flex;justify-content:space-between;align-items:center;padding:.55em 1.6em .3em;font-size:13px;font-weight:700}
 .sb i{display:inline-block;width:22px;height:11px;border:1.5px solid var(--ink);border-radius:3px;position:relative;vertical-align:-1px}
-.sb i::after{content:"";position:absolute;inset:1.5px 5px 1.5px 1.5px;background:var(--ink);border-radius:1px}
+.sb i::after{content:"";position:absolute;inset:1.5px 5px 1.5px 1.5px;border-radius:1px}
 #app{flex:1;min-height:0;display:flex;flex-direction:column;font-size:17px;line-height:1.5;position:relative;word-break:keep-all;overflow-wrap:anywhere}
 .big #app{font-size:20px}
 @media (max-width:760px){
@@ -74,45 +63,36 @@ svg.i{width:1.35em;height:1.35em;flex:none}
 }
 
 /* ---------- 연습 배너 + 코치 ---------- */
-.prac-banner{flex:none;display:flex;justify-content:space-between;align-items:center;gap:.5em;padding:.45em .9em;font-weight:800;font-size:.8em;
-  background:repeating-linear-gradient(-45deg,var(--butter) 0 12px,#FFD54A 12px 24px)}
-.prac-banner .logo{flex:none;display:flex;align-items:center;gap:.25em;background:rgba(255,255,255,.75);border-radius:10px;padding:.1em .45em}
+.prac-banner{flex:none;display:flex;justify-content:space-between;align-items:center;gap:.5em}
+.prac-banner .logo{flex:none;align-items:center;gap:.25em;background:rgba(255,255,255,.75);border-radius:10px;padding:.1em .45em}
 .prac-banner .logo b{font-family:var(--f-display);font-weight:400;font-size:1.15em;line-height:1}
 .prac-banner>span:not(.logo){flex:1;min-width:0}
-.prac-banner button{border:0;background:var(--ink);color:#fff;border-radius:99px;padding:.3em .8em;font-weight:800;font-size:.95em;min-height:44px;min-width:44px;flex:none}
-.coach{flex:none;display:flex;flex-direction:column;gap:.4em;padding:.6em .9em;background:var(--paper);border-bottom:1px solid var(--line)}
-.c-row{display:flex;align-items:flex-start;gap:.5em;font-weight:800;font-size:.9em;line-height:1.4}
-.tag{background:var(--blue);color:#fff;border-radius:8px;padding:.1em .5em;font-size:.82em;flex:none;margin-top:.1em}
-.tag.test{background:var(--ink)}
-.c-row .tag{white-space:nowrap}
-.m-short{display:none}
-.c-prog{display:flex;align-items:center;gap:.3em;font-size:.78em;font-weight:700;color:var(--ink-2)}
-.c-prog i{width:1.6em;height:5px;border-radius:9px;background:var(--line)}
-.c-prog i.done{background:var(--mint)}
-.c-prog i.on{background:var(--blue)}
-.c-bars{display:inline-flex;align-items:center;gap:.3em}
-.c-step{margin-left:.4em}
-.c-time{margin-left:auto;font-size:1.1em;font-weight:800;color:var(--ink);line-height:1.3}
-.hint{display:flex;align-items:flex-start;gap:.5em;font-size:.9em;color:var(--blue-ink);background:var(--sky-2);border-radius:12px;padding:.5em .65em}
+.prac-banner button{border:0;font-size:.95em;min-width:44px;flex:none}
+.coach{flex:none}
+
+.tag{flex:none}
+
+.c-prog i{border-radius:9px}
+
+.c-bars{display:inline-flex;align-items:center}
+
+.c-time{line-height:1.3}
+.hint{display:flex;gap:.5em;font-size:.9em}
 .hint svg{flex:none;margin-top:.1em}
 .hint span{flex:1}
-.hint button{border:0;background:none;padding:0;color:var(--blue-ink);min-width:44px;min-height:44px;margin:-.45em -.4em -.45em 0;display:grid;place-items:center;flex:none}
-.coach-tools{display:flex;gap:.4em;justify-content:flex-end;flex-wrap:wrap}
-.coach-tools button{border:1px solid #A9B6C2;background:var(--paper);border-radius:99px;font-size:.8em;font-weight:700;padding:.2em .8em;color:var(--ink-2);min-height:44px}
-.coach-tools button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.hint button{border:0;padding:0;display:grid;place-items:center;flex:none}
+
 .coach-tools button:disabled{cursor:default}
-.coach-tools button.help-btn{margin-right:auto;border:2px solid var(--ink);background:var(--butter);color:var(--ink);font-weight:800}
-.coach-tools button.help-btn:disabled{opacity:1;background:var(--paper)}
-.tgt{box-shadow:0 0 0 3px var(--ink),0 0 0 6px var(--gold);animation:tgt 1.2s infinite;position:relative;z-index:2}
+
+.tgt{position:relative;z-index:2}
 @keyframes tgt{50%{box-shadow:0 0 0 3px var(--ink),0 0 0 11px rgba(227,174,0,.45)}}
-.res-i.tgt{animation:none;box-shadow:inset 0 0 0 3px var(--ink);background:var(--butter-2)}
 
 /* ---------- 지도 + 바텀시트 ---------- */
 .area{flex:1;min-height:0;position:relative;display:flex;flex-direction:column;background:var(--map);overflow-y:auto;overflow-x:hidden}
 .area.lock{overflow:hidden}
 .map-wrap{--map-min:clamp(110px,26vh,210px);flex:1 0 var(--map-min);min-height:var(--map-min);position:relative;overflow:hidden}
 .big .map-wrap{--map-min:clamp(84px,16vh,180px)}
-.foot{flex:none;background:var(--paper);border-top:1px solid var(--line);padding:.6em 1em calc(.7em + env(safe-area-inset-bottom,0px));position:relative;z-index:5}
+.foot{flex:none;position:relative;z-index:5}
 #map{position:absolute;inset:0}
 #map.on-kakao{bottom:18px} /* 시트가 18px 겹쳐요. 카카오 로고·저작권 표시가 가려지지 않게 지도를 그만큼 올려요 */
 #map.locked{pointer-events:none} /* 고정 단계: 끌기·더블클릭 확대를 막고 터치는 화면 스크롤로 넘겨요 */
@@ -127,189 +107,177 @@ svg.i{width:1.35em;height:1.35em;flex:none}
 .pin-move{position:absolute;right:.9em;top:.5em;display:flex;gap:4px;opacity:0;pointer-events:none}
 .pin-move:focus-within{opacity:1;pointer-events:auto}
 .pin-move button{width:44px;height:44px;border:0;border-radius:50%;background:var(--paper);box-shadow:0 3px 10px rgba(30,40,51,.22);font-size:1.1em;font-weight:800;color:var(--ink)}
-.fab{position:absolute;width:2.7em;height:2.7em;border-radius:50%;border:0;background:var(--paper);box-shadow:0 3px 10px rgba(30,40,51,.22);display:grid;place-items:center;color:var(--ink)}
-.cancel-chip{position:absolute;top:.7em;right:.7em;border:0;background:var(--paper);border-radius:99px;box-shadow:0 3px 10px rgba(30,40,51,.22);padding:0 1em;min-height:44px;font-weight:800;font-size:.9em;color:var(--ink)}
-.route-bar{position:absolute;top:.6em;left:.7em;right:.7em;display:flex;align-items:center;gap:.35em;background:var(--paper);border-radius:99px;box-shadow:0 3px 10px rgba(30,40,51,.22);padding:0 1em 0 .1em;min-height:48px;font-weight:800;font-size:.92em}
+.fab{position:absolute;border-radius:50%;border:0;display:grid;place-items:center;color:var(--ink)}
+.cancel-chip{position:absolute;top:.7em;right:.7em;border:0;border-radius:99px;padding:0 1em;min-height:44px;font-size:.9em;color:var(--ink)}
+.route-bar{position:absolute;top:.6em;left:.7em;right:.7em;display:flex;align-items:center;gap:.35em;padding:0 1em 0 .1em;min-height:48px;font-size:.92em}
 .route-bar button{border:0;background:none;width:44px;height:44px;display:grid;place-items:center;color:var(--ink);flex:none}
 .route-bar span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.route-bar .from{flex:0 1 auto;color:var(--ink-2)}
+.route-bar .from{flex:0 1 auto}
 .route-bar em{font-style:normal}
-.route-bar small{font-size:.76em;font-weight:800;color:var(--ink-2);margin-right:.1em}
+.route-bar small{margin-right:.1em}
 .route-bar i{flex:none;font-style:normal;color:var(--ink-2)}
 .route-bar .to{flex:1 1 0}
-.fab.loc{right:.7em;bottom:1.9em;color:var(--blue)}
-.map-badge{position:absolute;left:.7em;bottom:1.9em;background:rgba(255,255,255,.88);border-radius:99px;padding:.15em .65em;font-size:.68em;font-weight:700;color:var(--ink-2);pointer-events:none}
-.sheet{flex:none;background:var(--paper);border-radius:24px 24px 0 0;box-shadow:0 -8px 24px rgba(30,40,51,.12);padding:.6em 1em 1.1em;display:flex;flex-direction:column;gap:.7em;position:relative;z-index:4;margin-top:-18px;transition:max-height .22s ease}
+.fab.loc{right:.7em;bottom:1.9em}
+.map-badge{position:absolute;left:.7em;bottom:1.9em;border-radius:99px;padding:.15em .65em;font-size:.68em;font-weight:700;color:var(--ink-2);pointer-events:none}
+.sheet{flex:none;background:var(--paper);display:flex;flex-direction:column;position:relative;z-index:4;margin-top:-18px}
 /* 손잡이: 끌어서 시트를 내리고 올려요. 눌러도 접히고 펴져요 */
-.grab{display:grid;place-items:center;flex:none;width:calc(100% + 2em);height:44px;margin:-.6em -1em -.75em;padding:0;border:0;background:none;touch-action:none;cursor:grab}
-.grab::before{content:"";width:3em;height:6px;border-radius:9px;background:#6B7A89}
-.grab:hover::before{background:var(--ink-2)}
+.grab{display:grid;place-items:center;flex:none;height:44px;padding:0;border:0;background:none;touch-action:none;cursor:grab}
+.grab::before{content:""}
+
 .sheet.dragging{transition:none;overflow:hidden}
 .sheet.dragging .grab{cursor:grabbing}
 .sheet.down{overflow:hidden;cursor:pointer}
-.sheet h3{margin:0;font-size:1.25em;font-weight:800;line-height:1.35}
+.sheet h3{margin:0;line-height:1.35}
 .muted{color:var(--ink-2)}
 .small{font-size:.85em}
 .sheet p{margin:0}
 .tabnum{font-variant-numeric:tabular-nums}
-.note{background:var(--butter-2);border-radius:14px;padding:.65em .85em;font-size:.88em}
-.note.blue{background:var(--sky-2)}
+.note{padding:.65em .85em;font-size:.88em}
 
-.tx-call{border:0;border-radius:14px;background:var(--taxi);color:var(--ink);font-weight:800;font-size:1.15em;min-height:3.2em;width:100%}
-.tx-call:hover{background:#FFC800}
-.btn{display:flex;align-items:center;justify-content:center;gap:.45em;width:100%;min-height:3em;padding:.4em 1em;border-radius:14px;border:0;font-weight:800;font-size:1em}
-.btn.ghost{background:var(--paper);border:1.5px solid var(--line)}
-.btn.dark{background:var(--ink);color:#fff}
-.btn.y{background:var(--taxi)}
-.btn:disabled{opacity:.75;cursor:default}
-.link{border:0;background:none;color:var(--ink-2);font-weight:700;text-decoration:underline;text-underline-offset:3px;padding:.3em .6em;font-size:.88em;align-self:center;min-height:44px}
+.tx-call{border:0;width:100%}
+
+.btn{display:flex;align-items:center;justify-content:center;gap:.45em;width:100%;min-height:3em;padding:.4em 1em;border:0;font-size:1em}
+
+.btn:disabled{cursor:default}
+.link{border:0;background:none;text-decoration:underline;text-underline-offset:3px;padding:.3em .6em;font-size:.88em;align-self:center;min-height:44px}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:.6em}
 .row3{display:grid;grid-template-columns:repeat(3,1fr);gap:.5em}
-.row3 button{display:flex;flex-direction:column;align-items:center;gap:.2em;border:1px solid var(--line);background:var(--paper);border-radius:14px;padding:.55em .2em;font-weight:700;font-size:.82em}
+.row3 button{display:flex;flex-direction:column;align-items:center;gap:.2em;padding:.55em .2em;font-size:.82em}
 
 /* 출발/도착 */
-.ft{display:flex;flex-direction:column;gap:.45em;background:#F6F7F8;border-radius:14px;padding:.7em .85em}
+.ft{display:flex;flex-direction:column;gap:.45em}
 .ft-r{display:flex;align-items:center;gap:.6em}
-.ft-r small{display:block;font-size:.72em;color:var(--ink-2);font-weight:700;line-height:1.2}
-.ft-r b{font-size:.95em}
+.ft-r small{display:block;color:var(--ink-2);line-height:1.2}
+
 .dot{width:.75em;height:.75em;border-radius:50%;flex:none}
-.dot.s{background:var(--blue);box-shadow:0 0 0 3px #CFE3F5}
-.dot.e{background:var(--coral);box-shadow:0 0 0 3px #F6D3CB}
 
 /* 검색 */
 .tx-search-wrap{position:relative}
-.tx-search{display:flex;align-items:center;gap:.6em;border:0;background:#F1F3F5;border-radius:14px;padding:.8em 3.5em .8em .9em;font-size:1.05em;font-weight:700;color:#55606B;text-align:left;width:100%;min-height:3.4em}
+.tx-search{display:flex;align-items:center;gap:.6em;border:0;padding:.8em 3.5em .8em .9em;text-align:left;width:100%}
 .tx-search span{flex:1}
-.mic-ic{position:absolute;right:.45em;top:50%;transform:translateY(-50%);z-index:3;width:2.75em;height:2.75em;border:0;border-radius:50%;background:var(--taxi);display:grid;place-items:center;color:var(--ink)}
-.res-h{font-size:.8em;font-weight:800;color:var(--ink-2);padding:.2em 0 0}
+.mic-ic{position:absolute;right:.45em;top:50%;transform:translateY(-50%);z-index:3;width:2.75em;height:2.75em;border:0;display:grid;place-items:center}
+.res-h{padding:.2em 0 0}
 .quick{display:flex;gap:.45em;flex-wrap:wrap}
-.quick button{display:inline-flex;align-items:center;gap:.3em;border:1px solid var(--line);background:var(--paper);border-radius:99px;padding:.4em .75em;font-weight:700;font-size:.85em;min-height:44px}
-.quick svg{width:1.1em;height:1.1em;color:var(--ink-2)}
+.quick button{display:inline-flex;align-items:center;gap:.3em;padding:.4em .75em;font-size:.85em}
+.quick svg{width:1.1em;height:1.1em}
 
 /* 전체 화면 패널 (검색·시작·결과) */
-.panel{position:absolute;inset:0;z-index:6;background:var(--paper);display:flex;flex-direction:column;overflow:hidden}
-.tx-sh{flex:none;display:flex;align-items:center;gap:.4em;padding:.6em .7em;border-bottom:1px solid var(--line)}
-.tx-sh input{flex:1;min-width:0;font:inherit;font-size:1.05em;font-weight:600;border:0;background:#F1F3F5;border-radius:12px;padding:.7em .8em;color:var(--ink)}
-.tx-sh input::placeholder{color:#55606B;opacity:1}
+.panel{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden}
+.tx-sh{flex:none;display:flex;align-items:center;gap:.4em;padding:.6em .7em}
+.tx-sh input{flex:1;min-width:0;font:inherit;font-size:1.05em;border:0;padding:.7em .8em}
+.tx-sh input::placeholder{opacity:1}
 .ic-btn{width:2.4em;height:2.4em;min-width:44px;min-height:44px;border:0;background:none;border-radius:12px;display:grid;place-items:center;flex:none}
-.ic-btn:hover{background:var(--sky-2)}
-.mic{width:2.8em;height:2.8em;border-radius:50%;border:0;background:var(--taxi);display:grid;place-items:center;flex:none}
-.mic.live{background:var(--coral);color:#fff}
-.listen{flex:none;display:flex;flex-direction:column;align-items:center;gap:.4em;padding:1.1em;border-bottom:1px solid var(--line);text-align:center}
-.listen small{color:var(--ink-2);font-size:.8em}
+
+.mic{width:2.8em;height:2.8em;border:0;display:grid;place-items:center;flex:none}
+
+.listen{flex:none;display:flex;flex-direction:column;align-items:center;gap:.4em;padding:1.1em;text-align:center}
+.listen small{color:var(--ink-2)}
 .wave{display:flex;gap:4px;height:2.2em;align-items:center}
 .wave i{width:6px;border-radius:4px;background:var(--coral);animation:wv .9s infinite ease-in-out}
 .wave i:nth-child(2){animation-delay:.12s}.wave i:nth-child(3){animation-delay:.24s}.wave i:nth-child(4){animation-delay:.36s}.wave i:nth-child(5){animation-delay:.48s}
 @keyframes wv{0%,100%{height:.5em}50%{height:2.2em}}
 .res{flex:1;overflow-y:auto}
 .res .res-h{padding:.8em 1em .3em}
-.res-i{display:flex;align-items:center;gap:.7em;width:100%;border:0;background:none;border-bottom:1px solid var(--line);padding:.85em 1em;text-align:left}
-.res-i:hover{background:var(--bg)}
-.res-i>svg{color:var(--ink-2)}
+.res-i{display:flex;align-items:center;gap:.7em;width:100%;border:0;background:none;padding:.85em 1em;text-align:left}
+
 .res-i span{flex:1;min-width:0}
 .res-i b{display:block;font-size:1.02em}
-.res-i small{color:var(--ink-2);font-size:.82em}
-.res-i em{font-style:normal;font-size:.82em;color:var(--ink-2);font-weight:700}
+.res-i small{color:var(--ink-2)}
+.res-i em{font-style:normal;color:var(--ink-2)}
 .empty{text-align:center;color:var(--ink-2);padding:2em 1em;line-height:1.6}
 
 /* 차종 */
-.cars{display:flex;flex-direction:column;gap:.35em}
-.car{display:grid;grid-template-columns:auto 1fr auto;align-items:center;column-gap:.6em;border:2px solid var(--line);background:var(--paper);border-radius:14px;padding:.25em .7em;text-align:left;min-height:2.8em}
-.car .cimg{width:2.6em;height:1.9em;display:grid;place-items:center;background:#F4F6F8;border-radius:10px}
-.car .cimg svg{width:2.5em;height:1.67em}
-.car .cname{grid-column:2;min-width:0}
+.cars{display:flex;flex-direction:column}
+.car{display:grid;align-items:center;text-align:left}
+
+.car .cname{min-width:0}
 .car .cname b{display:block;font-size:1em;line-height:1.25}
-.car .cname small{display:block;color:var(--ink-2);font-size:.82em;line-height:1.25}
-.car .cfare{grid-column:3;white-space:nowrap;font-weight:800;font-size:1.05em;line-height:1.2;text-align:right}
-.car .cfare small{display:block;font-weight:700;font-size:.72em;color:var(--ink-2)}
-.car.on{border-color:var(--ink);background:#FFFBE6}
+.car .cname small{display:block;color:var(--ink-2);line-height:1.25}
+.car .cfare{white-space:nowrap;line-height:1.2;text-align:right}
+.car .cfare small{display:block;font-weight:700;color:var(--ink-2)}
+
 [data-step=route] .sheet{gap:.45em}
-.trip{font-weight:800;font-size:.95em;color:var(--ink-2)}
+.trip{color:var(--ink-2)}
 .trip b{color:var(--ink);font-size:1.08em}
 .pick-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 .6em}
-.pick-h span{font-size:.88em;font-weight:800;color:var(--ink-2)}
+.pick-h span{font-size:.88em;color:var(--ink-2)}
 .pick-h span b{color:var(--ink)}
-.payrow{border:0;background:none;padding:0;width:100%;min-height:44px;text-align:left;display:flex;align-items:center;gap:.5em;font-size:.85em;color:var(--ink-2);font-weight:600}
-.payrow span{margin-left:auto;font-size:.9em;color:#17704F;font-weight:800}
+.payrow{border:0;background:none;padding:0;width:100%;min-height:44px;text-align:left;display:flex;align-items:center;gap:.5em;font-size:.85em}
+.payrow span{margin-left:auto}
 
 /* 호출 중 / 배차 */
-.radar{width:4.8em;height:4.8em;border-radius:50%;background:var(--taxi);margin:.3em auto;position:relative;display:grid;place-items:center}
-.radar::before,.radar::after{content:"";position:absolute;inset:0;border-radius:50%;border:3px solid var(--taxi);animation:ring 1.6s infinite}
+.radar{border-radius:50%;margin:.3em auto;position:relative;display:grid;place-items:center}
+.radar::before,.radar::after{content:"";position:absolute;inset:0;border-radius:50%;animation:ring 1.6s infinite}
 .radar::after{animation-delay:.8s}
 .radar svg{width:2.2em;height:2.2em}
 @keyframes ring{from{transform:scale(.85);opacity:1}to{transform:scale(1.5);opacity:0}}
-.eta{font-family:var(--f-display);font-size:1.6em;line-height:1.2}
-.eta em{font-style:normal;color:var(--coral)}
-.drv{display:flex;flex-wrap:wrap;align-items:center;gap:.4em .7em;border:1px solid var(--line);border-radius:16px;padding:.7em .8em}
-.drv .av{width:2.6em;height:2.6em;border-radius:50%;background:var(--sky);display:grid;place-items:center;font-weight:800;flex:none}
-.drv>div{flex:1 1 7.5em;min-width:0}
+.eta{line-height:1.2}
+.eta em{font-style:normal}
+.drv{display:flex;flex-wrap:wrap;align-items:center;gap:.4em .7em;padding:.7em .8em}
+.drv .av{width:2.6em;height:2.6em;border-radius:50%;display:grid;place-items:center;flex:none}
+.drv>div{min-width:0}
 .drv b{display:block}
-.drv small{color:var(--ink-2);font-size:.8em}
-.plate{display:inline-block;border:2.5px solid var(--ink);border-radius:8px;padding:.1em .55em;font-size:1.25em;font-weight:800;letter-spacing:.04em;background:#fff;white-space:nowrap;font-variant-numeric:tabular-nums}
-.plate.sm{font-size:1em;padding:0 .4em;border-width:2px}
+.drv small{color:var(--ink-2)}
+.plate{display:inline-block;padding:.1em .55em;font-size:1.25em;white-space:nowrap}
+.plate.sm{font-size:1em;padding:0 .4em}
 .plates{display:flex;flex-direction:column;gap:.45em}
-.pc{display:flex;align-items:center;gap:.55em;border:2px solid var(--line);background:var(--paper);border-radius:14px;padding:.4em .6em;width:100%;min-height:3.1em;text-align:left}
-.pc svg{width:2.7em;height:1.8em;flex:none}
-.pc .plate{font-size:1em;padding:0 .35em;border-width:2px;flex:none} /* 위에 나온 내 번호판과 같은 크기로 비교해요 */
+.pc{display:flex;align-items:center;width:100%;min-height:3.1em;text-align:left}
+
+.pc .plate{font-size:1em;padding:0 .35em;flex:none} /* 위에 나온 내 번호판과 같은 크기로 비교해요 */
 .pc small{font-size:.85em;color:var(--ink-2);margin-left:auto;text-align:right;line-height:1.25}
-.ridebar{height:.7em;border-radius:9px;background:var(--line);overflow:hidden}
-.ridebar i{display:block;height:100%;width:0;background:var(--taxi);border-radius:9px}
-.receipt{display:flex;flex-direction:column;gap:.5em;background:#F6F7F8;border-radius:14px;padding:.85em}
+.ridebar{overflow:hidden}
+.ridebar i{display:block;height:100%;width:0}
+.receipt{display:flex;flex-direction:column;gap:.5em;padding:.85em}
 .receipt div{display:flex;justify-content:space-between;gap:1em}
-.receipt .tot{border-top:1px dashed #C9D1D8;padding-top:.5em;font-weight:800;font-size:1.12em}
-.paid{display:inline-flex;align-items:center;gap:.25em;color:#17704F;font-weight:800;font-size:.85em}
+.receipt .tot{padding-top:.5em;font-size:1.12em}
+.paid{display:inline-flex;align-items:center;gap:.25em;font-size:.85em}
 
 /* 시작 / 결과 */
-.pbody{flex:1;overflow-y:auto;padding:1.1em 1.1em 1.4em;display:flex;flex-direction:column;gap:1em}
+.pbody{flex:1;overflow-y:auto;display:flex;flex-direction:column}
 .pbody>*{flex:none}
-.pfoot{flex:none;padding:.75em 1em calc(1em + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);display:flex;flex-direction:column;gap:.5em;background:var(--paper)}
-.result-hd{display:flex;flex-direction:column;align-items:center;gap:.3em;text-align:center}
-.result-hd h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:1.5em;line-height:1.3}
-.okmark{width:4.5em;height:4.5em;border-radius:50%;background:var(--mint);color:#fff;display:grid;place-items:center}
-.okmark svg{width:2.4em;height:2.4em}
-.okmark.retry{background:var(--butter);color:var(--ink)}
+.pfoot{flex:none;display:flex;flex-direction:column;gap:.5em}
+.result-hd{display:flex;flex-direction:column}
+.result-hd h2{margin:0}
+.okmark{border-radius:50%;display:grid;place-items:center}
+
 .report{display:flex;flex-direction:column;gap:.3em}
 .report p{margin:0;color:var(--ink-2);font-size:.93em}
 .r-top{display:flex;align-items:center;justify-content:space-between;gap:.5em}
-.r-badge{border-radius:99px;padding:.1em .7em;font-size:.85em;font-weight:800;flex:none}
-.r-badge.solo{background:var(--mint-2);color:#17704F}
-.r-badge.retry{background:var(--butter-2);color:#7A5B00}
-.card{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:.9em 1em}
-.checks{display:flex;flex-direction:column;gap:.55em}
+.r-badge{border-radius:99px;padding:.1em .7em;font-size:.85em;flex:none}
+
+.card{padding:.9em 1em}
+.checks{display:flex;flex-direction:column}
 .checks>div{display:flex;align-items:center;gap:.6em;font-size:.93em}
-.checks span.t{flex:1;font-weight:700}
-.checks small{display:block;font-weight:600;color:var(--ink-2);font-size:.82em}
+.checks span.t{flex:1}
+.checks small{display:block;color:var(--ink-2)}
 .ck{width:1.6em;height:1.6em;border-radius:50%;display:grid;place-items:center;flex:none}
 .ck svg{width:1em;height:1em}
-.ck.y{background:var(--mint);color:#fff}
-.ck.h{background:var(--butter);color:var(--ink)}
 
 /* 알림·토스트·모달 */
 /* 알림과 토스트는 배너 바로 아래에 띄워요(위치는 placeMsg). 배너와 조작 영역을 가리지 않고, 터치도 막지 않아요 */
-#noti{position:absolute;left:.6em;right:.6em;z-index:20;background:rgba(255,255,255,.98);border-radius:18px;box-shadow:0 10px 30px rgba(20,40,70,.25);padding:.65em .9em;display:flex;gap:.65em;align-items:flex-start;font-size:17px;animation:drop .3s ease-out;pointer-events:none}
+#noti{position:absolute;left:.6em;right:.6em;z-index:20;padding:.65em .9em;display:flex;gap:.65em;align-items:flex-start;font-size:17px;animation:drop .3s ease-out;pointer-events:none}
 .big #noti,.big #toast,.big .modal-in{font-size:20px}
-#noti .ni{width:2.3em;height:2.3em;border-radius:10px;flex:none;display:grid;place-items:center;background:var(--taxi)}
+#noti .ni{width:2.3em;height:2.3em;flex:none;display:grid;place-items:center}
 #noti b{display:block;font-size:.85em;color:var(--ink-2)}
-#noti p{margin:0;font-weight:700;line-height:1.4}
+#noti p{margin:0;line-height:1.4}
 @keyframes drop{from{opacity:0;transform:translateY(-8px)}}
-#toast{position:absolute;left:.6em;right:.6em;z-index:21;background:var(--ink);color:#fff;padding:.7em 1em;border-radius:14px;font-weight:700;font-size:17px;text-align:center;line-height:1.4;pointer-events:none;box-shadow:0 10px 30px rgba(20,40,70,.3)}
-#modal{position:absolute;inset:0;z-index:30;background:rgba(20,28,45,.45);display:flex;align-items:flex-end}
-.modal-in{background:var(--paper);width:100%;border-radius:24px 24px 0 0;padding:1.2em 1.1em 1.3em;display:flex;flex-direction:column;gap:.8em;font-size:17px}
+#toast{position:absolute;left:.6em;right:.6em;z-index:21;color:#fff;padding:.7em 1em;font-size:17px;text-align:center;line-height:1.4;pointer-events:none}
+#modal{position:absolute;inset:0;z-index:30;display:flex;align-items:flex-end}
+.modal-in{background:var(--paper);width:100%;display:flex;flex-direction:column;gap:.8em;font-size:17px}
 .modal-in{max-height:100%;overflow-y:auto}
 .modal-in h3{margin:0;font-size:1.2em}
 .modal-in p{margin:0;color:var(--ink-2)}
 
 /* ---------- 카카오맵 위에 올리는 표시 ---------- */
-.k-dot{width:18px;height:18px;border-radius:50%;background:var(--blue);border:3px solid #fff;box-shadow:0 0 0 6px rgba(44,119,186,.22),0 2px 6px rgba(0,0,0,.25)}
-.k-tag{background:var(--ink);color:#fff;border-radius:8px;padding:2px 8px;font:800 12px var(--f-body);box-shadow:0 2px 6px rgba(0,0,0,.25)}
+.k-dot{width:18px;height:18px;border-radius:50%;border:3px solid #fff}
+.k-tag{color:#fff;font:800 12px var(--f-body);box-shadow:0 2px 6px rgba(0,0,0,.25)}
 .big .k-pin b,.big .k-tag{font-size:15px}
 .k-pin{display:flex;flex-direction:column;align-items:center;font-family:var(--f-body)}
-.k-pin b{background:#fff;border-radius:10px;padding:2px 8px;font-size:12px;font-weight:800;box-shadow:0 2px 6px rgba(0,0,0,.2);margin-bottom:3px;white-space:nowrap}
+.k-pin b{background:#fff;margin-bottom:3px;white-space:nowrap}
 .k-pin span{width:22px;height:22px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.25);margin-bottom:6px}
-.k-pin.o span{background:var(--blue)}.k-pin.o b{color:var(--blue-ink)}
-.k-pin.d span{background:var(--coral)}.k-pin.d b{color:var(--coral)}
+
 /* 탑승 위치 핀: 지도 가운데에 고정되고 지도가 움직여요. 핀 끝이 지도 중심이에요 */
-.map-ui>.center-pin{position:absolute;left:50%;top:50%;transform:translate(-50%,-100%);pointer-events:none;transition:transform .12s}
+.map-ui>.center-pin{position:absolute;left:50%;top:50%;transform:translate(-50%,-100%);pointer-events:none}
 .map-ui>.center-pin.lift{transform:translate(-50%,calc(-100% - 8px))}
 #map.on-kakao~.map-ui>.center-pin{top:calc(50% - 9px)}
 #map.short~.map-ui>.center-pin b{visibility:hidden}
@@ -318,294 +286,172 @@ svg.i{width:1.35em;height:1.35em;flex:none}
 #map.nobar~.map-ui>.route-bar>span,#map.nobar~.map-ui>.route-bar>i{display:none}
 #map.pickable{cursor:grab}
 #map.pickable>svg{touch-action:none}
-.k-taxi svg{width:24px;height:31px;display:block;filter:drop-shadow(0 2px 2px rgba(0,0,0,.25))}
+.k-taxi svg{width:24px;height:31px;display:block}
 .k-taxi.big svg{width:31px;height:40px}
 .k-taxi.big{will-change:transform}
 .bob{animation:bob 2.6s ease-in-out infinite}
 @keyframes bob{50%{transform:translate(6px,-3px)}}
 .k-radar{width:160px;height:160px;position:relative}
-.k-radar i{position:absolute;inset:0;border-radius:50%;background:rgba(255,210,31,.35);border:2px solid var(--gold);animation:kr 2s infinite ease-out}
+.k-radar i{position:absolute;inset:0;border-radius:50%;animation:kr 2s infinite ease-out}
 .k-radar i+i{animation-delay:1s}
 @keyframes kr{from{transform:scale(.15);opacity:1}to{transform:scale(1);opacity:0}}
 
-
 /* ========== 새 디자인 층 (높이별 규칙보다 앞에 둬서 작은 화면 규칙이 그대로 이겨요) ========== */
-body{letter-spacing:-.012em}
-.stage{background-image:none}
-@media (min-width:761px){ .phone{border:9px solid #101318;border-radius:44px;box-shadow:0 40px 70px -30px rgba(16,19,24,.5)} }
-.sb{background:#14181F;color:#fff}
-.sb i{border-color:#fff}.sb i::after{background:#fff}
 
 /* 연습 배너: 언제나 보이는 얇은 어두운 띠 */
-.prac-banner{background:#14181F;color:#fff;font-weight:600;font-size:.76em;padding:.3em .55em .3em 1em}
+
 .prac-banner .logo{display:none}
-.prac-banner>span:not(.logo)::before{content:"";display:inline-block;width:.55em;height:.55em;margin-right:.5em;border-radius:50%;background:var(--taxi);vertical-align:.08em}
-.prac-banner button{background:rgba(255,255,255,.14);color:#fff;font-weight:700;padding:.2em .9em}
 
 /* 위쪽 안내 */
-.coach{gap:.5em;padding:.75em 1em .7em;border-bottom:0;box-shadow:0 1px 0 var(--line)}
-.c-row{align-items:center;font-size:1em;font-weight:800;letter-spacing:-.02em}
-.tag{background:var(--taxi);color:var(--ink);border-radius:7px;padding:.12em .5em;font-size:.72em;font-weight:800;margin-top:0}
-.tag.test{background:var(--ink);color:#fff}
-.c-prog{gap:.6em;font-size:.76em;font-weight:600}
-.c-bars{flex:1;gap:3px;max-width:6.5em}
+.coach{padding:.75em 1em .7em}
+
+.tag{padding:.12em .5em;margin-top:0}
+
 .c-prog i{flex:1;width:auto;height:4px;background:#E2E5E9}
 .c-prog i.done,.c-prog i.on{background:var(--ink)}
-.c-step{margin-left:0}
-.hint{align-items:center;background:#FFF8DB;color:var(--ink);border-radius:14px;padding:.55em .75em;font-weight:500}
-.hint button{color:var(--ink)}
-.coach-tools{gap:.35em}
-.coach-tools button{display:inline-flex;align-items:center;gap:.3em;border:0;background:var(--bg);color:var(--ink);font-weight:600;font-size:.78em;padding:.2em .85em}
+
+.hint{padding:.55em .75em}
+
+.coach-tools button{display:inline-flex;align-items:center;gap:.3em}
 .coach-tools button svg{width:1.15em;height:1.15em}
-.coach-tools button.on{background:var(--ink);color:#fff}
-.coach-tools button.help-btn{border:0;background:var(--bg);font-weight:700}
-.coach-tools button.help-btn:disabled{background:var(--taxi);color:var(--ink)}
-.tgt{box-shadow:0 0 0 3px var(--paper),0 0 0 6px var(--gold)}
+
 @keyframes tgt{50%{box-shadow:0 0 0 3px var(--paper),0 0 0 10px rgba(240,180,0,.45)}}
-.res-i.tgt{box-shadow:inset 0 0 0 2px var(--ink);background:#FFF8DB}
 
 /* 지도 위 버튼 */
-.fab{width:3em;height:3em;box-shadow:0 2px 10px rgba(16,19,24,.18)}
-.fab.loc{color:var(--ink)}
-.cancel-chip,.route-bar{box-shadow:0 2px 12px rgba(16,19,24,.16)}
-.route-bar{border-radius:16px;font-weight:700;letter-spacing:-.02em}
-.route-bar small{font-weight:600;color:var(--ink-3)}
+.fab{width:3em;height:3em}
+
 .route-bar .from{color:var(--ink-2);font-weight:600}
 .map-badge{background:rgba(255,255,255,.92)}
 
 /* 시트 */
-.sheet{border-radius:26px 26px 0 0;box-shadow:0 -6px 28px rgba(16,19,24,.1);padding:.6em 1.15em 1.1em;gap:.8em}
+.sheet{padding:.6em 1.15em 1.1em;gap:.8em}
 .grab{width:calc(100% + 2.3em);margin:-.6em -1.15em -.75em}
-.grab::before{width:2.4em;height:4px;background:#C8CDD3}
+
 .grab:hover::before{background:var(--ink-3)}
-.sheet h3{font-size:1.32em;letter-spacing:-.03em}
-.note{background:var(--bg);border-radius:14px;font-weight:500}
-.note.blue{background:var(--bg)}
+.sheet h3{font-size:1.32em}
 
 /* 주 버튼: 진한 검정으로 어디서나 눈에 띄게 */
-.foot{border-top:0;box-shadow:0 -1px 0 var(--line);padding:.7em 1.15em calc(.8em + env(safe-area-inset-bottom,0px))}
-.tx-call{background:var(--ink);color:#fff;border-radius:16px;font-size:1.12em;font-weight:700;letter-spacing:-.02em;min-height:3.3em}
-.tx-call:hover{background:#262C36}
-.btn{border-radius:16px;font-weight:700}
-.btn.ghost{background:var(--bg);border:0}
-.btn.y{background:var(--ink);color:#fff}
-.row3 button{border:0;background:var(--bg);border-radius:16px;font-weight:600}
+.foot{padding:.7em 1.15em calc(.8em + env(safe-area-inset-bottom,0px))}
+
 .link{color:var(--ink-2);font-weight:600}
 
 /* 출발·도착 */
-.ft{background:var(--bg);border-radius:16px;padding:.75em .9em}
+.ft{padding:.75em .9em}
 .ft-r small{font-weight:600}
 .ft-r b{font-size:1em;font-weight:700}
-.dot.s{background:var(--blue);box-shadow:0 0 0 3px #D5E3FB}
+.dot.s{background:var(--blue)}
 .dot.e{background:var(--coral);box-shadow:0 0 0 3px #F9D7D7}
 
 /* 검색 */
-.tx-search{background:var(--bg);border-radius:16px;font-weight:700;font-size:1.12em;color:var(--ink);letter-spacing:-.02em;min-height:3.5em}
-.mic-ic,.mic{background:var(--taxi)}
-.res-h{font-weight:700;color:var(--ink-3)}
-.quick button{border:0;background:var(--bg);font-weight:600}
-.tx-sh{border-bottom:0;box-shadow:0 1px 0 var(--line)}
-.tx-sh input{background:var(--bg);border-radius:14px}
+.tx-search{font-size:1.12em}
+
+.tx-sh{border-bottom:0}
+
 .ic-btn:hover{background:var(--bg)}
 .res-i{border-bottom-color:var(--bg)}
-.res-i>svg{color:var(--ink-3)}
-.res-i b{font-weight:700}
 
 /* 택시 고르기: 테두리를 줄이고, 고른 줄만 또렷하게 */
-.cars{gap:.2em}
-.car{border-color:transparent;border-radius:16px;padding:.35em .7em;column-gap:.75em}
-.car .cimg{width:3.3em;height:2.2em;background:none}
-.car .cimg svg{width:3.3em;height:2.2em}
-.car .cname b{font-weight:700;letter-spacing:-.02em}
-.car .cfare{font-size:1.1em;font-weight:800;letter-spacing:-.02em}
-.car.on{border-color:var(--ink);background:#FFF8DB}
-.trip{font-weight:600;font-size:.92em}
-.trip b{font-weight:800}
+
+.car .cfare{font-size:1.1em}
+
+.trip{font-size:.92em}
+
 .pick-h span{font-weight:600}
 .payrow{font-weight:600;color:var(--ink)}
 .payrow span{color:var(--ink-2);font-weight:600}
 
 /* 호출 뒤 */
 .radar{width:4.4em;height:4.4em}
-.eta{font-size:1.75em;font-weight:800;letter-spacing:-.035em}
-.eta em{color:var(--ink);background:linear-gradient(transparent 62%,var(--taxi) 62%)}
-.drv{border:0;background:var(--bg);border-radius:18px}
-.drv .av{background:var(--ink);color:#fff}
-.plate{border:2px solid var(--ink);border-radius:7px;background:#fff;font-weight:700;letter-spacing:.03em;box-shadow:inset 0 0 0 1px #fff,0 1px 2px rgba(16,19,24,.18)}
-.pc{border-color:transparent;background:var(--bg);border-radius:16px}
+.eta{font-size:1.75em}
+
+.plate{border:2px solid var(--ink);background:#fff}
+
 .pc small{font-weight:500}
-.ridebar{height:.5em;background:#E2E5E9}
-.ridebar i{background:var(--ink)}
-.receipt{background:var(--bg);border-radius:16px}
-.receipt .tot{border-top:1px solid #DADDE2}
-.paid{color:var(--mint);font-weight:700}
+
+.paid{font-weight:700}
 
 /* 검색과 결과 화면 */
 .panel{background:var(--paper)}
-.pbody{padding:0 0 1.2em;gap:1.1em}
+.pbody{padding:0 0 1.2em}
 .pbody>*{margin-left:1.15em;margin-right:1.15em}
-.pfoot{border-top:0;box-shadow:0 -1px 0 var(--line);padding:.7em 1.15em calc(.85em + env(safe-area-inset-bottom,0px))}
+.pfoot{padding:.7em 1.15em calc(.85em + env(safe-area-inset-bottom,0px))}
 
 /* 결과 */
 .pbody:has(.result-hd){padding-top:1.4em}
-.result-hd{align-items:flex-start;text-align:left;gap:.55em}
-.result-hd h2{font-weight:800;font-size:1.65em;letter-spacing:-.04em;line-height:1.25;text-wrap:balance}
-.okmark{width:3em;height:3em;background:var(--ink)}
-.okmark svg{width:1.6em;height:1.6em}
-.okmark.retry{background:var(--taxi)}
-.card{border:0;background:var(--bg);border-radius:18px}
-.r-badge.solo{background:var(--ink);color:#fff}
-.r-badge.retry{background:var(--taxi);color:var(--ink)}
-.ck.y{background:var(--ink)}
-.ck.h{background:var(--taxi)}
+
+.result-hd h2{line-height:1.25;text-wrap:balance}
 
 /* 알림 */
-#noti{border-radius:18px;box-shadow:0 12px 34px rgba(16,19,24,.2)}
-#toast{background:var(--ink);border-radius:16px}
-#modal{background:rgba(16,19,24,.5)}
-.modal-in{border-radius:26px 26px 0 0;padding:1.3em 1.15em 1.3em}
-.modal-in h3{font-weight:800;letter-spacing:-.03em}
+
+.modal-in{padding:1.3em 1.15em 1.3em}
 
 /* 지도 표시 */
-.k-dot{background:var(--blue)}
-.k-tag{background:var(--ink);border-radius:7px;font-weight:700}
-.k-pin b{border-radius:9px;font-weight:700}
-.k-pin.o span{background:var(--blue)}.k-pin.o b{color:var(--ink)}
-.k-pin.d span{background:var(--coral)}.k-pin.d b{color:var(--ink)}
 
-
+.k-pin.o span{background:var(--blue)}
+.k-pin.d span{background:var(--coral)}
 
 /* ---------- 화면 전체를 차분하게 ---------- */
-.prac-banner{background:var(--night)}
-.prac-banner>span:not(.logo){font-weight:500}
-.prac-banner button{font-weight:600}
-.c-row{font-weight:700}
-.tag{background:none;color:var(--ink-2);border:1px solid #CDD2DB;border-radius:6px;font-weight:600}
-.tag.test{background:none;color:var(--ink);border-color:var(--ink)}
-.hint{background:var(--butter-2);border-radius:12px}
-.coach-tools button{font-weight:500}
-.coach-tools button.help-btn{font-weight:600}
-/* 힌트 보기: 노란 전구를 크게 보여줘요 */
-.coach-tools button.help-btn>svg{width:1.65em;height:1.65em;color:#A86D00;fill:#FFD43B;stroke-width:2.2}
-.coach-tools button.help-btn:disabled{background:var(--butter);color:var(--ink)}
-.tgt{box-shadow:0 0 0 2px var(--paper),0 0 0 4px var(--gold)}
-@keyframes tgt{50%{box-shadow:0 0 0 2px var(--paper),0 0 0 8px rgba(217,165,32,.4)}}
-.res-i.tgt{background:var(--butter-2)}
-.sheet{border-radius:22px 22px 0 0}
-.modal-in{border-radius:22px 22px 0 0}
-.sheet h3{font-weight:700}
-.tx-call{background:var(--night);border-radius:12px;font-weight:600;letter-spacing:-.015em}
-.tx-call:hover{background:#1C2436}
-.btn{border-radius:12px;font-weight:600}
-.btn.y,.btn.dark{background:var(--night)}
-.ft,.note,.row3 button,.drv,.pc,.receipt,.card{border-radius:12px}
-.tx-search{border-radius:12px;font-weight:600}
-.tx-sh input{border-radius:10px}
-.mic-ic,.mic{background:var(--night);color:#fff}
-.mic.live{background:var(--coral)}
-.quick button{font-weight:500}
-.route-bar{border-radius:12px;font-weight:600}
-.car{border-radius:12px;border-width:1.5px}
-.car .cimg{width:3.5em;height:1.75em}
-.car .cimg svg{width:3.5em;height:1.75em}
-.car .cname b{font-weight:600}
-.car .cfare{font-weight:700}
-.car.on{background:var(--bg);border-color:var(--night)}
-.trip b{font-weight:700}
-.pick-h span b{font-weight:600}
-.eta{font-weight:700}
-.eta em{background:none;color:var(--ink)}
-.drv .av{background:var(--night);font-weight:600}
-.plate{border-width:1.5px;border-radius:5px;font-weight:600;box-shadow:none}
-.pc svg{width:3.4em;height:1.7em}
-.ridebar i{background:var(--night)}
-.result-hd h2{font-weight:700}
-.okmark{width:2.6em;height:2.6em;background:var(--night)}
-.okmark.retry{background:var(--butter)}
-.r-badge{font-weight:600}
-.r-badge.solo{background:var(--night)}
-.r-badge.retry{background:var(--butter)}
-.ck.y{background:var(--night)}
-.ck.h{background:var(--butter)}
-.checks>div{padding:.1em 0}
-.k-tag{background:var(--night)}
-#toast{background:var(--night)}
-.radar{background:var(--night);color:var(--taxi)}
-.radar::before,.radar::after{border-color:#AEB6C4}
 
+/* 힌트 보기: 노란 전구를 크게 보여줘요 */
+
+@keyframes tgt{50%{box-shadow:0 0 0 2px var(--paper),0 0 0 8px rgba(217,165,32,.4)}}
+
+.pick-h span b{font-weight:600}
+
+.eta em{background:none}
+
+.plate{box-shadow:none}
+
+.checks>div{padding:.1em 0}
 
 /* ---------- 움직임과 재질의 디테일 ---------- */
-:root{--spring:cubic-bezier(.32,.72,0,1);--hair:rgba(17,24,39,.1)}
+:root{--spring:cubic-bezier(.32,.72,0,1)}
 #app{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
 ::selection{background:rgba(31,102,229,.18)}
 h2,h3{text-wrap:balance}
 .cfare,.eta,.trip b,.plate,#clock{font-variant-numeric:tabular-nums}
 .area,.pbody,.res,.modal-in{overscroll-behavior:contain}
-button{-webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:transform .22s var(--spring),background-color .2s ease,border-color .2s ease,opacity .2s ease}
-button:not(.grab):active:not(:disabled){transform:scale(.97);transition-duration:.08s}
-button.car:active:not(:disabled){transform:scale(.985)}
-button.mic-ic:active:not(:disabled){transform:translateY(-50%) scale(.94)}
+button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+
 #sheet:focus-visible,#panel:focus-visible{outline:0}
-.sheet{transition:max-height .38s var(--spring);box-shadow:0 -.5px 0 var(--hair),0 -14px 40px rgba(17,24,39,.1)}
-.grab::before{width:36px;height:5px;border-radius:3px;background:#C9CDD4}
-.sheet.enter>*:not(.grab){animation:lift .44s var(--spring) backwards}
-.sheet.enter>*:nth-child(3){animation-delay:.03s}
-.sheet.enter>*:nth-child(4){animation-delay:.06s}
-.sheet.enter>*:nth-child(n+5){animation-delay:.09s}
+
 @keyframes lift{from{opacity:0;transform:translateY(9px)}}
-.foot{border-top:0;box-shadow:0 -.5px 0 var(--hair)}
-.coach{box-shadow:0 .5px 0 var(--hair)}
-.ft,.note,.receipt,.drv,.pc{box-shadow:inset 0 0 0 .5px var(--hair)}
-.tx-call{box-shadow:0 1px 2px rgba(13,19,32,.18),0 10px 22px -10px rgba(13,19,32,.4)}
+
+.note{box-shadow:inset 0 0 0 .5px var(--hair)}
+
 #modal{animation:dim .25s ease}
 .modal-in{animation:up .46s var(--spring)}
-#noti:not([hidden]){animation:drop .5s var(--spring)}
-#toast:not([hidden]){animation:drop .42s var(--spring)}
+
 @keyframes dim{from{background:rgba(20,28,45,0)}}
 @keyframes up{from{transform:translateY(100%)}}
 @keyframes drop{from{opacity:0;transform:translateY(-10px) scale(.98)}}
-@supports ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
-  .route-bar,.cancel-chip,#noti{background:rgba(255,255,255,.9);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);box-shadow:inset 0 0 0 .5px rgba(255,255,255,.6),0 .5px 0 var(--hair),0 8px 24px rgba(17,24,39,.14)}
-  #toast{background:rgba(13,19,32,.84);-webkit-backdrop-filter:saturate(160%) blur(18px);backdrop-filter:saturate(160%) blur(18px)}
-}
-@supports (corner-shape:squircle){
-  .tx-call,.btn,.car,.ft,.route-bar,.drv,#toast,#noti,.note,.row3 button,.pc,.receipt,.card,.tx-search,.hint,.pay-opt{corner-shape:squircle;border-radius:18px}
-  .sheet,.modal-in{corner-shape:squircle;border-radius:32px 32px 0 0}
-}
 
+@supports (corner-shape:squircle){
+  .tx-call,.btn,.car,.ft,.route-bar,.drv,#toast,#noti,.note,.row3 button,.pc,.receipt,.card,.tx-search,.hint,.pay-opt{corner-shape:squircle}
+  .sheet,.modal-in{corner-shape:squircle}
+}
 
 /* ---------- 검정을 덜고 색으로 상태를 말해요 ---------- */
-:root{--ok:#21AE66;--ok-ink:#0E7A45;--amber:#F49B1E;--amber-ink:#8A5A00;--tint:rgba(31,102,229,.08)}
+:root{--amber:#F49B1E;--amber-ink:#8A5A00}
 /* 가까운 택시 찾기 */
-.radar{background:radial-gradient(circle at 35% 28%,#FFF8DF,#F8DD8B 62%,#F0C75A);color:#7A5808;box-shadow:inset 0 .5px 0 rgba(255,255,255,.8),0 8px 22px -8px rgba(217,165,32,.6)}
-.radar::before,.radar::after{border:1.5px solid rgba(217,165,32,.5)}
+
 .radar svg{stroke-width:1.75}
 /* 진행 막대 */
-.ridebar{height:.45em;background:rgba(120,130,150,.24);border-radius:99px}
-.ridebar i{background:var(--blue);border-radius:99px;box-shadow:0 0 8px rgba(31,102,229,.35)}
-.c-bars i{background:#D5D9E0}
-.c-bars i.on{background:var(--blue)}
-.c-bars i.done{background:var(--blue);opacity:.45}
+.ridebar{border-radius:99px}
+.ridebar i{border-radius:99px}
+
 /* 고른 것과 작은 표시 */
-.car.on{background:var(--tint);border-color:var(--blue)}
-.drv .av{background:var(--blue-grad);color:#fff}
-.mic-ic,.mic{background:var(--blue-grad);color:#fff}
-.row3 button svg{color:var(--blue)}
+
 /* 결과 화면: 회색 바탕 위 흰 카드 */
-.pbody{background:#F3F4F7}
-.card{background:var(--paper);box-shadow:0 .5px 0 var(--hair),0 1px 3px rgba(17,24,39,.04)}
-.note.blue{background:var(--tint);color:#1C3F7E}
-.okmark{background:linear-gradient(180deg,#27A566,#178F52);box-shadow:0 8px 20px -8px rgba(33,174,102,.7);animation:pop .6s var(--spring)}
-.okmark.retry{background:linear-gradient(180deg,#FDD77F,#F4B63F);color:#5E4300;box-shadow:0 8px 20px -8px rgba(244,155,30,.6)}
+
 @keyframes pop{from{transform:scale(.6);opacity:0}}
-.r-badge.solo{background:rgba(33,174,102,.14);color:var(--ok-ink)}
-.r-badge.retry{background:rgba(244,155,30,.17);color:var(--amber-ink)}
+
 /* 단계별 기록 */
 .checks{gap:0;padding:.55em 0 .25em;overflow:hidden}
-.rec-h{padding:0 1em .35em;font-size:.84em;font-weight:600;color:var(--ink-2)}
+.rec-h{padding:0 1em .35em;color:var(--ink-2)}
 .checks>.rec{position:relative;gap:.7em;padding:.6em 1em}
 .rec+.rec::before{content:"";position:absolute;left:3.7em;right:0;top:0;height:1px;transform:scaleY(.5);background:var(--hair)}
-.rec-ic{width:2em;height:2em;border-radius:.55em;display:grid;place-items:center;color:#fff;flex:none;box-shadow:inset 0 .5px 0 rgba(255,255,255,.4)}
+.rec-ic{width:2em;height:2em;display:grid;place-items:center;flex:none}
 .rec-ic svg{width:1.15em;height:1.15em;stroke-width:2.1}
 .rec-ic.s-search{background:var(--blue-grad)}
 .rec-ic.s-fare{background:linear-gradient(180deg,#D98A1E,#B86E0C)}
@@ -613,75 +459,67 @@ button.mic-ic:active:not(:disabled){transform:translateY(-50%) scale(.94)}
 .rec-ic.s-car{background:linear-gradient(180deg,#27A566,#178F52)}
 .rec .ck{width:1.35em;height:1.35em}
 .rec .ck svg{width:.85em;height:.85em;stroke-width:3}
-.ck.y{background:#178F52;color:#fff}
-.ck.h{background:rgba(244,155,30,.2);color:var(--amber-ink)}
+
 .checks span.t{font-weight:600}
 .checks small{font-weight:500}
 
-
 /* ---------- 전체 검토 뒤 다듬기 ---------- */
-:root{--blue-grad:linear-gradient(180deg,#3F83F0,#1F66E5)}
+
 button{letter-spacing:inherit;line-height:1.3}
 #noti,#toast,.modal-in{word-break:keep-all;overflow-wrap:anywhere}
 .modal-in{line-height:1.5}
 .area,.pbody,.res,.modal-in,#app{scrollbar-width:thin;scrollbar-color:rgba(120,130,150,.35) transparent}
-.sb{background:var(--night)}
+
 /* 연습 안내는 항상 잘 읽혀요 */
 .prac-banner{font-size:.84em}
-.prac-banner>span:not(.logo){font-weight:600}
+
 /* 힌트 테두리 */
-.tgt,.tx-call.tgt,.pc.tgt{box-shadow:0 0 0 2px var(--paper),0 0 0 4px #B8860B}
+
 @keyframes tgt{50%{box-shadow:0 0 0 2px var(--paper),0 0 0 7px rgba(184,134,11,.45)}}
 /* 알아보기 쉬운 면과 글자 */
-.grab::before{background:#8A93A0}
-.btn.ghost,.row3 button,.quick button,.coach-tools button:not(.on){box-shadow:inset 0 0 0 1px #D5D9E0}
-.tx-search,.tx-sh input{box-shadow:inset 0 0 0 1px #AEB5C1}
-.route-bar small,.res-h{color:var(--ink-2)}
+
+.route-bar small{color:var(--ink-2)}
 .route-bar small{font-size:.85em}
-.res-h,.rec-h{font-size:.88em;font-weight:600}
-.tag,.ft-r small,.c-step,.checks small,.car .cfare small{font-size:.85em}
+.res-h{font-size:.88em}.rec-h{font-size:.88em;font-weight:600}
+.tag,.ft-r small,.checks small,.car .cfare small{font-size:.85em}
 .paid{color:var(--ok-ink)}
-.coach-tools button.on{background:var(--tint);color:var(--blue);box-shadow:inset 0 0 0 1px rgba(31,102,229,.45)}
-.car.on{border-width:2px}
-.car.on .cname b::after{content:" ✓";color:var(--blue);font-weight:700}
-.cars{gap:.35em}
+
+.car.on .cname b::after{color:var(--blue);font-weight:700}
+
 .dot.n{background:var(--ink-3);box-shadow:0 0 0 3px #E5E8EE}
 #map.pickable .k-dot{transform:scale(.6);opacity:.75}
 /* 번호판 */
-.plate,.plate.sm,.pc .plate{border-width:1.5px;border-radius:6px;padding-left:.4em;padding-right:.4em;border-color:var(--night)}
+.plate,.plate.sm,.pc .plate{border-width:1.5px;padding-left:.4em;padding-right:.4em}
 .pc.wrong{background:rgba(244,155,30,.1);box-shadow:inset 0 0 0 1.5px var(--amber)}
 .pc.wrong small{color:var(--amber-ink);font-weight:600}
-#toast.good{background:rgba(14,122,69,.94)}
-#toast.mist{background:rgba(122,74,0,.94)}
+
 /* 확인 창과 결제 수단 */
-.btn.risky{color:#A8321F}
+
 .pay-opts{display:flex;flex-direction:column;gap:.5em}
-.pay-opt{display:flex;align-items:center;justify-content:space-between;gap:.6em;width:100%;min-height:3.4em;padding:.5em .9em;border:0;border-radius:12px;background:var(--bg);text-align:left;box-shadow:inset 0 0 0 1px #D5D9E0}
+.pay-opt{display:flex;align-items:center;justify-content:space-between;gap:.6em;width:100%;min-height:3.4em;padding:.5em .9em;text-align:left}
 .pay-opt b{display:block;font-weight:600}
 .pay-opt small{display:block;color:var(--ink-2);font-size:.85em}
-.pay-opt.on{background:var(--tint);box-shadow:inset 0 0 0 2px var(--blue)}
+
 .pay-opt svg{width:1.3em;height:1.3em;color:var(--blue);flex:none}
 /* 결과 화면 */
-.pbody{background:var(--bg);padding-bottom:1.4em;gap:1em}
+.pbody{padding-bottom:1.4em;gap:1em}
 .pbody>.note{margin-left:calc(1.15em/.88);margin-right:calc(1.15em/.88);box-shadow:none}
-.panel.same .okmark{animation:none}
+
 /* 줄 맞춤과 무게 통일 */
 .coach{padding-left:1.15em;padding-right:1.15em}
 .res-i,.res .res-h{padding-left:1.15em;padding-right:1.15em}
-#toast,#noti{border-radius:16px}
-#toast,#noti p{font-weight:600}
+
+#toast{font-weight:600}
 .modal-in h3,.receipt .tot{font-weight:700}
-.cancel-chip,.res-i b{font-weight:600}
-.pfoot,.tx-sh{box-shadow:0 .5px 0 var(--hair)}
+.cancel-chip{font-weight:600}
+.tx-sh{box-shadow:0 .5px 0 var(--hair)}
 /* 작은 화면과 큰 글씨 */
 @container (max-height:760px){
-  .big .car .cimg,.big .car .cimg svg{width:2.6em;height:1.3em}
+  
   .big .car{column-gap:.5em}
 }
 @container (max-height:600px){
-  .car{grid-template-columns:1fr auto}
-  .car .cname{grid-column:1}
-  .car .cfare{grid-column:2}
+
   .fab.loc{width:44px;height:44px}
   .hint.wait{display:none}
   #noti .ni{display:none}
@@ -698,12 +536,9 @@ button{letter-spacing:inherit;line-height:1.3}
 /* 낮은 화면: 위쪽 영역을 줄여 지도와 시트 자리를 만들어요. 배너 문구는 그대로 유지해요 */
 @container (max-height:760px){
   .prac-banner .logo{display:none}
-  .coach{flex-direction:row;flex-wrap:wrap;gap:.3em .5em;padding:.45em .8em}
-  .c-row{flex:1 1 100%}
-  .c-prog{flex:1 1 100%;order:1;line-height:0}
-  .c-step{display:none}
-  .coach-tools{order:3;flex:1 1 100%;justify-content:flex-start;flex-wrap:nowrap}
-  .hint{order:2;flex:1 1 100%;padding:.4em .6em}
+  .coach{padding:.45em .8em}
+
+  .hint{padding:.4em .6em}
   .extra{display:none}
   .sheet{gap:.5em;padding:.5em .9em .7em}
   .grab{width:calc(100% + 1.8em);margin:-.5em -.9em -.8em}
@@ -713,19 +548,17 @@ button{letter-spacing:inherit;line-height:1.3}
   [data-step=plate] .map-wrap,[data-step=arrive] .map-wrap{--map-min:64px}
   [data-step=route] .map-wrap{--map-min:clamp(120px,19cqh,210px)}
   .big [data-step=route] .map-wrap{--map-min:92px}
-  .pc{min-height:max(44px,2.4em);padding:.15em .55em}
+  .pc{min-height:max(44px,2.4em)}
   .plates{gap:8px}
   .car .cfare small{display:none} /* 요금과 차종을 먼저 보여줘요. 결제 수단 줄은 시트를 내리면 보여요 */
   .receipt{gap:.3em;padding:.6em .8em}
   .receipt>div:nth-child(2){display:none}
   /* 미션은 짧은 문구로, 도구 버튼은 한 줄로 */
-  .m-full,.tag-more{display:none}
-  .m-short{display:inline}
-  .coach-tools button{font-size:.72em;padding:.1em .55em;white-space:nowrap}
+
 }
 
 @container (max-height:600px){
-  .car .cimg,.pc svg{display:none}
+  .pc svg{display:none}
   [data-step=route] .map-wrap,.big [data-step=route] .map-wrap{--map-min:72px}
   [data-step=arrive] .map-wrap,.big [data-step=arrive] .map-wrap{--map-min:40px}
   .big .ft small{display:none}
@@ -742,147 +575,95 @@ button{letter-spacing:inherit;line-height:1.3}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 
 /* 어르신이 쉽게 찾고 누를 수 있는 힌트 버튼 */
-.coach-tools button.help-btn{background:linear-gradient(180deg,#FFE992 0%,#FFDA55 100%);color:#513700;border:1.5px solid #C59628;border-radius:18px;font-size:max(16px,.95em);font-weight:800;min-height:52px;padding:.4em .8em;gap:.45em;box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 3px 10px rgba(145,100,12,.14);flex-shrink:0}
-.coach-tools button.help-btn>svg{color:#926014;fill:#FFD43B;background:rgba(255,255,255,.65);border-radius:50%;padding:.12em;box-sizing:content-box;box-shadow:inset 0 1px 0 rgba(255,255,255,.9)}
-.coach-tools button.help-btn:hover:not(:disabled){background:linear-gradient(180deg,#FFE37A 0%,#FFD13E 100%)}
-.coach-tools button.help-btn:focus-visible{outline:3px solid #1F66E5;outline-offset:3px}
-.coach-tools button.help-btn:disabled{background:#FFF0B5;color:#513700;opacity:1;box-shadow:inset 0 1px 0 rgba(255,255,255,.8)}
-@container (max-width:360px){.coach-tools{flex-wrap:wrap}}
+
+.coach-tools button.help-btn:disabled{opacity:1}
 
 /* ---------- 배프 원본 디자인: 배프.zip의 tokens.css / 택시 시안 ---------- */
-:root{
-  --sky:#CFE6F8;--sky-2:#EAF5FD;--blue:#2C77BA;--blue-ink:#1B4F80;
-  --butter:#FFE27A;--butter-2:#FFF5CC;--gold:#E3AE00;--taxi:#FFD21F;
-  --ink:#1E2833;--ink-2:#526070;--ink-3:#8C99A6;--line:#DCE6EF;
-  --paper:#FFF;--bg:#F6FAFD;--stage:#EAF5FD;--map:#EEF4EA;--night:#1E2833;
-  --mint:#23966D;--mint-2:#DFF4EA;--coral:#C8492F;--coral-2:#FCE6E0;
-  --ok-ink:#17694C;--tint:#EAF5FD;--blue-grad:linear-gradient(180deg,#3A87C9,#2C77BA);
-  --f-body:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
-  --f-display:"Jua","Noto Sans KR",sans-serif;
-}
+:root{--paper:#FFF;--map:#EEF4EA;}
 .stage{background-image:none;background-color:var(--stage)}
 .phone{background:var(--bg)}
-.sb{background:var(--taxi);color:var(--ink)}
+
 .sb i{border-color:var(--ink)}.sb i::after{background:var(--ink)}
-.prac-banner{background:var(--taxi);color:var(--ink);font-weight:800;line-height:1.35;padding:.35em .65em .35em .85em}
-.prac-banner>span:not(.logo){font-weight:800}
-.prac-banner>span:not(.logo)::before{display:none}
-.prac-banner button{background:var(--ink);color:white;border-radius:12px;min-height:48px;font-weight:800}
-.coach{background:var(--paper);box-shadow:none;border-bottom:1px solid var(--line)}
-.c-row{font-weight:800}
-.tag,.tag.test{background:var(--butter);color:var(--ink);border:0;border-radius:99px;font-weight:800}
-.c-prog{color:var(--blue-ink)}
-.c-bars i{background:var(--line)}.c-bars i.on{background:var(--blue)}.c-bars i.done{background:var(--mint);opacity:1}
-.hint,.note.blue{background:var(--sky-2);color:var(--blue-ink);border-radius:14px}
+.prac-banner{font-weight:800;line-height:1.35;padding:.35em .65em .35em .85em}
+
+.coach{background:var(--paper)}
+
+.tag,.tag.test{border:0}
+
+.note.blue{border-radius:14px}
 .hint{align-items:center}
-.hint button{background:var(--paper);border-radius:12px;margin:0;min-width:48px;min-height:48px}
-.coach-tools{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr);gap:6px}
-.coach-tools button{min-height:48px;border:1px solid var(--line);border-radius:12px;background:var(--line);color:var(--ink);font-size:max(14px,.78em);font-weight:800;padding:.35em .45em;box-shadow:none;white-space:normal}
-.coach-tools button.on{background:var(--butter);color:var(--ink);border-color:#E3B83F;box-shadow:none}
-.coach-tools button.help-btn{margin:0;min-height:56px;border:1.5px solid #C79A1C;border-radius:14px;background:var(--butter);color:var(--ink);font-size:max(16px,.9em);font-weight:800;padding:.35em .45em;box-shadow:none;gap:.35em}
-.coach-tools button.help-btn>svg{width:1.65em;height:1.65em;fill:var(--taxi);color:#795400;background:var(--butter-2);box-shadow:none}
-.coach-tools button.help-btn:hover:not(:disabled){background:#FFDA55}
-.coach-tools button.help-btn:disabled{background:var(--butter-2);color:var(--ink);box-shadow:none}
+.hint button{margin:0}
+
+.coach-tools button{box-shadow:none}
+.coach-tools button.on{box-shadow:none}
+
 .coach-tools button.help-btn:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
-.sheet{border-radius:20px 20px 0 0;box-shadow:0 -3px 14px rgb(30 40 51 / .12);corner-shape:round}
-.sheet h3{font-weight:800}
-.grab::before{background:#8C99A6}
-.tx-search,.tx-sh input{background:var(--bg);color:var(--ink);border-radius:14px;box-shadow:inset 0 0 0 1px var(--ink-3);font-weight:700}
+.sheet{corner-shape:round}
+
+.tx-search,.tx-sh input{color:var(--ink)}
 .tx-search{min-height:3.25em}
-.tx-search span{color:var(--ink)}
-.mic-ic,.mic{background:var(--butter);color:var(--ink);border-radius:14px}
-.mic.live{background:var(--coral);color:white}
-.quick button,.row3 button{border:1px solid var(--line);box-shadow:none;font-weight:700;min-height:48px}
-.route-bar{border-radius:14px;background:var(--paper);font-weight:800;box-shadow:0 2px 10px rgb(30 40 51 / .1)}
-.ft,.receipt{background:var(--bg);border-radius:14px;box-shadow:none}
-.car{border:2px solid var(--line);border-radius:16px;box-shadow:none;min-height:3.3em}
-.car.on{background:var(--sky-2);border-color:var(--blue)}
-.car .cimg{background:var(--bg)}.car.on .cimg{background:transparent}
-.car .cname b,.car .cfare{font-weight:800}
-.tx-call,.btn.y{background:var(--butter);color:var(--ink);border-radius:14px;font-weight:800;box-shadow:none}
-.tx-call{min-height:3em;font-size:1.15em;letter-spacing:0}
-.tx-call:hover,.btn.y:hover{background:#FFD957}
-.btn.dark{background:var(--ink);color:white}
-.btn{font-weight:800;border-radius:14px}
-.btn.ghost{background:var(--paper);border:1.5px solid var(--line);box-shadow:none}
-.foot,.pfoot{background:var(--paper);box-shadow:none;border-top:1px solid var(--line)}
-.tgt,.tx-call.tgt,.pc.tgt{box-shadow:0 0 0 2px var(--paper),0 0 0 5px var(--gold)}
+
+.quick button,.row3 button{min-height:48px}
+
+.car{min-height:3.3em}
+
+.btn.y{border-radius:14px}
+.tx-call{min-height:3em;font-size:1.15em}
+
+.foot,.pfoot{background:var(--paper)}
+
 @keyframes tgt{50%{box-shadow:0 0 0 2px var(--paper),0 0 0 7px rgba(227,174,0,.35)}}
-.res-i.tgt{box-shadow:inset 0 0 0 3px var(--gold);background:var(--butter-2)}
-.note{background:var(--butter-2)}
-.drv,.pc,.pay-opt{border-radius:16px;corner-shape:round;box-shadow:none}
-.drv{border:1px solid var(--line)}
-.drv .av{background:var(--sky);color:var(--blue-ink)}
-.eta{font-family:var(--f-display);font-weight:400}
-.eta em{color:var(--blue-ink)}
-.radar{background:var(--butter);color:var(--ink);box-shadow:none}
-.radar::before,.radar::after{border-color:var(--taxi)}
-.ridebar{background:var(--line)}.ridebar i{background:var(--blue);box-shadow:none}
+
+.drv,.pc,.pay-opt{corner-shape:round}
+
+.eta{font-family:var(--f-display)}
+
+.ridebar i{box-shadow:none}
 .pbody{background:var(--bg)}
 .result-hd{align-items:center;text-align:center;gap:.6em}
-.result-hd h2{font-family:var(--f-display);font-weight:400;letter-spacing:0;font-size:1.6em}
-.okmark{width:4.5em;height:4.5em;background:var(--mint-2);color:var(--ok-ink);box-shadow:none}
-.okmark svg{width:2.4em;height:2.4em}
-.okmark.retry{background:var(--butter-2);color:#795400;box-shadow:none}
-.card{background:var(--paper);border:1px solid var(--line);border-radius:20px;corner-shape:round;box-shadow:none}
-.rec-ic{background:var(--sky-2)!important;color:var(--blue-ink);box-shadow:none}
-.ck.y{background:var(--mint-2);color:var(--ok-ink)}
-.pay-opt.on{background:var(--sky-2);box-shadow:inset 0 0 0 2px var(--blue)}
-@container (max-width:340px){.coach-tools{grid-template-columns:1fr 1fr}.coach-tools button.help-btn{grid-column:1 / -1}}
-@media (prefers-reduced-motion:reduce){.tgt{animation:none}}
+.result-hd h2{font-family:var(--f-display)}
+.okmark{box-shadow:none}
 
+.okmark.retry{box-shadow:none}
+.card{background:var(--paper);corner-shape:round}
+.rec-ic{box-shadow:none}
 
 /* 차종은 참고 시안처럼 이름과 요금을 두 열로 보여줘요. */
 .car{grid-template-columns:minmax(0,1fr) auto;column-gap:.7em;padding:.4em .75em}
-.car .cimg{display:none}
+
 .car .cname{grid-column:1}
 .car .cfare{grid-column:2}
 
-.pfoot .btn.dark{background:var(--butter);color:var(--ink)}
-
 /* 하늘색 강조와 글자에 맞춘 안내 도구 */
-:root{--butter:#D7ECFA;--butter-2:#EEF7FD;--taxi:#CFE6F8;--gold:#5A9CCB}
-.prac-banner,.sb{background:var(--sky);color:var(--ink)}
-.tag,.tag.test{background:var(--sky-2);color:var(--blue-ink)}
-.coach-tools{display:flex;flex-wrap:wrap;justify-content:flex-start;align-items:center;gap:6px}
-.coach-tools button{flex:0 0 auto;width:auto;min-height:44px;padding:.35em .65em;font-size:.8em;line-height:1.35;border-radius:12px;white-space:nowrap;background:var(--bg);border:1px solid #C8DCEB;color:var(--ink-2)}
-.coach-tools button.on{background:var(--sky);border-color:#82B3D5;color:var(--blue-ink)}
-.coach-tools button.help-btn{flex:0 0 auto;grid-column:auto;margin:0;width:auto;min-height:44px;padding:.35em .65em;gap:.35em;font-size:.85em;line-height:1.35;white-space:nowrap;background:var(--sky);color:var(--blue-ink);border:1px solid #82B3D5;border-radius:12px;box-shadow:none}
-.coach-tools button.help-btn>svg{width:1.15em;height:1.15em;padding:0;box-sizing:border-box;background:none;border-radius:0;fill:none;color:currentColor;box-shadow:none;stroke-width:2}
-.coach-tools button.help-btn:disabled{background:var(--sky-2);color:var(--blue-ink);border-color:#B6D5EA;box-shadow:none}
-.coach-tools button.help-btn:hover:not(:disabled){background:#BEDDF3}
-.coach-tools button>svg{width:1.15em;height:1.15em}
-.tx-call,.btn.y,.pfoot .btn.dark{background:var(--sky);color:var(--blue-ink)}
-.tx-call:hover,.btn.y:hover,.pfoot .btn.dark:hover{background:#BEDDF3}
-.mic-ic,.mic{background:var(--sky);color:var(--blue-ink)}
-.mic.live{background:var(--coral);color:white}
-.note,.okmark.retry{background:var(--sky-2)}
-.okmark.retry{color:var(--blue-ink)}
-.tgt,.tx-call.tgt,.pc.tgt{box-shadow:0 0 0 2px var(--paper),0 0 0 4px var(--blue)}
-@keyframes tgt{50%{box-shadow:0 0 0 2px var(--paper),0 0 0 6px rgba(44,119,186,.3)}}
-.res-i.tgt{background:var(--sky-2);box-shadow:inset 0 0 0 3px var(--blue)}
 
+.coach-tools{flex-wrap:wrap;justify-content:flex-start}
+.coach-tools button{flex:0 0 auto;width:auto;min-height:44px;line-height:1.35;white-space:nowrap}
+
+.coach-tools button.help-btn{flex:0 0 auto;grid-column:auto;margin:0;width:auto;min-height:44px;gap:.35em;line-height:1.35;white-space:nowrap;box-shadow:none}
+.coach-tools button.help-btn>svg{width:1.15em;height:1.15em;padding:0;box-sizing:border-box;background:none;border-radius:0;box-shadow:none;stroke-width:2}
+.coach-tools button.help-btn:disabled{box-shadow:none}
+
+.coach-tools button>svg{width:1.15em;height:1.15em}
+
+@keyframes tgt{50%{box-shadow:0 0 0 2px var(--paper),0 0 0 6px rgba(44,119,186,.3)}}
 
 /* 하늘색 바탕에 노란 힌트, 설정 도구는 오른쪽 정렬 */
-.coach-tools{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:6px}
+.coach-tools{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center}
 .coach-tools button{justify-self:end}
-.coach-tools button.help-btn{justify-self:start;background:#FFE27A;color:#513700;border-color:#C79A1C}
-.coach-tools button.help-btn>svg{color:#795400;fill:#FFD43B}
-.coach-tools button.help-btn:hover:not(:disabled){background:#FFDA55}
-.coach-tools button.help-btn:disabled{background:#FFF5CC;color:#513700;border-color:#DCC27A}
+.coach-tools button.help-btn{justify-self:start}
+
 @container (max-width:340px){
   .coach-tools button.help-btn{grid-column:1 / -1}
   .coach-tools button[data-a=voice]{grid-column:2}
   .coach-tools button[data-a=big]{grid-column:3}
 }
 
-
 /* ---------- 마감: 테두리를 덜고 면과 글자 위계로 정리해요 ----------
    화면 구조와 하늘색·노랑은 그대로 두고 표현만 다듬어요. 높이별 간격 규칙을 흔들지 않게 여백 값은 되도록 건드리지 않아요 */
 :root{
   --blue:#0A72D1;--blue-ink:#0A5CA8;--blue-grad:#0A72D1;--sky:#D9EAF9;--sky-2:#EAF3FC;--tint:rgba(10,114,209,.1);
-  --ink:#1D1D1F;--ink-2:#5F6168;--ink-3:#86868B;--line:#E5E5EA;--bg:#F2F2F7;--stage:#F5F5F7;--night:#1D1D1F;
-  --ok:#1FA35B;--ok-ink:#0F7A43;--mint-2:rgba(31,163,91,.14);--coral:#D93A2B;
+  --ink:#1D1D1F;--ink-2:#5F6168;--ink-3:#86868B;--bg:#F2F2F7;--stage:#F5F5F7;
+  --ok:#1FA35B;--ok-ink:#0F7A43;--coral:#D93A2B;
   --hair:rgba(60,60,67,.16);--fill:rgba(118,118,128,.12);--on-tint:#0B3A66;
   --float:0 0 0 .5px rgba(0,0,0,.05),0 6px 20px rgba(0,0,0,.1);
   --f-body:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;
@@ -899,11 +680,10 @@ body{letter-spacing:-.011em}
 
 /* 위쪽 안내 */
 .coach{border-bottom:0;box-shadow:0 .5px 0 var(--hair)}
-.c-row{font-weight:700;letter-spacing:-.025em}
+
 .tag,.tag.test{background:var(--fill);color:var(--ink-2);border-radius:999px;font-weight:600}
-.c-prog{color:var(--ink-2);font-size:max(13.5px,.8em);font-weight:500}
-.c-step{font-size:1em}
-.c-bars i{height:4px;background:rgba(118,118,128,.2)}
+.c-prog{font-weight:500}
+
 .c-bars i.on,.c-bars i.done{background:var(--blue);opacity:1}
 .hint,.note,.note.blue{background:var(--sky-2);color:var(--on-tint);font-weight:500}
 .hint{border-radius:14px}
@@ -911,7 +691,7 @@ body{letter-spacing:-.011em}
 .coach-tools{gap:8px}
 .coach-tools button{border:0;border-radius:999px;background:var(--fill);color:var(--ink);font-weight:600;font-size:max(14px,.82em);padding:.3em .95em;letter-spacing:-.015em}
 .coach-tools button.on{background:var(--tint);color:var(--blue-ink);border:0}
-.coach-tools button:not(.on),.quick button,.btn.ghost{box-shadow:none}
+.coach-tools button:not(.on){box-shadow:none}
 .coach-tools button.help-btn{border:0;border-radius:999px;background:#FFF0BF;color:#544000;font-weight:600;font-size:max(15px,.86em);padding:.3em 1em .3em .8em}
 .coach-tools button.help-btn>svg{color:#A87600;fill:#FFCE3A}
 .coach-tools button.help-btn:hover:not(:disabled){background:#FFE9A6}
@@ -940,7 +720,7 @@ body{letter-spacing:-.011em}
 
 /* 시트와 주 버튼 */
 .sheet{border-radius:28px 28px 0 0;box-shadow:0 -.5px 0 rgba(0,0,0,.05),0 -10px 36px rgba(0,0,0,.08)}
-.grab::before{width:36px;height:5px;border-radius:3px;background:rgba(60,60,67,.32)}
+.grab::before{width:36px;height:5px;border-radius:3px}
 .sheet h3{font-weight:700;letter-spacing:-.03em}
 .foot,.pfoot{border-top:0;box-shadow:0 -.5px 0 var(--hair)}
 .tx-call,.btn.y,.pfoot .btn.dark,.btn.dark{background:var(--blue);color:#fff;font-weight:650;letter-spacing:-.02em;box-shadow:0 1px 1px rgba(10,60,110,.12),0 10px 22px -12px rgba(10,114,209,.65)}
@@ -951,7 +731,7 @@ body{letter-spacing:-.011em}
 .btn.risky{color:#C4321F}
 
 /* 검색 */
-.tx-search,.tx-sh input{background:var(--bg);border-radius:14px;box-shadow:inset 0 0 0 1px rgba(60,60,67,.13);letter-spacing:-.02em}
+.tx-search,.tx-sh input{background:var(--bg);border-radius:14px;letter-spacing:-.02em}
 .tx-search{font-weight:600}
 .tx-search span{color:var(--ink-2)}
 .tx-sh input{font-weight:500}
@@ -962,7 +742,7 @@ body{letter-spacing:-.011em}
 .quick svg{color:var(--ink-2)}
 .res-h{color:var(--ink-2);font-weight:600}
 .res-i{position:relative;border-bottom:0}
-.res-i+.res-i::before{content:"";position:absolute;left:4em;right:0;top:0;height:1px;transform:scaleY(.5);background:var(--hair)}
+.res-i+.res-i::before{content:"";position:absolute;right:0;top:0;height:1px;transform:scaleY(.5);background:var(--hair)}
 .res-i:hover,.res-i:active{background:var(--fill)}
 .res-i>svg{width:1.05em;height:1.05em;padding:.42em;box-sizing:content-box;border-radius:.62em;background:var(--tint);color:var(--blue)}
 .res-i b{font-weight:600;letter-spacing:-.022em}
@@ -1012,17 +792,16 @@ body{letter-spacing:-.011em}
 #noti .ni{background:var(--sky-2);color:var(--blue);border-radius:.7em}
 #noti b{font-weight:600}
 #noti p{font-weight:600;letter-spacing:-.018em}
-#toast{background:rgba(29,29,31,.88);-webkit-backdrop-filter:saturate(160%) blur(18px);backdrop-filter:saturate(160%) blur(18px);border-radius:18px}
+#toast{background:rgba(29,29,31,.88);-webkit-backdrop-filter:saturate(160%) blur(18px);backdrop-filter:saturate(160%) blur(18px)}
 #toast.good{background:rgba(15,122,67,.94)}
 #toast.mist{background:rgba(122,74,0,.94)}
 #modal{background:rgba(0,0,0,.32)}
 .modal-in{border-radius:28px 28px 0 0}
 .modal-in h3{letter-spacing:-.028em}
 @supports (corner-shape:squircle){
-  .tx-call,.btn,.ft,.drv,.note,.pc,.receipt,.card,.tx-search,.hint,.pay-opt,.route-bar,#toast,#noti,.cars,.car{corner-shape:squircle;border-radius:22px}
+  .tx-call,.btn,.ft,.drv,.note,.pc,.receipt,.card,.tx-search,.hint,.pay-opt,.route-bar,#noti,.cars,.car{corner-shape:squircle;border-radius:22px}#toast{corner-shape:squircle}
   .sheet,.modal-in{corner-shape:squircle;border-radius:36px 36px 0 0}
 }
-
 
 /* ---------- 움직임: 빠르게 반응하고, 끊기지 않게 이어지고, 조용히 멈춰요 ----------
    값은 살짝만 넘쳤다 돌아오는 스프링이에요. 움직임 줄이기 설정이면 위쪽 규칙이 모두 꺼요 */
@@ -1035,23 +814,15 @@ button.car:active:not(:disabled),button.res-i:active:not(:disabled){transform:sc
 .cars{position:relative}
 .car-ghost{position:absolute;left:0;right:0;z-index:2;display:block;border-radius:18px;background:var(--tint);box-shadow:inset 0 0 0 2px var(--blue);pointer-events:none}
 .car.on.sel-moving{background:transparent;box-shadow:none}
-.car.on .cname b::after{display:inline-block;animation:check-pop .4s var(--pop) backwards}
+.car.on .cname b::after{display:inline-block}
 .panel.same .car.on .cname b::after{animation:none}
 @keyframes check-pop{from{transform:scale(.4);opacity:0}}
 
 /* 힌트: 버튼과 내용이 한 덩어리예요 */
 .coach-tools .island{grid-column:1;grid-row:1;justify-self:start;min-width:0;border-radius:22px}
-.coach-tools.hint-on .island{grid-column:1 / -1;justify-self:stretch;background:#FFF0BF;border-radius:24px}
+
 .island .help-btn{position:relative}
-.coach-tools .island.open button.help-btn:disabled{background:transparent;color:#544000}
-.coach-tools.hint-on>button{grid-row:2}
-.coach-tools.hint-on>button[data-a=voice]{grid-column:2}
-.coach-tools.hint-on>button[data-a=big]{grid-column:3}
-.island.morphing{overflow:hidden;background:#FFF0BF}
-.island-body .hint{background:none;border-radius:0;padding:0 .6em .8em 1em;align-items:center;font-size:.95em;line-height:1.5}
-.island-body .hint>svg{display:none}
-.island.morphing .island-body{animation:island-in .42s ease-out .1s backwards}
-@keyframes island-in{from{opacity:0;transform:translateY(-6px)}}
+
 @container (max-width:340px){
   .coach-tools .island{grid-column:1 / -1}
 }
@@ -1110,36 +881,28 @@ button.car:active:not(:disabled),button.res-i:active:not(:disabled){transform:sc
 .fab:active{transform:scale(.92)}
 .c-bars i{transition:background-color .3s ease}
 
-
 /* 큰 화면에서만 지도를 넉넉히 둬요. 낮은 화면은 위쪽의 낮은 화면용 규칙을 그대로 따라요 */
 @container (min-height:761px){[data-step=route] .map-wrap{--map-min:clamp(180px,30cqh,300px)}.big [data-step=route] .map-wrap{--map-min:120px}}
 
 /* 안내 위쪽: 연습 표시와 진행 칸을 한 줄로, 제목은 그 아래 넓게 */
-.c-prog{gap:.6em;line-height:1.35}
-.c-prog .tag{font-size:max(13px,.95em);flex:none}
-.c-bars{flex:0 0 5.4em;max-width:5.4em}
-.c-step{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.c-row{font-size:1.04em;line-height:1.35}
-@container (max-height:760px){.c-prog{order:-1;line-height:1.35}}
+
 /* 안내 글은 낱말 사이를 조금 띄우고, 문장마다 줄을 나눠요 */
 .hint span,.note,.sheet p.small,.modal-in p{letter-spacing:-.004em;word-spacing:.07em;line-height:1.55;text-wrap:pretty}
-.island-body .hint{font-size:.97em}
+
 /* 탑승 위치 바꾸기 */
 .origin-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.origin-actions button{display:inline-flex;align-items:center;justify-content:center;gap:.35em;min-height:48px;padding:.3em .5em;border:0;border-radius:14px;background:var(--fill);color:var(--ink);font-weight:600;font-size:.95em;letter-spacing:-.018em;white-space:nowrap}
+.origin-actions button{display:inline-flex;align-items:center;justify-content:center;gap:.35em;min-height:48px;padding:.3em .5em;border:0;background:var(--fill);color:var(--ink);font-weight:600;font-size:.95em;letter-spacing:-.018em;white-space:nowrap}
 .origin-actions button svg{width:1.15em;height:1.15em;color:var(--blue)}
 .origin-actions button:disabled{color:var(--ink-2)}
 .res-i.gps-row b{color:var(--blue-ink)}
-
 
 /* 시트 올림·내림: 높이는 스크립트의 스프링으로 움직이고, 손잡이와 "더 보기" 글자는 서로 번져요 */
 .sheet{transition:none}
 .sheet.moving{overflow:hidden;will-change:height}
 .grab::before,.grab::after{grid-area:1/1;transition:opacity .22s ease}
-.grab::after{content:"▲ 더 보기";font-size:.85em;font-weight:800;color:var(--ink-2);opacity:0;pointer-events:none}
+.grab::after{content:"▲ 더 보기";font-size:.85em;color:var(--ink-2);opacity:0;pointer-events:none}
 .sheet.down .grab::before{opacity:0}
 .sheet.down .grab::after{opacity:1}
-
 
 /* ---------- 위쪽 안내 다시 짜기 ----------
    한 줄에 연습 표시 · 제목 · 진행 칸, 그 아래 한 줄에 힌트(또는 기다리는 표시) · 소리 · 글자.
@@ -1163,11 +926,11 @@ button.car:active:not(:disabled),button.res-i:active:not(:disabled){transform:sc
 .hc-head{display:flex;align-items:center;justify-content:space-between;gap:.6em;min-height:32px;font-size:max(13.5px,.8em);font-weight:600;color:#7A5900}
 .hc-head>span:first-child{display:inline-flex;align-items:center;gap:.4em;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hc-head>span:first-child svg{flex:none;width:1.3em;height:1.3em;color:#A87600;fill:#FFCE3A}
-.hc-acts{flex:none;display:inline-flex;align-items:center;gap:6px}
+.hc-acts{flex:none;display:inline-flex;align-items:center}
 .hc-acts button{position:relative;display:inline-grid;place-items:center;min-width:32px;min-height:32px;padding:0 .95em;border:0;border-radius:999px;background:rgba(122,89,0,.13);color:#4A3700;font-family:inherit;font-size:1em;font-weight:600}
 .hc-acts button[data-a=say]{padding:0;background:rgba(255,255,255,.8);color:#7A5900}
 .hc-acts button[data-a=say] svg{width:1.3em;height:1.3em}
-.hc-acts button::after{content:"";position:absolute;inset:-7px -3px}
+.hc-acts button::after{content:"";position:absolute}
 .hc-body{flex:1;display:flex;align-items:center;padding-right:.4em}
 .hc-body p{flex:1;min-width:0;margin:0;font-size:1em;font-weight:600;line-height:1.46;letter-spacing:-.012em;word-spacing:.06em;word-break:keep-all;text-wrap:pretty}
 @container (max-height:640px){.coach{gap:.35em;padding-top:.45em;padding-bottom:.45em}}
@@ -1182,7 +945,6 @@ button.car:active:not(:disabled),button.res-i:active:not(:disabled){transform:sc
 .pc svg{width:min(4.7em,82px);height:auto;flex:none;filter:drop-shadow(0 .5px .5px rgba(15,23,35,.38))}
 .drv>div{flex:1 1 6em}
 .pc.tgt::after{left:auto;right:.9em} /* 표시가 택시 그림을 가리지 않게 오른쪽에 둬요 */
-
 
 /* ---------- 정밀 점검 반영 (2026-11-11): 시각·움직임·접근성·화면 크기 ---------- */
 /* 누를 때 제자리에서 눌려요 */
@@ -1263,6 +1025,12 @@ button.mic-ic:active:not(:disabled){transform:translateY(-50%) scale(.94)}
 
 <script>
 'use strict';
+/* 차례 (번호는 아래 구역 제목과 같아요)
+   1 설정 CONFIG · 2 장소·경로 데이터 · 3 받는 값(URL) · 4 좌표·경로·요금 계산 · 5 연습 단계와 문구 · 6 상태 S
+   7 아이콘과 택시 그림 · 8 지도(SvgMap, KakaoMap, MapCtl, viewOf, 탑승 위치, 현재 위치, 진행 시계, 택시 이동)
+   9 화면 그리기(coachHTML, sheetHTML, footHTML, searchHTML, resultHTML, mapUiHTML, Motion, render, 바텀시트)
+   10 진행(Mic, setStep, 채점, 결과 전달) · 11 알림·소리 · 12 누르기(A) · 13 시작
+   새 기능을 넣을 때: 상태는 fresh()에, 화면은 sheetHTML()·footHTML()의 그 단계에, 버튼 동작은 A에, 단계가 바뀔 때 할 일은 setStep()에 더해요 */
 /* =====================================================================
    1. 설정 — 팀원이 바꿀 곳이에요
    ===================================================================== */
@@ -1292,6 +1060,7 @@ const PLACES = { // 기본 연습 장소. 실제 검색에서 고른 장소는 �
   khu:{n:'경희대 국제캠퍼스',a:'용인 기흥구 서천동 · 대학교',lat:37.2398,lon:127.0832,kind:'poi',kw:'경희대학교 대학교 학교'}
 };
 const RECENT = ['ytst','lake','mpst']; // "최근 목적지" 칩
+const isPlace = k => Object.prototype.hasOwnProperty.call(PLACES,k); // 바깥에서 온 값은 이걸로 확인한 뒤에만 PLACES에서 찾아요
 
 /* 실제 도로 경로. 비어 있거나 그림 지도일 때는 부드러운 곡선으로 그려요.
    채우는 법: python tools/fetch_routes.py 로 받은 tools/baepu-routes.json 내용을 ROUTES에 넣어요.
@@ -1329,7 +1098,7 @@ const qDest = Q.get('dest');
 const PARAMS = {
   mode: Q.get('mode')==='practice' ? 'practice' : 'test', // 기본은 힌트를 골라서 보는 방식이에요(채점은 테스트와 같아요)
   named: Q.get('mode')==='test', // 화면에 "테스트"라고 보여 줄지. 본 서비스나 프렌드가 요청했을 때만 보여요
-  mission: Object.prototype.hasOwnProperty.call(PLACES,qDest) ? qDest : null, // 없으면 자유 연습
+  mission: isPlace(qDest) ? qDest : null, // 없으면 자유 연습
   home: parseHome(Q.get('home')),
   area: cleanText(Q.get('area'),40) || '영통동 청명마을',
   guide: Q.get('guide')!=='0',
@@ -1349,7 +1118,6 @@ const unprj = (x,y) => ({lat:GEO.lat1-y/GEO.ky, lon:GEO.lon0+x/GEO.kx});
 function km(a,b){const R=6371,t=Math.PI/180,dLa=(b.lat-a.lat)*t,dLo=(b.lon-a.lon)*t;const h=Math.sin(dLa/2)**2+Math.cos(a.lat*t)*Math.cos(b.lat*t)*Math.sin(dLo/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
 function curve(a,b,bend=0.18,n=32){const A=prj(a),B=prj(b),mx=(A.x+B.x)/2,my=(A.y+B.y)/2,dx=B.x-A.x,dy=B.y-A.y,C={x:mx-dy*bend,y:my+dx*bend};const out=[];
   for(let i=0;i<=n;i++){const t=i/n,u=1-t;out.push(unprj(u*u*A.x+2*u*t*C.x+t*t*B.x,u*u*A.y+2*u*t*C.y+t*t*B.y))}return out}
-const HP = prj(HOME);
 const makeTaxis = (s,at=HOME) => { const c=prj(at); return [[-55,-40],[48,-28],[32,46],[-42,38],[74,8],[-8,-68]].map(([dx,dy])=>unprj(c.x+dx*s,c.y+dy*s)); };
 const makeApproach = s => { const P=prj(S.pick); return curve(unprj(P.x-80*s,P.y-62*s), S.pick, 0.22, 28); };
 // 경로 서버를 못 쓸 때의 대체 경로예요(받아 둔 망포역 경로를 거꾸로, 없으면 곡선). 평소에는 fetchApproach가 받은 실제 도로로 바꿔요
@@ -1388,7 +1156,7 @@ async function askRoute(from,to){ // 경로, 도로가 없다는 뜻의 'noroad'
 }
 async function fetchRoute(a,to){ // to는 PLACES의 key이거나 {lat,lon} 좌표예요
   if(!CONFIG.ROUTE_API) return null;
-  if(typeof to==='string'&&!Object.prototype.hasOwnProperty.call(PLACES,to)) return null;
+  if(typeof to==='string'&&!isPlace(to)) return null;
   const dest=typeof to!=='string'?to:(PLACES[to].dynamic?PLACES[to]:null); // 검색한 장소는 좌표로 보내요
   const from=nudged(a), target=dest?nudged(dest):to;
   let r=await askRoute(from,target);
@@ -1622,8 +1390,6 @@ function carIso(fill,kind){
   </defs>${g.join('')}</svg>`;
 }
 carIso.memo={}; // 같은 차는 한 번만 그려요
-const VAN_MODELS=['스타리아','카니발'];
-const CAR3D=fill=>carIso(fill,'sonata'), VAN3D=fill=>carIso(fill,'staria');
 
 /* =====================================================================
    8. 지도 — 카카오맵 / 그림 지도(SVG) 두 가지를 같은 방식으로 다뤄요
@@ -1632,7 +1398,7 @@ const CAR3D=fill=>carIso(fill,'sonata'), VAN3D=fill=>carIso(fill,'staria');
       moveCar(p)  움직이는 택시 위치 바꾸기
    ===================================================================== */
 const SvgMap = {
-  name:'svg', el:null, view:null, carPos:null, k:1,
+  el:null, view:null, carPos:null, k:1,
   init(el){ this.el=el; return Promise.resolve(); },
   show(v){ this.view=v; this.carPos=v.car?(v.carAt||v.at):null; this.carHeading=v.heading!=null?v.heading:samplePath(v.approachLine||v.route||[v.at],0).heading; this.draw(); },
   pickBox(){ // 탑승 위치를 고를 때는 그 위치가 정확히 지도 가운데에 와요
@@ -1703,7 +1469,7 @@ const SvgMap = {
 };
 
 const KakaoMap = {
-  name:'kakao', el:null, map:null, view:null, ovs:[], lines:[], car:null,
+  el:null, map:null, view:null, ovs:[], lines:[], car:null,
   init(el){
     this.el=el;
     return new Promise((res,rej)=>{
@@ -1874,7 +1640,9 @@ function setPick(p){
   if(S.step!=='origin'||km(p,S.pick)<0.003) return; // 지도를 다시 맞출 때 생기는 아주 작은 차이는 옮긴 것으로 보지 않아요
   S.pick={lat:p.lat,lon:p.lon}; S.pickName='';
   S.sk.origin.moved = S.base||km(p,HOME)>=0.01 ? 1 : 0; // 처음 위치로 되돌리면 옮기지 않은 것으로 봐요
-  const req=++pickReq; showPick(); refreshLive();
+  const req=++pickReq; showPick(); refreshLive(); namePick(p,req);
+}
+function namePick(p,req){ // 그 자리의 주소를 받아 탑승 위치 이름으로 보여 줘요. 늦게 온 옛 응답은 버려요
   try{
     if(MapCtl.impl!==KakaoMap||!kakao.maps.services) return;
     new kakao.maps.services.Geocoder().coord2Address(p.lon,p.lat,(r,st)=>{
@@ -1895,16 +1663,10 @@ function setBase(b){
   S.base=b; S.pick={lat:b.lat,lon:b.lon}; S.pickName=''; S.live=null; S.sk.origin.moved=1; S.originSearch=false; S.q=''; PlaceSearch.reset();
   TAXIS=makeTaxis(MapCtl.impl===KakaoMap?.4:1,b); MapCtl.lastKey=null;
   const req=++pickReq; render(); refreshLive();
-  if(b.kind!=='gps') return;
-  try{
-    new kakao.maps.services.Geocoder().coord2Address(b.lon,b.lat,(r,st)=>{
-      if(req!==pickReq||st!==kakao.maps.services.Status.OK||!r[0]) return;
-      const a=r[0].road_address||r[0].address;
-      if(a&&a.address_name){ S.pickName=a.address_name; showPick(); }
-    });
-  }catch(e){}
+  if(b.kind==='gps') namePick(b,req);
 }
 const canChooseBase=()=>MapCtl.impl===KakaoMap;
+const chooseBase=p=>{ setBase({lat:p.lat,lon:p.lon,n:p.n,kind:'place'}); toast(`${p.n}${eul(p.n)} 탑승 위치로 골랐어요`,'good'); }; // 검색한 장소를 탑승 기준으로
 // 위치는 여러 번 받아서 가장 정확한 값을 써요. 휴대폰은 GPS로 보통 수십 m 안이에요.
 // 노트북은 Wi-Fi로 짐작해서, 처음 몇 초는 1km쯤 어긋난 값이 오다가 뒤늦게 100m 안팎의 값이 오곤 해요.
 // 그래서 쓸 만한 값이 올 때까지 조금 더 기다리고, 어긋난 값으로 맞춘 뒤에도 더 나은 값이 오면 조용히 바꿔요.
@@ -2023,12 +1785,11 @@ const announce=t=>{ const e=$('sr'); if(!e) return; e.textContent=''; setTimeout
 const guided=()=>S.mode==='practice'?PREF.guide:S.hintOpen;
 const tg=c=>guided()&&c?' tgt':'';
 const missionShort=()=>S.missionOn?`${PLACES[MISSION_KEY].n}까지 일반택시 부르기`:'가고 싶은 곳까지 택시 부르기';
-const missionText=()=>S.missionOn?`우리 집에서 ${PLACES[MISSION_KEY].n}까지 일반택시를 불러 봐요`:'가고 싶은 곳까지 택시를 불러 봐요';
 
 const mmss = () => { const t=Math.max(0,Math.floor((flowNow()-S.t0)/1000)); return String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0'); };
 function coachHTML(){
   const st=S.step, sk=SKILL_OF[st], idx=SKILLS.findIndex(x=>x[0]===sk), test=S.mode==='test', wait=!!WAIT[st];
-  const hintText=HINT[st]().replace(/([요다]\.)\s+/g,'$1<br>'), sayBtn=`<button data-a="say" aria-label="읽어주기">${I('speaker')}</button>`, word='힌트';
+  const hintText=HINT[st]().replace(/([요다]\.)\s+/g,'$1<br>'), sayBtn=`<button data-a="say" aria-label="읽어주기">${I('speaker')}</button>`;
   const tag = test ? `<span class="tag${S.named?' test':''}">${S.named?'테스트':'연습'}</span>` : '<span class="tag">연습 모드</span>';
   // 한 줄: 연습 표시 · 제목 · 진행 칸. 단계 이름은 낭독기와 힌트 카드에서 알려 줘요
   const head = `<div class="c-prog">${tag}<b class="c-title">${missionShort()}</b><span class="c-bars" role="img" aria-label="${SKILLS.length}단계 중 ${idx+1}단계 · ${SKILLS[idx][1]}">${SKILLS.map((x,i)=>`<i class="${i<idx?'done':i===idx?'on':''}"></i>`).join('')}</span>${test&&S.named?`<b class="c-time tabnum" role="timer" aria-label="걸린 시간"><span id="timer">${mmss()}</span></b>`:''}</div>`;
@@ -2041,7 +1802,7 @@ function coachHTML(){
     + `<button class="${PREF.big?'on':''}" aria-pressed="${!!PREF.big}" data-a="big">글자 크게</button>`;
   const flowHint = !test&&(wait||PREF.guide) ? `<div class="hint${wait?' wait':''}">${I('light')}<span>${hintText}</span>${sayBtn}</div>` : '';
   // 힌트 카드: 위쪽 안내 위에 펼쳐져요. 지도와 버튼을 밀어내지 않아요
-  const card = test&&!wait&&S.hintOpen ? `<div class="hint-card" id="hint-card" role="group" aria-label="${word}" tabindex="-1"><div class="hc-head"><span>${I('light')}${word} · ${SKILLS[idx][1]}</span><span class="hc-acts">${sayBtn}<button data-a="hint-close">닫기</button></span></div><div class="hc-body"><p>${hintText}</p></div></div>` : '';
+  const card = test&&!wait&&S.hintOpen ? `<div class="hint-card" id="hint-card" role="group" aria-label="힌트" tabindex="-1"><div class="hc-head"><span>${I('light')}힌트 · ${SKILLS[idx][1]}</span><span class="hc-acts">${sayBtn}<button data-a="hint-close">닫기</button></span></div><div class="hc-body"><p>${hintText}</p></div></div>` : '';
   return `${head}${flowHint}<div class="coach-tools"${card?' inert':''}>${tools}</div>${card}`;
 }
 
@@ -2055,7 +1816,7 @@ function sheetHTML(){
     <div class="quick">${RECENT.map(k=>`<button data-a="pick" data-v="${k}">${I(PLACES[k].kind==='st'?'station':'clock')}${PLACES[k].n}</button>`).join('')}</div>`;
   case 'route': return `${GRAB()}<h3>${esc(P.n)}</h3>${P.dynamic?`<p class="small muted">${esc(P.a)}</p>`:''}<div class="trip tabnum">약 ${fr.km}km · 약 ${fr.min}분</div>
     ${P.dynamic&&!routeData(d)?'<p class="small muted">거리·시간·요금은 연습용으로 대강 계산한 값이에요.</p>':''}<div class="cars">${CARS.map(c=>`<button class="car${S.car===c.k?' on':''}" data-a="car" data-v="${c.k}" aria-pressed="${S.car===c.k}">
-      <span class="cimg">${c.k==='대형'?VAN3D(VEHICLES[c.k].c):CAR3D(VEHICLES[c.k].c)}</span><span class="cname"><b>${c.t}</b><small>${c.eta}분 뒤 도착 · ${c.d}</small></span>
+      <span class="cname"><b>${c.t}</b><small>${c.eta}분 뒤 도착 · ${c.d}</small></span>
       <span class="cfare tabnum"><small>예상</small>${won(carFare(fr.f,c.k))}</span></button>`).join('')}</div>
     <button class="payrow" data-a="pay-open" aria-label="${S.pay==='card'?'연습카드 자동결제':'기사님에게 직접 결제'}. 결제 수단 바꾸기">${I('card')}${S.pay==='card'?'연습카드 ···· 0000':'기사님에게 직접 결제'}<span>${S.pay==='card'?'내릴 때 자동결제':'내릴 때 직접 내요'} ›</span></button>`;
   case 'origin': return `${GRAB()}<div class="pick-h"><h3>어디서 탈까요?</h3><span>도착 <b>${esc(P.n)}</b></span></div>
@@ -2112,8 +1873,10 @@ const searching=()=>S.step==='search'||S.originSearch;
 const placeNorm=s=>String(s).normalize('NFKD').replace(/\s/g,'').toLowerCase();
 const placeMatches=(p,q)=>placeNorm(p.n+' '+p.a).includes(placeNorm(q));
 const PlaceSearch = {
-  query:'', items:[], status:'idle', id:0, timer:0, timeout:0, composing:false, cache:new Map(), known:new Map(),
+  query:'', items:[], status:'idle', id:0, timer:0, timeout:0, cache:new Map(), known:new Map(),
   reset(){ clearTimeout(this.timer); clearTimeout(this.timeout); this.id++; this.query=''; this.items=[]; this.status='idle'; },
+  remember(items){ items.forEach(p=>this.known.set(p.id,p)); while(this.known.size>150) this.known.delete(this.known.keys().next().value); }, // 다음 입력 때 바로 보여 주려고 기억해요
+  item(id){ return this.query===S.q.trim() ? this.items.find(p=>p.id===id) : undefined; }, // 지금 보이는 목록에서 고른 장소
   update(){
     if(!searching()||!$('res')) return;
     if(render.resFresh) render.resFresh=false; else $('panel').classList.add('same'); // 처음 열릴 때만 떠오르고, 글자를 칠 때는 그대로 바뀌어요
@@ -2139,8 +1902,7 @@ const PlaceSearch = {
         if(status!=='error'&&items.length){
           this.cache.set(cacheKey,{items,status});
           if(this.cache.size>40) this.cache.delete(this.cache.keys().next().value);
-          items.forEach(p=>this.known.set(p.id,p));
-          while(this.known.size>150) this.known.delete(this.known.keys().next().value);
+          this.remember(items);
         }
         this.items=items; this.status=status; this.update();
         announce(status==='error'?'지금은 장소를 찾지 못했어요.':this.items.length?`${this.items.length}곳을 찾았어요.`:'찾은 곳이 없어요.');
@@ -2159,8 +1921,7 @@ const PlaceSearch = {
           if(status!==kakao.maps.services.Status.OK){ finish([],'error'); return; }
           let items=rows.map(p=>({id:String(p.id),n:String(p.place_name||''),a:String(p.road_address_name||p.address_name||''),lat:Number(p.y),lon:Number(p.x),kind:'place',dynamic:true}))
             .filter(p=>/^\d+$/.test(p.id)&&p.n&&Number.isFinite(p.lat)&&Number.isFinite(p.lon)&&p.lat>=33&&p.lat<=39&&p.lon>=124&&p.lon<=132);
-          items.forEach(p=>this.known.set(p.id,p));
-          while(this.known.size>150) this.known.delete(this.known.keys().next().value);
+          this.remember(items);
           if(fallback) items=items.filter(p=>placeMatches(p,query));
           finish(items,items.length?'ready':'empty');
         },{location:new kakao.maps.LatLng(S.pick.lat,S.pick.lon),size:15});
@@ -2224,7 +1985,7 @@ function mapUiHTML(){
   if(S.step==='approach') h+=`<button class="cancel-chip" data-a="cancel-ask">호출 취소</button>`;
   if(S.step==='origin') h+=`<div class="center-pin k-pin o"><b>여기서 타요</b><span></span></div>${bar('pick-back','택시 종류 다시 고르기')}`;
   if(S.step==='origin'||S.step==='home') h+=`<button class="fab loc" data-a="locate" aria-label="${canChooseBase()?'현재 위치로 지도 맞추기':'연습 위치로 지도 맞추기'}">${I('loc')}</button>`;
-  if(MapCtl.impl.name==='svg') h+=`<span class="map-badge">연습용 그림 지도</span>`;
+  if(MapCtl.impl===SvgMap) h+=`<span class="map-badge">연습용 그림 지도</span>`;
   return h;
 }
 
@@ -2232,9 +1993,8 @@ function mapUiHTML(){
    움직임 줄이기 설정이거나 지원하지 않는 기기에서는 아무것도 하지 않고, 여기서 난 오류가 흐름을 막지 않아요 */
 const Motion = {
   soft:'linear(0,0.0348,0.118,0.2256,0.3411,0.4541,0.5582,0.6502,0.7289,0.7945,0.8477,0.8901,0.923,0.9481,0.9668,0.9803,0.9899,0.9963,1.0005,1.0031,1.0044,1.005,1.005,1.0047,1.0042,1.0036,1)',
-  pop:'linear(0,0.0554,0.1859,0.349,0.5154,0.6667,0.7932,0.8918,0.9631,1.0104,1.0383,1.0514,1.0542,1.0503,1.0428,1.0338,1.0249,1.0169,1.0102,1.0051,1.0015,0.9991,0.9978,0.9972,0.9971,0.9973,1)',
   ok(){ try{ return !!Element.prototype.animate && !matchMedia('(prefers-reduced-motion:reduce)').matches; }catch(e){ return false; } },
-  ease(k){ try{ return CSS.supports('animation-timing-function','linear(0,1)') ? this[k||'soft'] : 'cubic-bezier(.32,.72,0,1)'; }catch(e){ return 'ease-out'; } },
+  ease(){ try{ return CSS.supports('animation-timing-function','linear(0,1)') ? this.soft : 'cubic-bezier(.32,.72,0,1)'; }catch(e){ return 'ease-out'; } },
   play(el,frames,o){ if(!el||!this.ok()) return null; try{ return el.animate(frames,Object.assign({duration:480,easing:this.ease()},o)); }catch(e){ return null; } },
   done(a,fn){ if(a){ a.onfinish=fn; a.oncancel=fn; } else fn(); },
   before(){
@@ -2243,7 +2003,7 @@ const Motion = {
       const box=s=>{ const el=document.querySelector(s); return el?el.getBoundingClientRect():null; };
       const pill=document.querySelector('#coach .help-btn'), card=$('hint-card'), sel=document.querySelector('#sheet .car.on'), bars=[...document.querySelectorAll('#coach .c-bars i')];
       return {key:render.key, pill:pill?pill.getBoundingClientRect():null, card:card?card.innerHTML:null, sheetTop:$('sheet').firstElementChild?$('sheet').getBoundingClientRect().top:null,
-        search:box('#sheet .tx-search'), field:box('#q'), car:sel?sel.getBoundingClientRect():null, carV:sel?sel.dataset.v:null, bar:bars.findIndex(b=>b.classList.contains('on')), tgt:this.tgtKey};
+        search:box('#sheet .tx-search'), field:box('#q'), car:sel?sel.getBoundingClientRect():null, carV:sel?sel.dataset.v:null, bar:bars.findIndex(b=>b.classList.contains('on'))};
     }catch(e){ return null; }
   },
   after(p){ try{ if(p) this.run(p); }catch(e){} },
@@ -2438,8 +2198,8 @@ const Mic = {
   supported(){ return !!(window.SpeechRecognition||window.webkitSpeechRecognition)&&window.isSecureContext!==false; },
   stop(){ clearTimeout(this.timer); const r=this.rec; this.rec=null; if(r){ r.onresult=r.onerror=r.onend=null; try{ r.abort(); }catch(e){} } },
   // 예시 장소를 채워요. 말로 찾기도 실제 앱에 있는 방법이라 힌트로 세지 않고, 끝까지 들었을 때만 기록해요
-  example(ms){ later(()=>{ if(!S.listening) return; S.sk.search.mic=1; S.listening=false; S.q=S.missionOn?PLACES[MISSION_KEY].n:'광교호수공원';
-    if(S.step==='search'){ render(); PlaceSearch.schedule(); announce(`${S.q}${eul(S.q)} 찾아볼게요.`); } },ms); },
+  found(text){ S.sk.search.mic=1; S.q=text; render(); PlaceSearch.schedule(); announce(`${S.q}${eul(S.q)} 찾아볼게요.`); },
+  example(ms){ later(()=>{ if(!S.listening||S.step!=='search') return; S.listening=false; this.found(S.missionOn?PLACES[MISSION_KEY].n:'광교호수공원'); },ms); },
   start(){
     const R=window.SpeechRecognition||window.webkitSpeechRecognition, run=S; let r, heard='', settled=false;
     try{ r=new R(); }catch(e){ this.example(1800); return; }
@@ -2448,7 +2208,7 @@ const Mic = {
     const done=text=>{ if(settled) return; settled=true; this.stop(); if(S!==run||!S.listening) return; S.listening=false;
       text=String(text||'').replace(/[.?!。]+$/,'').trim();
       if(S.step!=='search') return;
-      if(text){ S.sk.search.mic=1; S.q=text; render(); PlaceSearch.schedule(); announce(`${S.q}${eul(S.q)} 찾아볼게요.`); }
+      if(text) this.found(text);
       else { render(); toast('소리가 잘 들리지 않았어요. 마이크를 다시 누르거나 글자로 써 봐요'); } };
     r.onresult=e=>{ if(!live()) return; let fin='', tmp='';
       for(let i=0;i<e.results.length;i++){ const x=e.results[i]; if(x.isFinal) fin+=x[0].transcript; else tmp+=x[0].transcript; }
@@ -2468,7 +2228,7 @@ const haltStep=()=>{ clearTimers(); stopAnim(); Mic.stop(); lastStepAt=performan
 const markGuide=()=>{ if(S.mode==='practice'&&PREF.guide&&!WAIT[S.step]) S.sk[SKILL_OF[S.step]].g=1; };
 const tickStep=()=>{ const now=flowNow(); if(S.stepAt!=null&&!WAIT[S.step]) S.sk[SKILL_OF[S.step]].ms+=now-S.stepAt; S.stepAt=now; }; // 기다리는 단계를 뺀 단계별 시간
 function setStep(st){
-  haltStep(); stopSpeech(); tickStep(); clearTimeout(resAnnounce);
+  haltStep(); stopSpeech(); tickStep();
   if(st==='ride'){ clearTimeout(noti._t); $('noti').hidden=true; }
   if(toastIsMistake) hideMessages(); // 고친 뒤에도 "다시 골라 봐요"가 남지 않게 해요
   if(st!=='search') PlaceSearch.reset();
@@ -2477,7 +2237,7 @@ function setStep(st){
   render();
   { const sh=$('sheet'); sh.setAttribute('role','group'); sh.setAttribute('aria-label',(SKILLS.find(x=>x[0]===SKILL_OF[st])||[])[1]||'택시 부르기'); sh.classList.remove('enter'); void sh.offsetWidth; sh.classList.add('enter'); clearTimeout(setStep.enterT); setStep.enterT=setTimeout(()=>sh.classList.remove('enter'),700); }
   $('area').scrollTop=0; $('app').scrollTop=0; // 앞 단계에서 내린 스크롤이 다음 단계로 이어지지 않게 해요
-  if(PREF.voice) say(WAIT[st]||guided() ? HINT[st]() : STEP_SAY[st]());
+  say(WAIT[st]||guided() ? HINT[st]() : STEP_SAY[st]());
   announce(STEP_SAY[st]());
   if(st!=='search') quietFocus($('sheet')); // 누른 버튼이 사라져도 키보드와 낭독기가 새 단계에서 이어 가요
   if(st==='search') PlaceSearch.schedule();
@@ -2493,7 +2253,7 @@ function setStep(st){
 let lastMist={key:'',at:-1e9};
 function mistake(msg,key){ // 같은 곳을 손이 떨려 연달아 누른 건 한 번으로 세요
   const now=performance.now(), dup=key===lastMist.key&&now-lastMist.at<800; lastMist={key,at:now};
-  if(!dup){ S.mist++; S.sk[SKILL_OF[S.step]].m++; if(PREF.voice) say(msg); }
+  if(!dup){ S.mist++; S.sk[SKILL_OF[S.step]].m++; say(msg); }
   toast(msg,'mist'); toastIsMistake=true;
 }
 function begin(){ TAXIS=makeTaxis(MapCtl.impl===KakaoMap?.4:1); S.t0=flowNow(); S.screen='ride'; MapCtl.lastKey=null; setStep('home'); }
@@ -2602,14 +2362,14 @@ const A = {
   'search-back':()=>{ if(S.originSearch){ S.originSearch=false; S.q=''; PlaceSearch.reset(); render(); return; } setStep('home'); },
   'use-gps':()=>useGps(),
   'origin-search':()=>{ if(!canChooseBase()) return; S.originSearch=true; S.q=''; PlaceSearch.reset(); render(); announce('탑승 위치를 검색해요.'); later(()=>{const q=$('q');if(q)quietFocus(q)},60); },
-  'origin-place':id=>{ if(PlaceSearch.query!==S.q.trim()) return; const p=PlaceSearch.items.find(x=>x.id===id); if(!p) return; setBase({lat:p.lat,lon:p.lon,n:p.n,kind:'place'}); toast(`${p.n}${eul(p.n)} 탑승 위치로 골랐어요`,'good'); },
-  'origin-local':k=>{ if(!Object.prototype.hasOwnProperty.call(PLACES,k)) return; const p=PLACES[k]; setBase({lat:p.lat,lon:p.lon,n:p.n,kind:'place'}); toast(`${p.n}${eul(p.n)} 탑승 위치로 골랐어요`,'good'); },
+  'origin-place':id=>{ const p=PlaceSearch.item(id); if(p) chooseBase(p); },
+  'origin-local':k=>{ if(isPlace(k)) chooseBase(PLACES[k]); },
   mic:()=>{
     if(S.listening){ Mic.stop(); clearTimers(); S.listening=false; render(); announce('듣기를 멈췄어요.'); return; } // 듣는 중에 다시 누르면 멈춰요
     S.listening=true; render(); announce('듣고 있어요.');
     if(Mic.supported()) Mic.start(); else Mic.example(1800); },
-  'pick-place':id=>{ if(PlaceSearch.query!==S.q.trim()) return; const p=PlaceSearch.items.find(p=>p.id===id); if(!p) return; const key='place_'+p.id; PLACES[key]={...p}; A.pick(key); },
-  pick:v=>{ if(!Object.prototype.hasOwnProperty.call(PLACES,v)) return; if(S.missionOn&&v!==MISSION_KEY){ mistake(`오늘 갈 곳은 "${PLACES[MISSION_KEY].n}"${eyo(PLACES[MISSION_KEY].n)}. 다시 골라 봐요`,'pick:'+v); return; } S.dest=v; setStep('route'); refreshLive(); },
+  'pick-place':id=>{ const p=PlaceSearch.item(id); if(!p) return; const key='place_'+p.id; PLACES[key]={...p}; A.pick(key); },
+  pick:v=>{ if(!isPlace(v)) return; if(S.missionOn&&v!==MISSION_KEY){ mistake(`오늘 갈 곳은 "${PLACES[MISSION_KEY].n}"${eyo(PLACES[MISSION_KEY].n)}. 다시 골라 봐요`,'pick:'+v); return; } S.dest=v; setStep('route'); refreshLive(); },
   'route-back':()=>{S.dest=null;setStep('home')},
   car:v=>{S.car=v;render()},
   'car-ok':()=>{ if(S.missionOn&&S.car!=='일반'){ mistake('오늘은 "일반택시"로 불러 봐요. 일반택시를 먼저 눌러요','car-ok'); return; } setStep('origin'); refreshLive(); },
@@ -2633,7 +2393,7 @@ const A = {
   'arrive-ok':()=>finish(),
   'sheet-toggle':()=>{ if(!sheetJustDragged) setSheet(!S.sheetDown); },
   hint:()=>{ if(S.hintOpen) return; S.hintOpen=true; if(S.hintFor!==S.step){ S.hintFor=S.step; S.hints++; S.sk[SKILL_OF[S.step]].h++; } // 같은 단계에서 닫았다 다시 열어도 한 번으로 세요
-    render(); announce(HINT[S.step]()); const h=$('hint-card'); if(h&&!searching()) quietFocus(h); if(PREF.voice) say(HINT[S.step]()); },
+    render(); announce(HINT[S.step]()); const h=$('hint-card'); if(h&&!searching()) quietFocus(h); say(HINT[S.step]()); },
   'hint-close':()=>{ if(!S.hintOpen) return; S.hintOpen=false; render(); const b=document.querySelector('#coach .help-btn'); if(b&&!searching()) quietFocus(b); },
   guide:()=>{PREF.guide=!PREF.guide;markGuide();render()},
   voice:()=>{PREF.voice=!PREF.voice;render();if(PREF.voice)say('소리 안내를 켰어요');else stopSpeech()},
@@ -2666,15 +2426,12 @@ document.addEventListener('click',e=>{
   if(el.dataset.a!=='exit'&&performance.now()-lastStepAt<350&&el.closest('#sheet,#foot,#panel,#mapui,#modal')) return;
   const f=A[el.dataset.a]; if(f) f(el.dataset.v);
 });
-let resAnnounce=0;
 document.addEventListener('input',e=>{ if(e.target.id!=='q') return;
   const changed=e.target.value!==S.q; S.q=e.target.value;
   if(S.listening){ S.listening=false; clearTimers(); Mic.stop(); const l=document.querySelector('.listen'); if(l) l.remove(); const m=document.querySelector('.mic'); if(m) m.classList.remove('live'); } // 직접 쓰면 듣기를 멈춰요
-
   if(changed) PlaceSearch.schedule(); // 값이 같으면 목록을 바꾸지 않아요(누르는 중인 버튼이 사라지지 않게)
 });
-document.addEventListener('compositionstart',e=>{if(e.target.id==='q'){PlaceSearch.composing=true;}});
-document.addEventListener('compositionend',e=>{if(e.target.id==='q'){PlaceSearch.composing=false;S.q=e.target.value;PlaceSearch.schedule();}});
+document.addEventListener('compositionend',e=>{ if(e.target.id==='q'){ S.q=e.target.value; PlaceSearch.schedule(); } }); // 한글을 다 쓴 뒤에도 한 번 더 찾아요
 document.addEventListener('keydown',e=>{ if(e.key!=='Escape') return; if(!$('modal').hidden) A['modal-no'](); else if(S.screen==='ride'&&S.hintOpen) A['hint-close'](); });
 document.addEventListener('visibilitychange',()=>{ document.hidden?pauseFlow('hidden'):resumeFlow('hidden'); }); // 전화를 받는 시간 등은 걸린 시간에서 빼요
 if(document.hidden) pauseFlow('hidden');
