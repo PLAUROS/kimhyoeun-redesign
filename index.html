@@ -1853,36 +1853,49 @@ function setBase(b){
   }catch(e){}
 }
 const canChooseBase=()=>MapCtl.impl===KakaoMap;
-// 위치는 몇 초 동안 여러 번 받아서 가장 정확한 값을 써요. 휴대폰은 GPS로 보통 수십 m 안이지만,
-// 노트북처럼 GPS가 없는 기기는 Wi-Fi로 짐작해서 1km 가까이 어긋날 수 있어요. 그때는 지도를 끌어 맞추라고 알려 줘요
-const GPS_WAIT_MS = 4000, GPS_GOOD_M = 30, GPS_ROUGH_M = 150, GPS_GIVEUP_MS = 12000;
+// 위치는 여러 번 받아서 가장 정확한 값을 써요. 휴대폰은 GPS로 보통 수십 m 안이에요.
+// 노트북은 Wi-Fi로 짐작해서, 처음 몇 초는 1km쯤 어긋난 값이 오다가 뒤늦게 100m 안팎의 값이 오곤 해요.
+// 그래서 쓸 만한 값이 올 때까지 조금 더 기다리고, 어긋난 값으로 맞춘 뒤에도 더 나은 값이 오면 조용히 바꿔요.
+// 브라우저에 따라서는 끝까지 어긋난 값만 주기도 해요(2026-11-11 이 노트북의 Whale: 정확도 1km, 실제로 약 1.4km 어긋남)
+const GPS_GOOD_M = 30, GPS_OK_M = 150, GPS_WAIT_MS = 2500, GPS_LONG_MS = 5000, GPS_GIVEUP_MS = 14000, GPS_REFINE_MS = 20000;
 function gpsErrText(m){ return m>=1000?`${(Math.round(m/100)/10).toFixed(1).replace(/\.0$/,'')}km`:`${Math.max(10,Math.round(m/10)*10)}m`; }
 function useGps(){
   if(S.locating) return;
   if(!navigator.geolocation){ toast('이 기기에서는 현재 위치를 확인할 수 없어요'); return; }
   const run=S, open=()=>S===run&&(S.step==='home'||S.step==='origin'), geo=navigator.geolocation, t0=Date.now();
   S.locating=true; render(); announce('현재 위치를 찾고 있어요.');
-  let best=null, id=null, timer=0, done=false;
+  let best=null, id=null, timer=0, done=false, used=null;
+  const stop=()=>{ clearTimeout(timer); if(id!==null){ geo.clearWatch(id); id=null; } };
+  const inKorea=g=>g.coords.latitude>=33&&g.coords.latitude<=39&&g.coords.longitude>=124&&g.coords.longitude<=132;
+  const apply=g=>{ const acc=Number.isFinite(g.coords.accuracy)?g.coords.accuracy:0; used={lat:g.coords.latitude,lon:g.coords.longitude,kind:'gps',acc}; setBase(used); return acc; };
   const finish=err=>{
-    if(done) return; done=true; clearTimeout(timer); if(id!==null) geo.clearWatch(id);
-    if(!open()){ if(S===run) S.locating=false; return; }
+    if(done) return; done=true; clearTimeout(timer);
+    if(!open()){ stop(); if(S===run) S.locating=false; return; }
     S.locating=false;
-    if(!best){ render(); toast(err&&err.code===1?'위치 사용을 허용하면 실제 위치로 맞출 수 있어요':'현재 위치를 찾지 못했어요. 장소를 검색해 봐요'); return; }
-    const {latitude:lat, longitude:lon, accuracy}=best.coords;
-    if(!(lat>=33&&lat<=39&&lon>=124&&lon<=132)){ render(); toast('국내에서만 현재 위치를 쓸 수 있어요'); return; }
-    const acc=Number.isFinite(accuracy)?accuracy:0;
-    setBase({lat,lon,kind:'gps',acc});
-    if(acc>GPS_ROUGH_M) toast(`이 기기는 위치가 ${gpsErrText(acc)}쯤 어긋날 수 있어요. ${S.step==='origin'?'지도를 끌어 타는 곳에 맞춰요':'탈 곳은 다음 화면에서 지도를 끌어 맞춰요'}`);
-    else toast('현재 위치로 맞췄어요','good');
+    if(!best){ stop(); render(); toast(err&&err.code===1?'위치 사용을 허용하면 실제 위치로 맞출 수 있어요':'현재 위치를 찾지 못했어요. 장소를 검색해 봐요'); return; }
+    if(!inKorea(best)){ stop(); render(); toast('국내에서만 현재 위치를 쓸 수 있어요'); return; }
+    const acc=apply(best);
+    if(acc<=GPS_OK_M){ stop(); toast('현재 위치로 맞췄어요','good'); return; }
+    toast(`이 기기는 위치가 ${gpsErrText(acc)}쯤 어긋날 수 있어요. ${S.step==='origin'?'지도를 끌거나 "다른 곳 검색"으로 맞춰요':'탈 곳은 다음 화면에서 다시 맞출 수 있어요'}`);
+    timer=setTimeout(stop,GPS_REFINE_MS); // 더 나은 값이 오는지 조금 더 지켜봐요
+  };
+  const better=g=>{ // 어긋난 값으로 맞춘 뒤에 더 정확한 값이 왔어요. 그사이 핀을 옮겼거나 다른 곳을 골랐으면 건드리지 않아요
+    if(!open()||S.base!==used||km(S.pick,used)>.005){ stop(); return; }
+    if(!inKorea(g)||!(g.coords.accuracy<=GPS_OK_M)) return;
+    stop(); apply(g); toast('더 정확한 위치를 찾아서 다시 맞췄어요','good');
   };
   try{
     id=geo.watchPosition(g=>{
+      if(done){ if(used) better(g); return; }
       if(!best||g.coords.accuracy<best.coords.accuracy) best=g;
       if(g.coords.accuracy<=GPS_GOOD_M) finish(); // 충분히 정확하면 바로 써요
-    },e=>{ if(e.code===1||(e.code===2&&!best)) finish(e); },{enableHighAccuracy:true,timeout:GPS_GIVEUP_MS,maximumAge:0});
+    },e=>{ if(!done&&(e.code===1||(e.code===2&&!best))) finish(e); },{enableHighAccuracy:true,timeout:GPS_GIVEUP_MS,maximumAge:0});
   }catch(e){ finish(e); return; }
-  const check=()=>{ if(best||Date.now()-t0>=GPS_GIVEUP_MS) finish({code:3}); else timer=setTimeout(check,500); };
-  timer=setTimeout(check,GPS_WAIT_MS);
+  const check=()=>{ const el=Date.now()-t0;
+    if(best&&(best.coords.accuracy<=GPS_OK_M?el>=GPS_WAIT_MS:el>=GPS_LONG_MS)) finish(); // 쓸 만하면 일찍, 어긋나 있으면 더 기다려요
+    else if(el>=GPS_GIVEUP_MS) finish({code:3});
+    else timer=setTimeout(check,400); };
+  timer=setTimeout(check,400);
 }
 // 그림 지도에서 탑승 위치 고르기: 끌면 지도가 따라오고, 누르면 그 자리로 옮겨요
 let svgDrag=null;
