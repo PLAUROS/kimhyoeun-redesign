@@ -78,7 +78,7 @@ flowchart TD
 ```mermaid
 flowchart LR
   R["route 화면"] --> C["CARS: 대형택시 → 블루파트너스 → 일반호출"]
-  C --> I["callTypeIcon: 노란 띠 승합차 / 노란 줄무늬 택시 / 회색 택시"]
+  C --> I["callTypeIcon: 입체 그림(스타리아 / 노란 줄 제휴 택시 / 쏘나타)"]
   C --> F["carFare: 기존 배율로 계산"]
   F --> T["목록의 모든 요금: 예상 + 금액"]
   I --> UI["이름·설명·아이콘·예상 요금"]
