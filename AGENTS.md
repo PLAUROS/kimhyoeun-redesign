@@ -56,7 +56,7 @@ with-3d-intro 브랜치는 과거 3D 시작 화면 보관용이다. 요청 없�
 | 설정·입력 | CONFIG, PARAMS, HOME, PLACES, ROUTES, isPlace | 외부 key와 좌표를 검증 |
 | 경로·요금 | km, routeData, fetchRoute, askRoute, refreshLive, fetchApproach, fareOf | 단위·좌표 순서·늦은 응답 주의 |
 | 상태·문구 | fresh, S, SKILLS, SKILL_OF, STEP_SAY, HINT | 새 상태는 fresh에 초기화 |
-| 그림 | I, CAB, cabParts, carIso, CAR_KIND, CAR_SHAPES, callTypeIcon | 지도 택시·번호판 택시·호출 선택 아이콘은 별개 |
+| 그림 | I, CAB, cabParts, carIso, CAR_KIND, CAR_SHAPES, callTypeIcon | 지도 택시(CAB)는 별개. 번호판 택시와 호출 선택 아이콘은 같은 carIso 그림 |
 | 지도 | SvgMap, KakaoMap, MapCtl, viewOf | 두 렌더러를 함께 고려 |
 | 위치·이동 | base, setBase, setPick, chooseBase, namePick, useGps, makeTrack, runAlong | 위치는 결과에서 제외 |
 | 화면 | coachHTML, sheetHTML, footHTML, searchHTML, resultHTML, mapUiHTML, render | DOM 재생성과 초점·스크롤 보존 |
@@ -120,9 +120,9 @@ with-3d-intro 브랜치는 과거 3D 시작 화면 보관용이다. 요청 없�
 
 | 표시 순서 | 화면 이름 | 상세 설명(현재 문구) | 내부 key | 기존 요금 배율 | 선택 아이콘 |
 |---|---|---|---|---|---|
-| 1 | 대형택시 | 여럿이 탈 때 | 대형 | 1.8 | 노란 띠 흰색 승합차 |
-| 2 | 블루파트너스 | 배차될 때까지 찾아주는 제휴 택시 | 모범 | 1.6 | 노란 줄무늬 택시 |
-| 3 | 일반호출 | 주변 택시 호출 | 일반 | 1 | 회색 택시 |
+| 1 | 대형택시 | 여럿이 탈 때 | 대형 | 1.8 | 은색 스타리아 |
+| 2 | 블루파트너스 | 배차될 때까지 찾아주는 제휴 택시 | 모범 | 1.6 | 노란 사선 두 줄을 입힌 흰색 택시(아이콘 전용 그림) |
+| 3 | 일반호출 | 주변 택시 호출 | 일반 | 1 | 흰색 쏘나타 |
 
 - CARS의 배열 순서가 화면 순서다. 기본 선택은 여전히 내부 key 일반이며 세 번째 일반호출이 선택된다. 첫 행이 기본 선택이라고 가정하지 않는다.
 - 상세 설명 앞에 기존의 “3분 뒤 도착 ·” 같은 문구를 다시 붙이지 않는다. 배차·접근 단계의 대기 시간 계산은 그대로다.
@@ -132,9 +132,9 @@ with-3d-intro 브랜치는 과거 3D 시작 화면 보관용이다. 요청 없�
 - 미션의 일반 선택 검증은 내부 key 일반을 유지하되 안내에는 일반호출이라고 표시한다.
 - VEHICLES 및 차종별 연습 차량·번호판과 결과 car 값은 내부 key를 계속 사용한다. UI 이름을 바꾸면서 이 계약을 무심코 바꾸지 않는다.
 - callTypeIcon(key)은 index.html 안에서 SVG를 만든다. 이미지 다운로드나 별도 이미지 파일은 필요 없다. 그림은 장식용 aria-hidden이며 후보 이름은 텍스트로 제공한다.
-- 일반 화면은 아이콘·호출 이름·요금을 나란히, 설명은 이름 아래 남은 두 열에 배치한다. 아이콘 너비는 52px이다.
+- 일반 화면은 아이콘·이름과 설명·요금 세 칸이다. 아이콘과 요금은 줄 높이의 가운데에 오고, 설명은 이름 아래 가운데 칸에서 길면 줄을 바꾼다(요금 아래까지 넓히면 요금이 위로 치우친다). 아이콘 너비는 52px이다.
 - 폰 프레임 너비가 360px 이하이면(@container) 아이콘 40px, 큰 글씨에서는 너비와 상관없이 44px로 조정하며 이름·요금·설명을 세 줄로 배치한다. 아이콘 때문에 설명을 말줄임하거나 요금을 잘라내지 않는다.
-- 세 아이콘은 모두 callTypeIcon 안에서 같은 방식(단순한 SVG 도형)으로 그린다. 대형택시는 van, 나머지 둘은 car가 그리고, 그림자·아래 차체·전조등·바퀴 조각(shadow, low, face, wheels)을 함께 쓴다. 번호판 확인용 carIso와 지도 위 CAB/cabParts는 별개이며, 선택 아이콘을 고칠 때 건드리지 않는다. 실제 택시 앱의 아이콘 이미지를 가져다 쓰지 않고 직접 그린다.
+- callTypeIcon(key)은 번호판 화면과 같은 입체 그림 carIso로 그린다. 일반호출·대형택시는 그 차종에 배정되는 연습 차량(VEHICLES의 색과 모델)을 그대로 쓰므로 VEHICLES를 고치면 아이콘도 함께 바뀐다. 블루파트너스만 CALL_ICON에 따로 정한 그림(흰 차에 노란 사선 두 줄, carIso의 deco 'partner')을 쓴다. 그래서 블루파트너스를 골라도 번호판 화면에 오는 차는 VEHICLES.모범(검은색 그랜저)이며 아이콘과 다르다. 새 모델이면 CAR_KIND와 CAR_SHAPES에도 넣는다. 지도 위 CAB/cabParts는 별개다. 실제 택시 앱의 아이콘 이미지를 가져다 쓰지 않는다.
 
 ## 9. 디자인·접근성·전환
 
