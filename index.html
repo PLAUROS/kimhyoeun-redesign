@@ -1230,12 +1230,13 @@ function fareOf(k){ // 받은 경로의 값 → 거리 비율로 조정한 값 �
 const NEARBY = Object.entries(PLACES).sort((a,b)=>km(HOME,a[1])-km(HOME,b[1])); // 집에서 가까운 순서
 // 표시 이름·순서만 변경해요. 기존 결과 key, 연습 차량, 요금 배율은 유지해요.
 const CARS = [
-  {k:'대형', t:'바로호출', d:'자동배차 차량을 한번에', eta:9, mul:1.8},
+  {k:'대형', t:'대형택시', d:'여럿이 탈 때', eta:9, mul:1.8},
   {k:'모범', t:'블루파트너스', d:'배차될 때까지 찾아주는 제휴 택시', eta:6, mul:1.6},
   {k:'일반', t:'일반호출', d:'주변 택시 호출', eta:3, mul:1}
 ];
-// 차종 선택용 작은 그림: 여러 대+번개 / 제휴 택시 / 일반 택시
+// 차종 선택용 작은 그림: 실제 배정 모델의 승합차 / 제휴 택시 / 일반 택시
 function callTypeIcon(key){
+  if(key==='대형'){ const v=VEHICLES[key]; return carIso(v.c,CAR_KIND[v.model]); }
   const car=(x,y,scale,fill,partner=false)=>`<g transform="translate(${x} ${y}) scale(${scale})">
     <ellipse cx="40" cy="48" rx="35" ry="3" fill="#1E2833" opacity=".12"/>
     <path d="M7 30 10 20 26 18 35 7 56 9 67 24 77 29 80 42 74 46 12 44 6 38Z" fill="${fill}" stroke="#8D99A8" stroke-width="1"/>
@@ -1250,9 +1251,7 @@ function callTypeIcon(key){
     <ellipse cx="64" cy="43" rx="7" ry="10" fill="#263442"/><ellipse cx="64" cy="43" rx="3.5" ry="6" fill="#B7C4D1"/>
     <path d="M39 6V2h12v5" fill="#FFD21F"/>
   </g>`;
-  const body=key==='대형'
-    ?car(26,8,.72,'#DDE3EA',true)+car(15,13,.72,'#E8EDF3',true)+car(3,18,.72,'#F3F5F8',true)+'<path d="m88 1-16 22h10l-5 17 19-25H85Z" fill="#4285EF"/>'
-    :car(5,10,1.05,key==='모범'?'#F2F5F9':'#B7C1CF',key==='모범');
+  const body=car(5,10,1.05,key==='모범'?'#F2F5F9':'#B7C1CF',key==='모범');
   return `<svg viewBox="0 0 100 70" aria-hidden="true" focusable="false">${body}</svg>`;
 }
 
