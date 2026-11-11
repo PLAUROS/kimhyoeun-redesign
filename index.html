@@ -882,7 +882,7 @@ button.car:active:not(:disabled),button.res-i:active:not(:disabled){transform:sc
 .c-bars i{transition:background-color .3s ease}
 
 /* 큰 화면에서만 지도를 넉넉히 둬요. 낮은 화면은 위쪽의 낮은 화면용 규칙을 그대로 따라요 */
-@container (min-height:761px){[data-step=route] .map-wrap{--map-min:clamp(180px,30cqh,300px)}.big [data-step=route] .map-wrap{--map-min:120px}}
+@container (min-height:761px){[data-step=route] .map-wrap{--map-min:clamp(180px,29cqh,300px)}.big [data-step=route] .map-wrap{--map-min:120px}}
 
 /* 안내 위쪽: 연습 표시와 진행 칸을 한 줄로, 제목은 그 아래 넓게 */
 
@@ -997,14 +997,14 @@ button.mic-ic:active:not(:disabled){transform:translateY(-50%) scale(.94)}
 @container (max-width:400px){.big .hc-body p{font-size:.92em}}
 @container (max-height:760px){.pc{padding:.15em 1em .15em .55em}}
 
-/* 차종 아이콘과 이름·예상 요금. 설명은 두 열을 합쳐 읽기 쉽게 보여줘요. */
+/* 차종 아이콘, 이름과 설명, 예상 요금. 아이콘과 요금은 줄 높이의 가운데에 와요. 설명이 길면 요금 옆에서 줄을 바꿔요. */
 .car{grid-template-columns:52px minmax(0,1fr) auto;column-gap:8px;row-gap:3px}
 .car .call-type-icon{grid-column:1;grid-row:1 / 3;display:grid;place-items:center;align-self:center}
 .car .call-type-icon svg{display:block;width:52px;height:auto}
 .car .cname{display:contents}
 .car .cname b{grid-column:2;grid-row:1;min-width:0;align-self:center}
-.car .cname small{grid-column:2 / -1;grid-row:2;white-space:normal;overflow:visible;text-overflow:clip}
-.car .cfare{grid-column:3;grid-row:1;align-self:center}
+.car .cname small{grid-column:2;grid-row:2;white-space:normal;overflow:visible;text-overflow:clip}
+.car .cfare{grid-column:3;grid-row:1 / 3;align-self:center}
 @container (max-width:360px){
   .car{grid-template-columns:40px minmax(0,1fr)}
   .car .call-type-icon{grid-row:1 / 4}
@@ -1234,31 +1234,10 @@ const CARS = [
   {k:'모범', t:'블루파트너스', d:'배차될 때까지 찾아주는 제휴 택시', eta:6, mul:1.6},
   {k:'일반', t:'일반호출', d:'주변 택시 호출', eta:3, mul:1}
 ];
-// 차종 선택용 작은 그림: 노란 띠 승합차(대형택시) / 노란 띠 택시(블루파트너스) / 회색 택시(일반호출). 세 그림 모두 같은 방식으로 그려요
-function callTypeIcon(key){
-  const shadow='<ellipse cx="40" cy="48" rx="35" ry="3" fill="#1E2833" opacity=".12"/>';
-  const low='<path d="M7 30 62 33 77 29 79 40 63 45 10 40Z" fill="#D2D8E1"/><path d="M62 33 77 29 79 40 63 45Z" fill="#B9C3D1"/>'; // 아래쪽 차체와 앞면
-  const face='<path d="m65 35 10-2 1 4-10 2Z" fill="#FFF4B4"/><path d="m68 42 8-2" stroke="#D5A400" stroke-width="2"/><path d="M12 35 17 35" stroke="#9EABB8" stroke-width="1.5"/>'; // 전조등과 범퍼
-  const wheels='<ellipse cx="20" cy="40" rx="7" ry="10" fill="#263442"/><ellipse cx="20" cy="40" rx="3.5" ry="6" fill="#B7C4D1"/><ellipse cx="64" cy="43" rx="7" ry="10" fill="#263442"/><ellipse cx="64" cy="43" rx="3.5" ry="6" fill="#B7C4D1"/>';
-  const car=(x,y,scale,fill,partner=false)=>`<g transform="translate(${x} ${y}) scale(${scale})">${shadow}
-    <path d="M7 30 10 20 26 18 35 7 56 9 67 24 77 29 80 42 74 46 12 44 6 38Z" fill="${fill}" stroke="#8D99A8" stroke-width="1"/>
-    <path d="M30 19 38 10 54 12 62 24Z" fill="#263442"/>
-    <path d="M14 21 24 20 30 12 21 12Z" fill="#384956"/>
-    ${low}${partner?'<path d="m19 20 7 1 12 22-8-1Z" fill="#FFC400"/><path d="m30 22 5 1 12 21-6-.5Z" fill="#FFD544"/>':''}${face}${wheels}
-    <path d="M39 6V2h12v5" fill="#FFD21F"/>
-  </g>`;
-  // 승합차: 지붕이 높고 길어요. 옆 유리 세 칸과 세로 노란 띠 두 줄
-  const van=(x,y,scale,fill)=>`<g transform="translate(${x} ${y}) scale(${scale})">${shadow}
-    <path d="M6 30 8 12 13 5 57 5 68 20 77 28 80 42 74 46 12 44 6 38Z" fill="${fill}" stroke="#8D99A8" stroke-width="1"/>
-    <path d="M46 21 46 9 56 9 64.5 22Z" fill="#263442"/>
-    <path d="M29.5 20.5 29.5 9 43 9 43 21Z" fill="#263442"/>
-    <path d="M11.5 19.5 13 9 26.5 9 26.5 20.3Z" fill="#384956"/>
-    ${low}<path d="M17 22h6.5l2.5 21.4-6.5-.3Z" fill="#FFC400"/><path d="M28 22.6h5.5l2.5 21.3-5.5-.2Z" fill="#FFD544"/>${face}${wheels}
-    <path d="M30 5V1h12v4" fill="#FFD21F"/>
-  </g>`;
-  const body=key==='대형'?van(5,11,1.05,'#F2F5F9'):car(5,10,1.05,key==='모범'?'#F2F5F9':'#B7C1CF',key==='모범');
-  return `<svg viewBox="0 0 100 70" aria-hidden="true" focusable="false">${body}</svg>`;
-}
+// 차종 선택용 그림: 번호판 화면과 같은 입체 그림(carIso)이에요. 일반호출·대형택시는 그 차종에 배정되는 연습 차량
+// (흰색 쏘나타, 은색 스타리아)을 그대로 쓰고, 블루파트너스는 제휴 택시처럼 흰 차에 노란 사선 두 줄을 입혀 따로 그려요
+const CALL_ICON = { 모범:{c:'#F5F7FA', model:'K5', deco:'partner'} };
+function callTypeIcon(key){ const v=CALL_ICON[key]||VEHICLES[key]; return carIso(v.c,CAR_KIND[v.model],v.deco); }
 
 const carOf = k => CARS.find(x=>x.k===k);
 const carFare = (f,k) => { const c=carOf(k); return c.mul===1 ? f : Math.round(f*c.mul/100)*100; };
@@ -1370,8 +1349,8 @@ const CAR_SHAPES={
     front:[['p',[[.2,.92],[.8,.92],[.76,.56],[.24,.56]],CK],['r',[.01,.17,.6,.94],'#3A4553',1],['l',[[.17,.62],[.17,.93],[.02,.93]],'#FFFFFF',1,.8],['p',[[.24,.44],[.76,.44],[.7,.32],[.3,.32]],CSILVER],['r',[.44,.56,.47,.53],'#E4E8EC']]}
 };
 const CAR_KIND={'쏘나타':'sonata','K5':'k5','그랜저':'grandeur','K8':'k8','스타리아':'staria','카니발':'carnival'};
-function carIso(fill,kind){
-  const name=CAR_SHAPES[kind]?kind:'sonata', u=name+fill.slice(1); if(carIso.memo[u]) return carIso.memo[u];
+function carIso(fill,kind,deco){
+  const name=CAR_SHAPES[kind]?kind:'sonata', u=name+fill.slice(1)+(deco?'-'+deco:''); if(carIso.memo[u]) return carIso.memo[u];
   const m=CAR_SHAPES[name], W=m.W, ink='rgba(18,26,38,', clamp=v=>Math.max(0,Math.min(1,v));
   // 차 안의 좌표(l: 앞에서 뒤로, w: 가까운 옆에서 먼 옆으로, z: 높이)를 화면 좌표로 바꾸고, 그림 크기를 재요. 앞이 넓게 보이는 각도예요
   let x0=1e9, x1=-1e9, y0=1e9, y1=-1e9;
@@ -1396,6 +1375,10 @@ function carIso(fill,kind){
     if(sh(a)||sh(b)) g.push(face([[a[0],0,a[1]-sh(a)],[b[0],0,b[1]-sh(b)],[b[0],sh(b),b[1]],[a[0],sh(a),a[1]]],tone(vEdge)));
   });
   g.push(poly(B.map(q=>[q[0]+cw(q),0,q[1]-sh(q)]),`url(#cb${u})`,sk(tone(vSide))));
+  if(deco==='partner'){ // 제휴 택시: 앞문 자리에 노란 사선 두 줄
+    const band=(l0,wd,c)=>{ const lt=l0+.5, zt=zAt(B,lt+wd)-.05; g.push(poly([[l0,-.004,.36],[l0+wd,-.004,.36],[lt+wd,-.004,zt],[lt,-.004,zt]],c)); };
+    band(1.52,.5,'#FFC400'); band(2.3,.3,'#FFD544');
+  }
   // 앞모습: 코의 굽은 면을 따라 그려요
   const lF=z=>{ for(let i=0;i<B.length-1&&B[i][0]<.7;i++){ const a=B[i], b=B[i+1]; if(b[1]>a[1]&&z>=a[1]&&z<=b[1]) return a[0]+(b[0]-a[0])*(z-a[1])/(b[1]-a[1]); } return 0; };
   const fp=q=>[lF(q[1])-.015,.2+q[0]*(W-.4),q[1]];
